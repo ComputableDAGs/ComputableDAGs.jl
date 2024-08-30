@@ -1,0 +1,27 @@
+name = "GraphComputing"
+uuid = "62933717-1c9d-4a3f-b06f-7ab7f17ca32d"
+authors = ["AntonReinhard <anton.reinhard@proton.me>"]
+version = "0.1.0"
+
+[deps]
+AMDGPU = "21141c5a-9bdb-4563-92ae-f87d6854732e"
+AccurateArithmetic = "22286c92-06ac-501d-9306-4abd417d9753"
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+Combinatorics = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"
+DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
+KernelAbstractions = "63c18a36-062a-441e-b654-da1e3ab1ce7c"
+NumaAllocators = "21436f30-1b4a-4f08-87af-e26101bb5379"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+RuntimeGeneratedFunctions = "7e49a35a-f44a-4d26-94aa-eba1b4ca6b47"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
+UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
+
+[extras]
+CUDA_Runtime_jll = "76a88914-d11a-5bdc-97e0-2f5a05c973a2"
+SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["SafeTestsets", "Test"]
