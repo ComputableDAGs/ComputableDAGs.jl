@@ -13,7 +13,7 @@ function is_connected(graph::DAG)
         push!(seenNodes, current)
 
         for child in current.children
-            push!(nodeQueue, child)
+            push!(nodeQueue, child[1])
         end
     end
 

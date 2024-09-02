@@ -70,10 +70,6 @@ export fixpoint_reached, optimize_to_fixpoint!
 export Machine
 export get_machine_info, cpu_st
 
-export ==, in, show, isempty, delete!, length
-
-export bytes_to_human_readable
-
 import Base.length
 import Base.show
 import Base.==

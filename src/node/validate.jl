@@ -13,10 +13,10 @@ function is_valid_node(graph::DAG, node::Node)
     for parent in node.parents
         @assert typeof(parent) != typeof(node) "Node's type is the same as its parent's!"
         @assert parent in graph "Node's parent is not in the same graph!"
-        @assert node in parent.children "Node is not a child of its parent!"
+        @assert is_child(node, parent) "Node is not a child of its parent!"
     end
 
-    for child in node.children
+    for (child, index) in node.children
         @assert typeof(child) != typeof(node) "Node's type is the same as its child's!"
         @assert child in graph "Node's child is not in the same graph!"
         @assert node in child.parents "Node is not a parent of its child!"

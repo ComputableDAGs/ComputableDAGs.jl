@@ -55,29 +55,28 @@ function _insert_node!(graph::DAG, node::Node; track=true, invalidate_cache=true
 end
 
 """
-    _insert_edge!(graph::DAG, node1::Node, node2::Node; track = true, invalidate_cache = true)
+    _insert_edge!(graph::DAG, node1::Node, node2::Node, index::Int=0; track = true, invalidate_cache = true)
 
-Insert the edge between node1 (child) and node2 (parent) into the graph.
+Insert the edge between `node1` (child) and `node2` (parent) into the graph. An optional integer index can be given. The arguments of the function call that this node compiles to will then be ordered by these indices.
 
 !!! warning
     For creating new graphs, use the public version [`insert_edge!`](@ref) instead which uses the defaults false for the keywords.
 
 ## Keyword Arguments
-`track::Bool`: Whether to add the changes to the [`DAG`](@ref)'s [`Diff`](@ref). Should be set `false` in parsing or graph creation functions for performance.
-
-`invalidate_cache::Bool`: Whether to invalidate caches associated with the changes. Should also be turned off for graph creation or parsing.
+- `track::Bool`: Whether to add the changes to the [`DAG`](@ref)'s [`Diff`](@ref). Should be set `false` in parsing or graph creation functions for performance.
+- `invalidate_cache::Bool`: Whether to invalidate caches associated with the changes. Should also be turned off for graph creation or parsing.
 
 See also: [`_insert_node!`](@ref), [`_remove_node!`](@ref), [`_remove_edge!`](@ref)
 """
 function _insert_edge!(
-    graph::DAG, node1::Node, node2::Node; track=true, invalidate_cache=true
+    graph::DAG, node1::Node, node2::Node, index::Int=0; track=true, invalidate_cache=true
 )
     #@assert (node2 ∉ parents(node1)) && (node1 ∉ children(node2)) "Edge to insert already exists"
 
     # 1: mute
     # edge points from child to parent
     push!(node1.parents, node2)
-    push!(node2.children, node1)
+    push!(node2.children, (node1, index))
 
     # 2: keep track
     if (track)
@@ -158,8 +157,10 @@ function _remove_edge!(
         end
     end
 
+    removed_node_index = 0
     for i in eachindex(node2.children)
-        if (node2.children[i] == node1)
+        if (node2.children[i][1] == node1)
+            removed_node_index = node2.children[i][2]
             splice!(node2.children, i)
             break
         end
@@ -177,7 +178,7 @@ function _remove_edge!(
 
     # 2: keep track
     if (track)
-        push!(graph.diff.removedEdges, make_edge(node1, node2))
+        push!(graph.diff.removedEdges, make_edge(node1, node2, removed_node_index))
     end
 
     # 3: invalidate caches

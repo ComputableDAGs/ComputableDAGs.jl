@@ -17,5 +17,5 @@ function in(edge::Edge, graph::DAG)
         return false
     end
 
-    return n1 in children(n2)
+    return n1 in getindex.(children(n2), 1)
 end

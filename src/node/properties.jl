@@ -31,28 +31,30 @@ end
 """
     children(node::Node)
 
-Return a copy of the node's children so it can safely be muted without changing the node in the graph.
+Return node's children.
 
 A node's children are its prerequisite nodes, nodes that need to execute before the task of this node.
+
+A node's children are the nodes that must run before it.
 """
-function children(node::DataTaskNode)::Vector{ComputeTaskNode}
+function children(node::DataTaskNode)
     return node.children
 end
-function children(node::ComputeTaskNode)::Vector{DataTaskNode}
+function children(node::ComputeTaskNode)
     return node.children
 end
 
 """
     parents(node::Node)
 
-Return a copy of the node's parents so it can safely be muted without changing the node in the graph.
+Return the node's parents.
 
 A node's parents are its subsequent nodes, nodes that need this node to execute.
 """
-function parents(node::DataTaskNode)::Vector{ComputeTaskNode}
+function parents(node::DataTaskNode)
     return node.parents
 end
-function parents(node::ComputeTaskNode)::Vector{DataTaskNode}
+function parents(node::ComputeTaskNode)
     return node.parents
 end
 
@@ -80,13 +82,14 @@ Return a vector of all partners of this node.
 
 A node's partners are all parents of any of its children. The result contains no duplicates and includes the node itself.
 
-Note: This is very slow when there are multiple children with many parents. 
-This is less of a problem in [`siblings(node::Node)`](@ref) because (depending on the model) there are no nodes with a large number of children, or only a single one.
+!!! note
+    This is very slow when there are multiple children with many parents. 
+    This is less of a problem in [`siblings(node::Node)`](@ref) because (depending on the model) there are no nodes with a large number of children, or only a single one.
 """
 function partners(node::Node)::Set{Node}
     result = Set{Node}()
     push!(result, node)
-    for child in children(node)
+    for (child, index) in children(node)
         union!(result, parents(child))
     end
 
@@ -100,7 +103,7 @@ Alternative version to [`partners(node::Node)`](@ref), avoiding allocation of a 
 """
 function partners(node::Node, set::Set{Node})
     push!(set, node)
-    for child in children(node)
+    for (child, index) in children(node)
         union!(set, parents(child))
     end
     return nothing
@@ -121,5 +124,5 @@ end
 Return whether the `potential_child` is a child of `node`.
 """
 function is_child(potential_child::Node, node::Node)::Bool
-    return potential_child in children(node)
+    return potential_child in getindex.(children(node), 1)
 end
