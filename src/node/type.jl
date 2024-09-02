@@ -15,7 +15,6 @@ See [`DataTaskNode`](@ref), [`ComputeTaskNode`](@ref) and [`make_node`](@ref).
 abstract type Node end
 
 # declare this type here because it's needed
-# the specific operations are declared in graph.jl
 abstract type Operation end
 
 """
@@ -26,7 +25,7 @@ Any node that transfers data and does no computation.
 # Fields
 `.task`:            The node's data task type. Usually [`DataTask`](@ref).\\
 `.parents`:         A vector of the node's parents (i.e. nodes that depend on this one).\\
-`.children`:        A vector of the node's children (i.e. nodes that this one depends on).\\
+`.children`:        A vector of tuples of the node's children (i.e. nodes that this one depends on) and their indices, indicating their order in the resulting function call passed to the task.\\
 `.id`:              The node's id. Improves the speed of comparisons and is used as a unique identifier.\\
 `.nodeReduction`:   Either this node's [`NodeReduction`](@ref) or `missing`, if none. There can only be at most one.\\
 `.nodeSplit`:       Either this node's [`NodeSplit`](@ref) or `missing`, if none. There can only be at most one.\\
@@ -37,7 +36,7 @@ mutable struct DataTaskNode{TaskType<:AbstractDataTask} <: Node
 
     # use vectors as sets have way too much memory overhead
     parents::Vector{Node}
-    children::Vector{Node}
+    children::Vector{Tuple{Node,Int}}
 
     # need a unique identifier unique to every *constructed* node
     # however, it can be copied when splitting a node
@@ -62,7 +61,7 @@ Any node that computes a result from inputs using an [`AbstractComputeTask`](@re
 # Fields
 `.task`:            The node's compute task type. A concrete subtype of [`AbstractComputeTask`](@ref).\\
 `.parents`:         A vector of the node's parents (i.e. nodes that depend on this one).\\
-`.children`:        A vector of the node's children (i.e. nodes that this one depends on).\\
+`.children`:        A vector of tuples with the node's children (i.e. nodes that this one depends on) and their index, used to order the arguments for the [`AbstractComputeTask`](@ref).\\
 `.id`:              The node's id. Improves the speed of comparisons and is used as a unique identifier.\\
 `.nodeReduction`:   Either this node's [`NodeReduction`](@ref) or `missing`, if none. There can only be at most one.\\
 `.nodeSplit`:       Either this node's [`NodeSplit`](@ref) or `missing`, if none. There can only be at most one.\\
@@ -71,7 +70,7 @@ Any node that computes a result from inputs using an [`AbstractComputeTask`](@re
 mutable struct ComputeTaskNode{TaskType<:AbstractComputeTask} <: Node
     task::TaskType
     parents::Vector{Node}
-    children::Vector{Node}
+    children::Vector{Tuple{Node,Int}}
     id::Base.UUID
 
     nodeReduction::Union{Operation,Missing}

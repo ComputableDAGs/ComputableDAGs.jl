@@ -35,7 +35,7 @@ function schedule_dag(::GreedyScheduler, graph::DAG, machine::Machine)
             deviceAccCost[lowestDevice] = compute_effort(task(node))
         end
 
-        if (node isa DataTaskNode && length(node.children) == 0)
+        if (node isa DataTaskNode && length(children(node)) == 0)
             push!(schedule, get_init_function_call(node, entry_device(machine)))
         else
             push!(schedule, get_function_call(node)...)

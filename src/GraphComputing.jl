@@ -9,44 +9,27 @@ using RuntimeGeneratedFunctions
 RuntimeGeneratedFunctions.init(@__MODULE__)
 
 # graph types
-export DAG
-export Node
-export Edge
-export ComputeTaskNode
-export DataTaskNode
-export AbstractTask
-export AbstractComputeTask
-export AbstractDataTask
+export DAG, Node, Edge
+export ComputeTaskNode, DataTaskNode
+export AbstractTask, AbstractComputeTask, AbstractDataTask
 export DataTask
 export PossibleOperations
 export GraphProperties
 
 # graph functions
-export make_node
-export make_edge
-export insert_node!
-export insert_edge!
-export is_entry_node
-export is_exit_node
-export parents
-export children
-export compute
-export data
-export compute_effort
-export task
-export get_properties
-export get_exit_node
+export make_node, make_edge
+export insert_node!, insert_edge!
+export is_entry_node, is_exit_node
+export parents, children, partners, siblings
+export compute, data, compute_effort, task
+export get_properties, get_exit_node
 export operation_stack_length
 export is_valid, is_scheduled
 
 # graph operation related
-export Operation
-export AppliedOperation
-export NodeReduction
-export NodeSplit
-export push_operation!
-export pop_operation!
-export can_pop
+export Operation, AppliedOperation
+export NodeReduction, NodeSplit
+export push_operation!, pop_operation!, can_pop
 export reset_graph!
 export get_operations
 
@@ -66,13 +49,14 @@ export ReductionOptimizer, SplitOptimizer
 export optimize_step!, optimize!
 export fixpoint_reached, optimize_to_fixpoint!
 
+# models
+export AbstractModel, AbstractProblemInstance
+export problem_instance, input_type, graph, input_expr
+
 # machine info
 export Machine
+export NumaNode
 export get_machine_info, cpu_st
-
-export ==, in, show, isempty, delete!, length
-
-export bytes_to_human_readable
 
 import Base.length
 import Base.show

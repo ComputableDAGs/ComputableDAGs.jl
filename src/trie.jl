@@ -53,7 +53,7 @@ function insert_helper!(
     end
 
     depth = depth + 1
-    id = node.children[depth].id
+    id = node.children[depth][1].id
 
     if (!haskey(trie.children, id))
         trie.children[id] = NodeIdTrie{NodeType}()
@@ -70,7 +70,7 @@ function insert_helper!(
     end
 
     depth = depth + 1
-    id = node.children[depth].id
+    id = node.children[depth][1].id
 
     if (!haskey(trie.children, id))
         trie.children[id] = NodeIdTrie{NodeType}()

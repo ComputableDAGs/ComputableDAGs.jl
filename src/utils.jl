@@ -21,7 +21,7 @@ Return a human readable string representation of the given number.
 ```jldoctest
 julia> using GraphComputing
 
-julia> bytes_to_human_readable(4096)
+julia> GraphComputing.bytes_to_human_readable(4096)
 "4.0 KiB"
 ```
 """
@@ -36,12 +36,25 @@ function bytes_to_human_readable(bytes)
 end
 
 """
-    lt_nodes(n1::Node, n2::Node)
+    _lt_nodes(n1::Node, n2::Node)
 
 Less-Than comparison between nodes. Uses the nodes' ids to sort.
 """
-function lt_nodes(n1::Node, n2::Node)
+function _lt_nodes(n1::Node, n2::Node)
     return n1.id < n2.id
+end
+
+"""
+    _lt_node_tuples(n1::Tuple{Node, Int}, n2::Tuple{Node, Int})
+
+Less-Than comparison between nodes with indices.
+"""
+function _lt_node_tuples(n1::Tuple{Node,Int}, n2::Tuple{Node,Int})
+    if n1[2] == n2[2]
+        return n1[1].id < n2[1].id
+    else
+        return n1[2] < n2[2]
+    end
 end
 
 """
@@ -51,8 +64,8 @@ Sort the nodes' parents and children vectors. The vectors are mostly very short 
 Sorted nodes are required to make the finding of [`NodeReduction`](@ref)s a lot faster using the [`NodeTrie`](@ref) data structure.
 """
 function sort_node!(node::Node)
-    sort!(children(node); lt=lt_nodes)
-    return sort!(parents(node); lt=lt_nodes)
+    sort!(children(node); lt=_lt_node_tuples)
+    return sort!(parents(node); lt=_lt_nodes)
 end
 
 """

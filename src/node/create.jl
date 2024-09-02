@@ -3,7 +3,7 @@ function DataTaskNode(t::AbstractDataTask, name="")
     return DataTaskNode(
         t,
         Vector{Node}(),
-        Vector{Node}(),
+        Vector{Tuple{Node,Int}}(),      # TODO this can only ever be a single child
         UUIDs.uuid1(rng[threadid()]),
         missing,
         missing,
@@ -14,7 +14,7 @@ function ComputeTaskNode(t::AbstractComputeTask)
     return ComputeTaskNode(
         t,                              # task
         Vector{Node}(),                 # parents
-        Vector{Node}(),                 # children
+        Vector{Tuple{Node,Int}}(),      # children
         UUIDs.uuid1(rng[threadid()]),   # id
         missing,                        # node reduction
         missing,                        # node split
@@ -54,20 +54,22 @@ function make_node(t::AbstractComputeTask)
 end
 
 """
-    make_edge(n1::Node, n2::Node)
+    make_edge(n1::Node, n2::Node, index::Int)
 
 Fallback implementation of `make_edge` throwing an error. If you got this error it likely means you tried to construct an edge between two nodes of the same type.
 """
-function make_edge(n1::Node, n2::Node)
-    return error("Can only create edges from compute to data node or reverse")
+function make_edge(n1::Node, n2::Node, index::Int=0)
+    return error("can only create edges from compute to data node or reverse")
 end
 
 """
-    make_edge(n1::ComputeTaskNode, n2::DataTaskNode)
+    make_edge(n1::ComputeTaskNode, n2::DataTaskNode, index::Int)
 
 Construct and return a new [`Edge`](@ref) pointing from `n1` (child) to `n2` (parent).
+
+The index parameter is 0 by default and is passed to the parent node as argument index for its child.
 """
-function make_edge(n1::ComputeTaskNode, n2::DataTaskNode)
+function make_edge(n1::ComputeTaskNode, n2::DataTaskNode, index::Int=0)
     return Edge((n1, n2))
 end
 
@@ -75,7 +77,9 @@ end
     make_edge(n1::DataTaskNode, n2::ComputeTaskNode)
 
 Construct and return a new [`Edge`](@ref) pointing from `n1` (child) to `n2` (parent).
+
+The index parameter is 0 by default and is passed to the parent node as argument index for its child.
 """
-function make_edge(n1::DataTaskNode, n2::ComputeTaskNode)
+function make_edge(n1::DataTaskNode, n2::ComputeTaskNode, index::Int=0)
     return Edge((n1, n2))
 end

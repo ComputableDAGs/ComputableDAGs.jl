@@ -126,20 +126,20 @@ function node_reduction!(graph::DAG, nodes::Vector{Node})
     get_snapshot_diff(graph)
 
     n1 = nodes[1]
-    n1Children = copy(children(n1))
+    n1_children = copy(children(n1))
 
-    n1Parents = Set(n1.parents)
+    n1_parents = Set(parents(n1))
 
     # set of the new parents of n1
-    newParents = Set{Node}()
+    new_parents = Set{Node}()
 
     # names of the previous children that n1 now replaces per parent
-    newParentsChildNames = Dict{Node,Symbol}()
+    new_parents_child_names = Dict{Node,Symbol}()
 
     # remove all of the nodes' parents and children and the nodes themselves (except for first node)
     for i in 2:length(nodes)
         n = nodes[i]
-        for child in n1Children
+        for (child, index) in n1_children
             _remove_edge!(graph, child, n)
         end
 
@@ -147,22 +147,19 @@ function node_reduction!(graph::DAG, nodes::Vector{Node})
             _remove_edge!(graph, n, parent)
 
             # collect all parents
-            push!(newParents, parent)
-            newParentsChildNames[parent] = Symbol(to_var_name(n.id))
+            push!(new_parents, parent)
+            new_parents_child_names[parent] = Symbol(to_var_name(n.id))
         end
 
         _remove_node!(graph, n)
     end
 
-    for parent in newParents
+    for parent in new_parents
         # now add parents of all input nodes to n1 without duplicates
-        if !(parent in n1Parents)
+        if !(parent in n1_parents)
             # don't double insert edges
             _insert_edge!(graph, n1, parent)
         end
-
-        # this has to be done for all parents, even the ones of n1 because they can be duplicate
-        prevChild = newParentsChildNames[parent]
     end
 
     return get_snapshot_diff(graph)
@@ -183,25 +180,25 @@ function node_split!(
     # clear snapshot
     get_snapshot_diff(graph)
 
-    n1Parents = copy(parents(n1))
-    n1Children = copy(children(n1))
+    n1_parents = copy(parents(n1))
+    n1_children = copy(children(n1))
 
-    for parent in n1Parents
+    for parent in n1_parents
         _remove_edge!(graph, n1, parent)
     end
-    for child in n1Children
+    for (child, index) in n1_children
         _remove_edge!(graph, child, n1)
     end
     _remove_node!(graph, n1)
 
-    for parent in n1Parents
-        nCopy = copy(n1)
+    for parent in n1_parents
+        n_copy = copy(n1)
 
-        _insert_node!(graph, nCopy)
-        _insert_edge!(graph, nCopy, parent)
+        _insert_node!(graph, n_copy)
+        _insert_edge!(graph, n_copy, parent)
 
-        for child in n1Children
-            _insert_edge!(graph, child, nCopy)
+        for (child, index) in n1_children
+            _insert_edge!(graph, child, n_copy)
         end
     end
 
