@@ -96,7 +96,6 @@ end
         input_symbols::Dict{String, Vector{Symbol}},
         instance::AbstractProblemInstance,
         machine::Machine,
-        cache_module::Module,
         context_module::Module
     )
 
@@ -106,7 +105,6 @@ function gen_input_assignment_code(
     input_symbols::Dict{String,Vector{Symbol}},
     instance,
     machine::Machine,
-    cache_module::Module,
     context_module::Module,
 )
     assign_inputs = Vector{FunctionCall}()
@@ -118,7 +116,7 @@ function gen_input_assignment_code(
 
             fc = FunctionCall(
                 RuntimeGeneratedFunction(
-                    cache_module,
+                    @__MODULE__,
                     context_module,
                     Expr(:->, :x, input_expr(instance, name, :x)),
                 ),
@@ -140,7 +138,6 @@ end
         graph::DAG,
         instance::AbstractProblemInstance,
         machine::Machine,
-        cache_module::Module,
         context_module::Module,
         scheduler::AbstractScheduler = GreedyScheduler()
     )
@@ -153,7 +150,6 @@ function gen_tape(
     graph::DAG,
     instance,
     machine::Machine,
-    cache_module::Module,
     context_module::Module,
     scheduler::AbstractScheduler=GreedyScheduler(),
 )
@@ -173,9 +169,7 @@ function gen_tape(
     outSym = Symbol(to_var_name(get_exit_node(graph).id))
 
     initCaches = gen_cache_init_code(machine)
-    assign_inputs = gen_input_assignment_code(
-        inputSyms, instance, machine, cache_module, context_module
-    )
+    assign_inputs = gen_input_assignment_code(inputSyms, instance, machine, context_module)
 
     return Tape{input_type(instance)}(
         initCaches, assign_inputs, schedule, inputSyms, outSym, Dict(), instance, machine

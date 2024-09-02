@@ -3,20 +3,22 @@
         graph::DAG,
         instance,
         machine::Machine,
-        cache_module::Module,
         context_module::Module
     )
 
 Return a function of signature `compute_<id>(input::input_type(instance))`, which will return the result of the DAG computation on the given input.
+The final argument `context_module` should always be `@__MODULE__` to be able to use functions defined in the caller's environment. For this to work,
+you need 
+```Julia
+using RuntimeGeneratedFunctions
+RuntimeGeneratedFunctions.init(@__MODULE__)
+```
+in your top level.
 """
 function get_compute_function(
-    graph::DAG,
-    instance,
-    machine::Machine,
-    cache_module::Module=@__MODULE__,
-    context_module::Module=@__MODULE__
+    graph::DAG, instance, machine::Machine, context_module::Module
 )
-    tape = gen_tape(graph, instance, machine, cache_module, context_module)
+    tape = gen_tape(graph, instance, machine, context_module)
 
     initCaches = Expr(:block, tape.initCachesCode...)
     assignInputs = Expr(:block, expr_from_fc.(tape.inputAssignCode)...)
@@ -35,7 +37,7 @@ function get_compute_function(
         Expr(:block, initCaches, assignInputs, code, Expr(:return, resSym)), # function body
     )
 
-    return RuntimeGeneratedFunction(cache_module, context_module, expr)
+    return RuntimeGeneratedFunction(@__MODULE__, context_module, expr)
 end
 
 """
@@ -47,14 +49,8 @@ end
 
 Return a function of signature `compute_<id>(input::CuVector, output::CuVector, n::Int64)`, which will return the result of the DAG computation of the input on the given output variable.
 """
-function get_cuda_kernel(
-    graph::DAG,
-    instance,
-    machine::Machine,
-    cache_module::Module=@__MODULE__,
-    context_module::Module=@__MODULE__
-)
-    tape = gen_tape(graph, instance, machine, cache_module, context_module)
+function get_cuda_kernel(graph::DAG, instance, machine::Machine, context_module::Module)
+    tape = gen_tape(graph, instance, machine, context_module)
 
     initCaches = Expr(:block, tape.initCachesCode...)
     assignInputs = Expr(:block, expr_from_fc.(tape.inputAssignCode)...)
@@ -77,7 +73,7 @@ function get_cuda_kernel(
         end"
     )
 
-    return RuntimeGeneratedFunction(cache_module, context_module, expr)
+    return RuntimeGeneratedFunction(@__MODULE__, context_module, expr)
 end
 
 """
@@ -86,7 +82,6 @@ end
         instance,
         machine::Machine,
         input,
-        cache_module::Module,
         context_module::Module
     )
 
@@ -94,18 +89,11 @@ Execute the code of the given `graph` on the given input values.
 
 This is essentially shorthand for
 ```julia
-tape = gen_tape(graph, instance, machine, cache_module, context_module)
+tape = gen_tape(graph, instance, machine, context_module)
 return execute_tape(tape, input)
 ```
 """
-function execute(
-    graph::DAG,
-    instance,
-    machine::Machine,
-    input,
-    cache_module::Module=@__MODULE__,
-    context_module::Module=@__MODULE__
-)
-    tape = gen_tape(graph, instance, machine, cache_module, context_module)
+function execute(graph::DAG, instance, machine::Machine, input, context_module::Module)
+    tape = gen_tape(graph, instance, machine, context_module)
     return execute_tape(tape, input)
 end
