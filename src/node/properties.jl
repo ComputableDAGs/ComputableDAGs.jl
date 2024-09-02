@@ -69,7 +69,7 @@ function siblings(node::Node)::Set{Node}
     result = Set{Node}()
     push!(result, node)
     for parent in parents(node)
-        union!(result, children(parent))
+        union!(result, getindex.(children(parent), 1))
     end
 
     return result

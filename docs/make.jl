@@ -37,8 +37,4 @@ makedocs(;
     ),
     pages=pages,
 )
-deploydocs(;
-    repo="github.com/GraphComputing-jl/GraphComputing.jl.git",
-    push_preview=false,
-    devbranch="main",
-)
+deploydocs(; repo="github.com/GraphComputing-jl/GraphComputing.jl.git", push_preview=false)

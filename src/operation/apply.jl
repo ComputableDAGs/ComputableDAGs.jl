@@ -139,7 +139,7 @@ function node_reduction!(graph::DAG, nodes::Vector{Node})
     # remove all of the nodes' parents and children and the nodes themselves (except for first node)
     for i in 2:length(nodes)
         n = nodes[i]
-        for child in n1_children
+        for (child, index) in n1_children
             _remove_edge!(graph, child, n)
         end
 
@@ -186,7 +186,7 @@ function node_split!(
     for parent in n1_parents
         _remove_edge!(graph, n1, parent)
     end
-    for child in n1_children
+    for (child, index) in n1_children
         _remove_edge!(graph, child, n1)
     end
     _remove_node!(graph, n1)
@@ -197,7 +197,7 @@ function node_split!(
         _insert_node!(graph, n_copy)
         _insert_edge!(graph, n_copy, parent)
 
-        for child in n1_children
+        for (child, index) in n1_children
             _insert_edge!(graph, child, n_copy)
         end
     end

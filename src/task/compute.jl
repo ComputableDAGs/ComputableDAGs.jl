@@ -51,7 +51,7 @@ function get_function_call(node::DataTaskNode)
             SVector{0,Any}(),
             SVector{1,Symbol}(Symbol(to_var_name(first(children(node))[1].id))),
             Symbol(to_var_name(node.id)),
-            first(children(node)).device,
+            first(children(node))[1].device,
         ),
     ]
 end
