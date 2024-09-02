@@ -28,7 +28,7 @@ function optimize_step!(optimizer::GreedyOptimizer, graph::DAG)
             return acc
         end,
         operations;
-        init = typemax(cost_type(optimizer.estimator)),
+        init=typemax(cost_type(optimizer.estimator)),
     )
 
     if lowestCost > zero(cost_type(optimizer.estimator))
@@ -56,7 +56,7 @@ function fixpoint_reached(optimizer::GreedyOptimizer, graph::DAG)
             return acc
         end,
         operations;
-        init = typemax(cost_type(optimizer.estimator)),
+        init=typemax(cost_type(optimizer.estimator)),
     )
 
     if lowestCost > zero(cost_type(optimizer.estimator))

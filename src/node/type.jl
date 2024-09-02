@@ -3,7 +3,7 @@ using UUIDs
 using Base.Threads
 
 # TODO: reliably find out how many threads we're running with (nthreads() returns 1 when precompiling :/)
-rng = [Random.MersenneTwister(0) for _ = 1:128]
+rng = [Random.MersenneTwister(0) for _ in 1:128]
 
 """
     Node

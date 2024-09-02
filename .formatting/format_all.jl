@@ -3,7 +3,7 @@ using JuliaFormatter
 # we asume the format_all.jl script is located in .formatting
 project_path = Base.Filesystem.joinpath(Base.Filesystem.dirname(Base.source_path()), "..")
 
-not_formatted = format(project_path; verbose = true)
+not_formatted = format(project_path; verbose=true)
 if not_formatted
     @info "Formatting verified."
 else

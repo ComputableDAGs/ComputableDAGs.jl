@@ -23,7 +23,7 @@ Function calling the given optimizer `n` times, muting the graph. Returns `true`
 If a more efficient method exists, this can be overloaded for a specific optimizer.
 """
 function optimize!(optimizer::AbstractOptimizer, graph::DAG, n::Int)
-    for i = 1:n
+    for i in 1:n
         if !optimize_step!(optimizer, graph)
             return false
         end

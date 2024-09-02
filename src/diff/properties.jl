@@ -6,9 +6,9 @@ The fields are `.addedNodes`, `.addedEdges`, `.removedNodes` and `.removedEdges`
 """
 function length(diff::Diff)
     return (
-        addedNodes = length(diff.addedNodes),
-        removedNodes = length(diff.removedNodes),
-        addedEdges = length(diff.addedEdges),
-        removedEdges = length(diff.removedEdges),
+        addedNodes=length(diff.addedNodes),
+        removedNodes=length(diff.removedNodes),
+        addedEdges=length(diff.addedEdges),
+        removedEdges=length(diff.removedEdges),
     )
 end

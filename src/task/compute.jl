@@ -9,10 +9,7 @@ For a node or a task together with necessary information, return a vector of [`F
 For ordinary compute or data tasks the vector will contain exactly one element.
 """
 function get_function_call(
-    t::CompTask,
-    device::AbstractDevice,
-    inSymbols::AbstractVector,
-    outSymbol::Symbol,
+    t::CompTask, device::AbstractDevice, inSymbols::AbstractVector, outSymbol::Symbol
 ) where {CompTask<:AbstractComputeTask}
     return [FunctionCall(compute, SVector{1,Any}(t), inSymbols, outSymbol, device)]
 end
@@ -27,7 +24,7 @@ function get_function_call(node::ComputeTaskNode)
             node.task,
             node.device,
             SVector{length(node.children),Symbol}(
-                Symbol.(to_var_name.(getfield.(children(node), :id)))...,
+                Symbol.(to_var_name.(getfield.(children(node), :id)))...
             ),
             Symbol(to_var_name(node.id)),
         )

@@ -6,15 +6,15 @@ Also take care to keep consistent compute intensity.
 """
 function -(prop1::GraphProperties, prop2::GraphProperties)
     return (
-        data = prop1.data - prop2.data,
-        computeEffort = prop1.computeEffort - prop2.computeEffort,
-        computeIntensity = if (prop1.data - prop2.data == 0)
+        data=prop1.data - prop2.data,
+        computeEffort=prop1.computeEffort - prop2.computeEffort,
+        computeIntensity=if (prop1.data - prop2.data == 0)
             0.0
         else
             (prop1.computeEffort - prop2.computeEffort) / (prop1.data - prop2.data)
         end,
-        noNodes = prop1.noNodes - prop2.noNodes,
-        noEdges = prop1.noEdges - prop2.noEdges,
+        noNodes=prop1.noNodes - prop2.noNodes,
+        noEdges=prop1.noEdges - prop2.noEdges,
     )::GraphProperties
 end
 
@@ -26,15 +26,15 @@ Also take care to keep consistent compute intensity.
 """
 function +(prop1::GraphProperties, prop2::GraphProperties)
     return (
-        data = prop1.data + prop2.data,
-        computeEffort = prop1.computeEffort + prop2.computeEffort,
-        computeIntensity = if (prop1.data + prop2.data == 0)
+        data=prop1.data + prop2.data,
+        computeEffort=prop1.computeEffort + prop2.computeEffort,
+        computeIntensity=if (prop1.data + prop2.data == 0)
             0.0
         else
             (prop1.computeEffort + prop2.computeEffort) / (prop1.data + prop2.data)
         end,
-        noNodes = prop1.noNodes + prop2.noNodes,
-        noEdges = prop1.noEdges + prop2.noEdges,
+        noNodes=prop1.noNodes + prop2.noNodes,
+        noEdges=prop1.noEdges + prop2.noEdges,
     )::GraphProperties
 end
 
@@ -45,10 +45,10 @@ Unary negation of the graph properties. `.computeIntensity` will not be negated 
 """
 function -(prop::GraphProperties)
     return (
-        data = -prop.data,
-        computeEffort = -prop.computeEffort,
-        computeIntensity = prop.computeIntensity,   # no negation here!
-        noNodes = -prop.noNodes,
-        noEdges = -prop.noEdges,
+        data=-prop.data,
+        computeEffort=-prop.computeEffort,
+        computeIntensity=prop.computeIntensity,   # no negation here!
+        noNodes=-prop.noNodes,
+        noEdges=-prop.noEdges,
     )::GraphProperties
 end

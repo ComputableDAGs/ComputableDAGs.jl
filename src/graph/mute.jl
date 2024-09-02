@@ -9,7 +9,7 @@
 Insert the node into the graph.
 """
 function insert_node!(graph::DAG, node::Node)
-    return _insert_node!(graph, node; track = false, invalidate_cache = false)
+    return _insert_node!(graph, node; track=false, invalidate_cache=false)
 end
 
 """
@@ -18,7 +18,7 @@ end
 Insert the edge between node1 (child) and node2 (parent) into the graph.
 """
 function insert_edge!(graph::DAG, node1::Node, node2::Node)
-    return _insert_edge!(graph, node1, node2; track = false, invalidate_cache = false)
+    return _insert_edge!(graph, node1, node2; track=false, invalidate_cache=false)
 end
 
 """
@@ -36,7 +36,7 @@ Insert the node into the graph.
 
 See also: [`_remove_node!`](@ref), [`_insert_edge!`](@ref), [`_remove_edge!`](@ref)
 """
-function _insert_node!(graph::DAG, node::Node; track = true, invalidate_cache = true)
+function _insert_node!(graph::DAG, node::Node; track=true, invalidate_cache=true)
     # 1: mute
     push!(graph.nodes, node)
 
@@ -70,11 +70,7 @@ Insert the edge between node1 (child) and node2 (parent) into the graph.
 See also: [`_insert_node!`](@ref), [`_remove_node!`](@ref), [`_remove_edge!`](@ref)
 """
 function _insert_edge!(
-    graph::DAG,
-    node1::Node,
-    node2::Node;
-    track = true,
-    invalidate_cache = true,
+    graph::DAG, node1::Node, node2::Node; track=true, invalidate_cache=true
 )
     #@assert (node2 ∉ parents(node1)) && (node1 ∉ children(node2)) "Edge to insert already exists"
 
@@ -114,7 +110,7 @@ Remove the node from the graph.
 
 See also: [`_insert_node!`](@ref), [`_insert_edge!`](@ref), [`_remove_edge!`](@ref)
 """
-function _remove_node!(graph::DAG, node::Node; track = true, invalidate_cache = true)
+function _remove_node!(graph::DAG, node::Node; track=true, invalidate_cache=true)
     #@assert node in graph.nodes "Trying to remove a node that's not in the graph"
 
     # 1: mute
@@ -149,11 +145,7 @@ Remove the edge between node1 (child) and node2 (parent) into the graph.
 See also: [`_insert_node!`](@ref), [`_remove_node!`](@ref), [`_insert_edge!`](@ref)
 """
 function _remove_edge!(
-    graph::DAG,
-    node1::Node,
-    node2::Node;
-    track = true,
-    invalidate_cache = true,
+    graph::DAG, node1::Node, node2::Node; track=true, invalidate_cache=true
 )
     # 1: mute
     pre_length1 = length(node1.parents)

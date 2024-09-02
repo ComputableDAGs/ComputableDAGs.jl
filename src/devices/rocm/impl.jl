@@ -31,7 +31,7 @@ end
 
 Return a Vector of [`ROCmGPU`](@ref)s available on the current machine. If `verbose` is true, print some additional information.
 """
-function get_devices(deviceType::Type{T}; verbose::Bool = false) where {T<:ROCmGPU}
+function get_devices(deviceType::Type{T}; verbose::Bool=false) where {T<:ROCmGPU}
     devices = Vector{AbstractDevice}()
 
     if !AMDGPU.functional()

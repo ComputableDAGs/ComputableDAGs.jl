@@ -1,40 +1,38 @@
 # TODO: do this with macros
 function call_fc(
-    fc::FunctionCall{VectorT,0},
-    cache::Dict{Symbol,Any},
+    fc::FunctionCall{VectorT,0}, cache::Dict{Symbol,Any}
 ) where {VectorT<:SVector{1}}
     cache[fc.return_symbol] = fc.func(cache[fc.arguments[1]])
     return nothing
 end
 
 function call_fc(
-    fc::FunctionCall{VectorT,1},
-    cache::Dict{Symbol,Any},
+    fc::FunctionCall{VectorT,1}, cache::Dict{Symbol,Any}
 ) where {VectorT<:SVector{1}}
     cache[fc.return_symbol] = fc.func(fc.value_arguments[1], cache[fc.arguments[1]])
     return nothing
 end
 
 function call_fc(
-    fc::FunctionCall{VectorT,0},
-    cache::Dict{Symbol,Any},
+    fc::FunctionCall{VectorT,0}, cache::Dict{Symbol,Any}
 ) where {VectorT<:SVector{2}}
     cache[fc.return_symbol] = fc.func(cache[fc.arguments[1]], cache[fc.arguments[2]])
     return nothing
 end
 
 function call_fc(
-    fc::FunctionCall{VectorT,1},
-    cache::Dict{Symbol,Any},
+    fc::FunctionCall{VectorT,1}, cache::Dict{Symbol,Any}
 ) where {VectorT<:SVector{2}}
-    cache[fc.return_symbol] =
-        fc.func(fc.value_arguments[1], cache[fc.arguments[1]], cache[fc.arguments[2]])
+    cache[fc.return_symbol] = fc.func(
+        fc.value_arguments[1], cache[fc.arguments[1]], cache[fc.arguments[2]]
+    )
     return nothing
 end
 
 function call_fc(fc::FunctionCall{VectorT,1}, cache::Dict{Symbol,Any}) where {VectorT}
-    cache[fc.return_symbol] =
-        fc.func(fc.value_arguments[1], getindex.(Ref(cache), fc.arguments)...)
+    cache[fc.return_symbol] = fc.func(
+        fc.value_arguments[1], getindex.(Ref(cache), fc.arguments)...
+    )
     return nothing
 end
 
@@ -46,14 +44,16 @@ Execute the given [`FunctionCall`](@ref) on the dictionary.
 Several more specialized versions of this function exist to reduce vector unrolling work for common cases.
 """
 function call_fc(fc::FunctionCall{VectorT,M}, cache::Dict{Symbol,Any}) where {VectorT,M}
-    cache[fc.return_symbol] =
-        fc.func(fc.value_arguments..., getindex.(Ref(cache), fc.arguments)...)
+    cache[fc.return_symbol] = fc.func(
+        fc.value_arguments..., getindex.(Ref(cache), fc.arguments)...
+    )
     return nothing
 end
 
 function expr_from_fc(fc::FunctionCall{VectorT,0}) where {VectorT}
-    func_call =
-        Expr(:call, fc.func, eval.(gen_access_expr.(Ref(fc.device), fc.arguments))...)
+    func_call = Expr(
+        :call, fc.func, eval.(gen_access_expr.(Ref(fc.device), fc.arguments))...
+    )
     access_expr = eval(gen_access_expr(fc.device, fc.return_symbol))
 
     return Expr(:(=), access_expr, func_call)
@@ -155,7 +155,7 @@ function gen_tape(
     machine::Machine,
     cache_module::Module,
     context_module::Module,
-    scheduler::AbstractScheduler = GreedyScheduler(),
+    scheduler::AbstractScheduler=GreedyScheduler(),
 )
     schedule = schedule_dag(scheduler, graph, machine)
 
@@ -174,22 +174,11 @@ function gen_tape(
 
     initCaches = gen_cache_init_code(machine)
     assign_inputs = gen_input_assignment_code(
-        inputSyms,
-        instance,
-        machine,
-        cache_module,
-        context_module,
+        inputSyms, instance, machine, cache_module, context_module
     )
 
     return Tape{input_type(instance)}(
-        initCaches,
-        assign_inputs,
-        schedule,
-        inputSyms,
-        outSym,
-        Dict(),
-        instance,
-        machine,
+        initCaches, assign_inputs, schedule, inputSyms, outSym, Dict(), instance, machine
     )
 end
 

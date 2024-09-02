@@ -31,7 +31,7 @@ end
 
 Return a Vector of [`CUDAGPU`](@ref)s available on the current machine. If `verbose` is true, print some additional information.
 """
-function get_devices(deviceType::Type{T}; verbose::Bool = false) where {T<:CUDAGPU}
+function get_devices(deviceType::Type{T}; verbose::Bool=false) where {T<:CUDAGPU}
     devices = Vector{AbstractDevice}()
 
     if !CUDA.functional()

@@ -30,8 +30,7 @@ end
 Insert the node reductions into the graph and the nodes' caches. Employs multithreading for speedup.
 """
 function nr_insertion!(
-    operations::PossibleOperations,
-    nodeReductions::Vector{Vector{NodeReduction}},
+    operations::PossibleOperations, nodeReductions::Vector{Vector{NodeReduction}}
 )
     total_len = 0
     for vec in nodeReductions
@@ -61,8 +60,7 @@ end
 Insert the node splits into the graph and the nodes' caches. Employs multithreading for speedup.
 """
 function ns_insertion!(
-    operations::PossibleOperations,
-    nodeSplits::Vector{Vector{NodeSplit}},
+    operations::PossibleOperations, nodeSplits::Vector{Vector{NodeSplit}}
 )
     total_len = 0
     for vec in nodeSplits
@@ -94,8 +92,8 @@ Generate all possible operations on the graph. Used initially when the graph is 
 Safely inserts all the found operations into the graph and its nodes.
 """
 function generate_operations(graph::DAG)
-    generatedReductions = [Vector{NodeReduction}() for _ = 1:nthreads()]
-    generatedSplits = [Vector{NodeSplit}() for _ = 1:nthreads()]
+    generatedReductions = [Vector{NodeReduction}() for _ in 1:nthreads()]
+    generatedSplits = [Vector{NodeSplit}() for _ in 1:nthreads()]
 
     # make sure the graph is fully generated through
     apply_all!(graph)
@@ -143,7 +141,6 @@ function generate_operations(graph::DAG)
             push!(generatedReductions[threadid()], NodeReduction(nrVec))
         end
     end
-
 
     # launch thread for node reduction insertion
     # remove duplicates

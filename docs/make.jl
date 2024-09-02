@@ -1,7 +1,7 @@
 using Pkg
 
 project_path = Base.Filesystem.joinpath(Base.Filesystem.dirname(Base.source_path()), "..")
-Pkg.develop(; path = project_path)
+Pkg.develop(; path=project_path)
 
 using Documenter
 using GraphComputing
@@ -25,20 +25,20 @@ pages = [
 ]
 
 makedocs(;
-    modules = [GraphComputing],
-    checkdocs = :exports,
-    authors = "Anton Reinhard",
-    repo = Documenter.Remotes.GitHub("GraphComputing-jl", "GraphComputing.jl"),
-    sitename = "GraphComputing.jl",
-    format = Documenter.HTML(;
-        prettyurls = get(ENV, "CI", "false") == "true",
-        canonical = "https://graphcomputing.gitlab.io/GraphComputing.jl",
-        assets = String[],
+    modules=[GraphComputing],
+    checkdocs=:exports,
+    authors="Anton Reinhard",
+    repo=Documenter.Remotes.GitHub("GraphComputing-jl", "GraphComputing.jl"),
+    sitename="GraphComputing.jl",
+    format=Documenter.HTML(;
+        prettyurls=get(ENV, "CI", "false") == "true",
+        canonical="https://graphcomputing.gitlab.io/GraphComputing.jl",
+        assets=String[],
     ),
-    pages = pages,
+    pages=pages,
 )
 deploydocs(;
-    repo = "github.com/GraphComputing-jl/GraphComputing.jl.git",
-    push_preview = false,
-    devbranch = "main",
+    repo="github.com/GraphComputing-jl/GraphComputing.jl.git",
+    push_preview=false,
+    devbranch="main",
 )

@@ -2,7 +2,7 @@ name: formatter
 on: [pull_request]
 jobs:
   formatter:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: checkout repo
         uses: actions/checkout@v4

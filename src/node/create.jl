@@ -1,22 +1,26 @@
 
-DataTaskNode(t::AbstractDataTask, name = "") = DataTaskNode(
-    t,
-    Vector{Node}(),
-    Vector{Node}(),
-    UUIDs.uuid1(rng[threadid()]),
-    missing,
-    missing,
-    name,
-)
-ComputeTaskNode(t::AbstractComputeTask) = ComputeTaskNode(
-    t,                              # task
-    Vector{Node}(),                 # parents
-    Vector{Node}(),                 # children
-    UUIDs.uuid1(rng[threadid()]),   # id
-    missing,                        # node reduction
-    missing,                        # node split
-    missing,                        # device
-)
+function DataTaskNode(t::AbstractDataTask, name="")
+    return DataTaskNode(
+        t,
+        Vector{Node}(),
+        Vector{Node}(),
+        UUIDs.uuid1(rng[threadid()]),
+        missing,
+        missing,
+        name,
+    )
+end
+function ComputeTaskNode(t::AbstractComputeTask)
+    return ComputeTaskNode(
+        t,                              # task
+        Vector{Node}(),                 # parents
+        Vector{Node}(),                 # children
+        UUIDs.uuid1(rng[threadid()]),   # id
+        missing,                        # node reduction
+        missing,                        # node split
+        missing,                        # device
+    )
+end
 
 copy(m::Missing) = missing
 copy(n::ComputeTaskNode) = ComputeTaskNode(copy(task(n)))
@@ -36,7 +40,7 @@ end
 
 Construct and return a new [`DataTaskNode`](@ref) with the given task.
 """
-function make_node(t::AbstractDataTask, name::String = "")
+function make_node(t::AbstractDataTask, name::String="")
     return DataTaskNode(t, name)
 end
 

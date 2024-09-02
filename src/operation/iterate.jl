@@ -2,16 +2,17 @@ import Base.iterate
 
 const _POSSIBLE_OPERATIONS_FIELDS = fieldnames(PossibleOperations)
 
-_POIteratorStateType =
-    NamedTuple{(:result, :state),Tuple{Union{NodeReduction,NodeSplit},Tuple{Symbol,Int64}}}
+_POIteratorStateType = NamedTuple{
+    (:result, :state),Tuple{Union{NodeReduction,NodeSplit},Tuple{Symbol,Int64}}
+}
 
 @inline function iterate(
-    possibleOperations::PossibleOperations,
+    possibleOperations::PossibleOperations
 )::Union{Nothing,_POIteratorStateType}
     for fieldname in _POSSIBLE_OPERATIONS_FIELDS
         iterator = iterate(getfield(possibleOperations, fieldname))
         if (!isnothing(iterator))
-            return (result = iterator[1], state = (fieldname, iterator[2]))
+            return (result=iterator[1], state=(fieldname, iterator[2]))
         end
     end
 
@@ -19,13 +20,12 @@ _POIteratorStateType =
 end
 
 @inline function iterate(
-    possibleOperations::PossibleOperations,
-    state,
+    possibleOperations::PossibleOperations, state
 )::Union{Nothing,_POIteratorStateType}
     newStateSym = state[1]
     newStateIt = iterate(getfield(possibleOperations, newStateSym), state[2])
     if !isnothing(newStateIt)
-        return (result = newStateIt[1], state = (newStateSym, newStateIt[2]))
+        return (result=newStateIt[1], state=(newStateSym, newStateIt[2]))
     end
 
     # cycle to next field
@@ -35,7 +35,7 @@ end
         newStateSym = _POSSIBLE_OPERATIONS_FIELDS[index]
         newStateIt = iterate(getfield(possibleOperations, newStateSym))
         if !isnothing(newStateIt)
-            return (result = newStateIt[1], state = (newStateSym, newStateIt[2]))
+            return (result=newStateIt[1], state=(newStateSym, newStateIt[2]))
         end
         index += 1
     end

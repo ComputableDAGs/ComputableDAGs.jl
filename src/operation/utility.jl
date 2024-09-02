@@ -14,8 +14,8 @@ Return a named tuple with the number of each of the operation types as a named t
 """
 function length(operations::PossibleOperations)
     return (
-        nodeReductions = length(operations.nodeReductions),
-        nodeSplits = length(operations.nodeSplits),
+        nodeReductions=length(operations.nodeReductions),
+        nodeSplits=length(operations.nodeSplits),
     )
 end
 
@@ -49,11 +49,9 @@ function can_reduce(n1::Node, n2::Node)
 end
 
 function can_reduce(
-    n1::NodeType,
-    n2::NodeType,
+    n1::NodeType, n2::NodeType
 ) where {
-    TaskType<:AbstractTask,
-    NodeType<:Union{DataTaskNode{TaskType},ComputeTaskNode{TaskType}},
+    TaskType<:AbstractTask,NodeType<:Union{DataTaskNode{TaskType},ComputeTaskNode{TaskType}}
 }
     n1_length = length(children(n1))
     n2_length = length(children(n2))

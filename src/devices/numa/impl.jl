@@ -33,14 +33,14 @@ end
 
 Return a Vector of [`NumaNode`](@ref)s available on the current machine. If `verbose` is true, print some additional information.
 """
-function get_devices(deviceType::Type{T}; verbose::Bool = false) where {T<:NumaNode}
+function get_devices(deviceType::Type{T}; verbose::Bool=false) where {T<:NumaNode}
     devices = Vector{AbstractDevice}()
     noNumaNodes = highest_numa_node()
 
     if (verbose)
         println("Found $(noNumaNodes + 1) NUMA nodes")
     end
-    for i = 0:noNumaNodes
+    for i in 0:noNumaNodes
         push!(devices, NumaNode(i, 1, default_strategy(NumaNode), -1, UUIDs.uuid1(rng[1])))
     end
 
@@ -62,7 +62,7 @@ function gen_cache_init_code(device::NumaNode)
     end
 
     return error(
-        "Unimplemented cache strategy \"$(device.cacheStrategy)\" for device \"$(device)\"",
+        "Unimplemented cache strategy \"$(device.cacheStrategy)\" for device \"$(device)\""
     )
 end
 

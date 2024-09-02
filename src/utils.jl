@@ -32,7 +32,7 @@ function bytes_to_human_readable(bytes)
         bytes /= 1024
         unit_index += 1
     end
-    return string(round(bytes, sigdigits = 4), " ", units[unit_index])
+    return string(round(bytes; sigdigits=4), " ", units[unit_index])
 end
 
 """
@@ -51,8 +51,8 @@ Sort the nodes' parents and children vectors. The vectors are mostly very short 
 Sorted nodes are required to make the finding of [`NodeReduction`](@ref)s a lot faster using the [`NodeTrie`](@ref) data structure.
 """
 function sort_node!(node::Node)
-    sort!(children(node), lt = lt_nodes)
-    return sort!(parents(node), lt = lt_nodes)
+    sort!(children(node); lt=lt_nodes)
+    return sort!(parents(node); lt=lt_nodes)
 end
 
 """
@@ -62,7 +62,7 @@ Return the memory footprint of the graph in Byte. Should be the same result as `
 """
 function mem(graph::DAG)
     size = 0
-    size += Base.summarysize(graph.nodes, exclude = Union{Node})
+    size += Base.summarysize(graph.nodes; exclude=Union{Node})
     for n in graph.nodes
         size += mem(n)
     end
@@ -78,7 +78,7 @@ function mem(graph::DAG)
         size += mem(op)
     end
 
-    size += Base.summarysize(graph.dirtyNodes, exclude = Union{Node})
+    size += Base.summarysize(graph.dirtyNodes; exclude=Union{Node})
     return size += sizeof(diff)
 end
 
@@ -88,7 +88,7 @@ end
 Return the memory footprint of the operation in Byte. Used in [`mem(graph::DAG)`](@ref). Unlike `Base.summarysize()` this doesn't follow all references which would yield (almost) the size of the entire graph.
 """
 function mem(op::Operation)
-    return Base.summarysize(op, exclude = Union{Node})
+    return Base.summarysize(op; exclude=Union{Node})
 end
 
 """
@@ -97,7 +97,7 @@ end
 Return the memory footprint of the node in Byte. Used in [`mem(graph::DAG)`](@ref). Unlike `Base.summarysize()` this doesn't follow all references which would yield (almost) the size of the entire graph.
 """
 function mem(node::Node)
-    return Base.summarysize(node, exclude = Union{Node,Operation})
+    return Base.summarysize(node; exclude=Union{Node,Operation})
 end
 
 """

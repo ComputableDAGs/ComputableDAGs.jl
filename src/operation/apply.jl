@@ -94,17 +94,17 @@ function revert_diff!(graph::DAG, diff::Diff)
     # add removed nodes, remove added nodes, same for edges
     # note the order
     for edge in diff.addedEdges
-        _remove_edge!(graph, edge.edge[1], edge.edge[2], track = false)
+        _remove_edge!(graph, edge.edge[1], edge.edge[2]; track=false)
     end
     for node in diff.addedNodes
-        _remove_node!(graph, node, track = false)
+        _remove_node!(graph, node; track=false)
     end
 
     for node in diff.removedNodes
-        _insert_node!(graph, node, track = false)
+        _insert_node!(graph, node; track=false)
     end
     for edge in diff.removedEdges
-        _insert_edge!(graph, edge.edge[1], edge.edge[2], track = false)
+        _insert_edge!(graph, edge.edge[1], edge.edge[2]; track=false)
     end
 
     graph.properties -= GraphProperties(diff)
@@ -137,7 +137,7 @@ function node_reduction!(graph::DAG, nodes::Vector{Node})
     newParentsChildNames = Dict{Node,Symbol}()
 
     # remove all of the nodes' parents and children and the nodes themselves (except for first node)
-    for i = 2:length(nodes)
+    for i in 2:length(nodes)
         n = nodes[i]
         for child in n1Children
             _remove_edge!(graph, child, n)
@@ -176,8 +176,7 @@ Split the given node into one node per parent, return the applied difference to 
 For details see [`NodeSplit`](@ref).
 """
 function node_split!(
-    graph::DAG,
-    n1::Union{DataTaskNode{TaskType},ComputeTaskNode{TaskType}},
+    graph::DAG, n1::Union{DataTaskNode{TaskType},ComputeTaskNode{TaskType}}
 ) where {TaskType<:AbstractTask}
     @assert is_valid_node_split_input(graph, n1)
 

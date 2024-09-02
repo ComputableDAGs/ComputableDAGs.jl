@@ -14,7 +14,7 @@ function is_valid_node_reduction_input(graph::DAG, nodes::Vector{Node})
         if n ∉ graph
             throw(
                 AssertionError(
-                    "[Node Reduction] The given nodes are not part of the given graph",
+                    "[Node Reduction] The given nodes are not part of the given graph"
                 ),
             )
         end
@@ -25,7 +25,7 @@ function is_valid_node_reduction_input(graph::DAG, nodes::Vector{Node})
     for n in nodes
         if typeof(task(n)) != t
             throw(
-                AssertionError("[Node Reduction] The given nodes are not of the same type"),
+                AssertionError("[Node Reduction] The given nodes are not of the same type")
             )
         end
 
@@ -33,7 +33,7 @@ function is_valid_node_reduction_input(graph::DAG, nodes::Vector{Node})
             if (n.name != nodes[1].name)
                 throw(
                     AssertionError(
-                        "[Node Reduction] The given nodes do not have the same name",
+                        "[Node Reduction] The given nodes do not have the same name"
                     ),
                 )
             end
