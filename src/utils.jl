@@ -21,7 +21,7 @@ Return a human readable string representation of the given number.
 ```jldoctest
 julia> using GraphComputing
 
-julia> bytes_to_human_readable(4096)
+julia> GraphComputing.bytes_to_human_readable(4096)
 "4.0 KiB"
 ```
 """
