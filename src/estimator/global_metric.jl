@@ -17,27 +17,27 @@ const CDCost = NamedTuple{
     (:data, :computeEffort, :computeIntensity),Tuple{Float64,Float64,Float64}
 }
 
-function +(cost1::CDCost, cost2::CDCost)::CDCost
+function Base.:+(cost1::CDCost, cost2::CDCost)::CDCost
     d = cost1.data + cost2.data
     ce = computeEffort = cost1.computeEffort + cost2.computeEffort
     return (data=d, computeEffort=ce, computeIntensity=ce / d)::CDCost
 end
 
-function -(cost1::CDCost, cost2::CDCost)::CDCost
+function Base.:-(cost1::CDCost, cost2::CDCost)::CDCost
     d = cost1.data - cost2.data
     ce = computeEffort = cost1.computeEffort - cost2.computeEffort
     return (data=d, computeEffort=ce, computeIntensity=ce / d)::CDCost
 end
 
-function isless(cost1::CDCost, cost2::CDCost)::Bool
+function Base.isless(cost1::CDCost, cost2::CDCost)::Bool
     return cost1.data + cost1.computeEffort < cost2.data + cost2.computeEffort
 end
 
-function zero(type::Type{CDCost})
+function Base.zero(type::Type{CDCost})
     return (data=0.0, computeEffort=0.0, computeIntensity=0.0)::CDCost
 end
 
-function typemax(type::Type{CDCost})
+function Base.typemax(type::Type{CDCost})
     return (data=Inf, computeEffort=Inf, computeIntensity=0.0)::CDCost
 end
 
