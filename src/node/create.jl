@@ -70,7 +70,7 @@ Construct and return a new [`Edge`](@ref) pointing from `n1` (child) to `n2` (pa
 The index parameter is 0 by default and is passed to the parent node as argument index for its child.
 """
 function make_edge(n1::ComputeTaskNode, n2::DataTaskNode, index::Int=0)
-    return Edge((n1, n2))
+    return Edge((n1, n2), index)
 end
 
 """
@@ -81,5 +81,5 @@ Construct and return a new [`Edge`](@ref) pointing from `n1` (child) to `n2` (pa
 The index parameter is 0 by default and is passed to the parent node as argument index for its child.
 """
 function make_edge(n1::DataTaskNode, n2::ComputeTaskNode, index::Int=0)
-    return Edge((n1, n2))
+    return Edge((n1, n2), index)
 end
