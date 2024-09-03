@@ -15,6 +15,7 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [compat]
+DataStructures = "0.18"
 NumaAllocators = "0.2"
 RuntimeGeneratedFunctions = "0.5"
 StaticArrays = "1"
