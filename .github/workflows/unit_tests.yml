@@ -1,6 +1,6 @@
 name: unit_tests
 
-on: [push]
+on: [push, pull_request]
 
 env:
   # keep the depot directly in the repository for the cache

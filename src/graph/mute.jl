@@ -5,11 +5,18 @@
 
 """
     insert_node!(graph::DAG, node::Node)
+    insert_node!(graph::DAG, task::AbstractTask, name::String="")
 
-Insert the node into the graph.
+Insert the node into the graph or alternatively construct a node from the given task and insert it.
 """
 function insert_node!(graph::DAG, node::Node)
     return _insert_node!(graph, node; track=false, invalidate_cache=false)
+end
+function insert_node!(graph::DAG, task::AbstractDataTask, name::String="")
+    return _insert_node!(graph, make_node(task, name); track=false, invalidate_cache=false)
+end
+function insert_node!(graph::DAG, task::AbstractComputeTask)
+    return _insert_node!(graph, make_node(task); track=false, invalidate_cache=false)
 end
 
 """
@@ -17,8 +24,8 @@ end
 
 Insert the edge between node1 (child) and node2 (parent) into the graph.
 """
-function insert_edge!(graph::DAG, node1::Node, node2::Node)
-    return _insert_edge!(graph, node1, node2; track=false, invalidate_cache=false)
+function insert_edge!(graph::DAG, node1::Node, node2::Node, index::Int=0)
+    return _insert_edge!(graph, node1, node2, index; track=false, invalidate_cache=false)
 end
 
 """
@@ -80,7 +87,7 @@ function _insert_edge!(
 
     # 2: keep track
     if (track)
-        push!(graph.diff.addedEdges, make_edge(node1, node2))
+        push!(graph.diff.addedEdges, make_edge(node1, node2, index))
     end
 
     # 3: invalidate caches
@@ -134,12 +141,11 @@ end
 """
     _remove_edge!(graph::DAG, node1::Node, node2::Node; track = true, invalidate_cache = true)
 
-Remove the edge between node1 (child) and node2 (parent) into the graph.
+Remove the edge between node1 (child) and node2 (parent) into the graph. Returns the integer index of the removed edge.
 
 ## Keyword Arguments
-`track::Bool`: Whether to add the changes to the [`DAG`](@ref)'s [`Diff`](@ref). Should be set `false` in parsing or graph creation functions for performance.
-
-`invalidate_cache::Bool`: Whether to invalidate caches associated with the changes. Should also be turned off for graph creation or parsing.
+- `track::Bool`: Whether to add the changes to the [`DAG`](@ref)'s [`Diff`](@ref). Should be set `false` in parsing or graph creation functions for performance.
+- `invalidate_cache::Bool`: Whether to invalidate caches associated with the changes. Should also be turned off for graph creation or parsing.
 
 See also: [`_insert_node!`](@ref), [`_remove_node!`](@ref), [`_insert_edge!`](@ref)
 """
@@ -183,7 +189,7 @@ function _remove_edge!(
 
     # 3: invalidate caches
     if (!invalidate_cache)
-        return nothing
+        return removed_node_index
     end
 
     invalidate_operation_caches!(graph, node1)
@@ -195,7 +201,7 @@ function _remove_edge!(
         push!(graph.dirtyNodes, node2)
     end
 
-    return nothing
+    return removed_node_index
 end
 
 """

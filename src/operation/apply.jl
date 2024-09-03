@@ -23,7 +23,7 @@ end
 Fallback implementation of apply_operation! for unimplemented operation types, throwing an error.
 """
 function apply_operation!(graph::DAG, operation::Operation)
-    return error("Unknown operation type!")
+    return error("unknown operation type")
 end
 
 """
@@ -62,7 +62,7 @@ end
 Fallback implementation of operation reversion for unimplemented operation types, throwing an error.
 """
 function revert_operation!(graph::DAG, operation::AppliedOperation)
-    return error("Unknown operation type!")
+    return error("unknown operation type")
 end
 
 """
@@ -104,7 +104,7 @@ function revert_diff!(graph::DAG, diff::Diff)
         _insert_node!(graph, node; track=false)
     end
     for edge in diff.removedEdges
-        _insert_edge!(graph, edge.edge[1], edge.edge[2]; track=false)
+        _insert_edge!(graph, edge.edge[1], edge.edge[2], edge.index; track=false)
     end
 
     graph.properties -= GraphProperties(diff)
@@ -130,8 +130,8 @@ function node_reduction!(graph::DAG, nodes::Vector{Node})
 
     n1_parents = Set(parents(n1))
 
-    # set of the new parents of n1
-    new_parents = Set{Node}()
+    # set of the new parents of n1 together with the index of the child nodes
+    new_parents = Set{Tuple{Node,Int}}()
 
     # names of the previous children that n1 now replaces per parent
     new_parents_child_names = Dict{Node,Symbol}()
@@ -140,25 +140,26 @@ function node_reduction!(graph::DAG, nodes::Vector{Node})
     for i in 2:length(nodes)
         n = nodes[i]
         for (child, index) in n1_children
+            # no need to care about the indices here
             _remove_edge!(graph, child, n)
         end
 
         for parent in copy(parents(n))
-            _remove_edge!(graph, n, parent)
+            removed_index = _remove_edge!(graph, n, parent)
 
             # collect all parents
-            push!(new_parents, parent)
+            push!(new_parents, (parent, removed_index))
             new_parents_child_names[parent] = Symbol(to_var_name(n.id))
         end
 
         _remove_node!(graph, n)
     end
 
-    for parent in new_parents
+    for (parent, index) in new_parents
         # now add parents of all input nodes to n1 without duplicates
         if !(parent in n1_parents)
             # don't double insert edges
-            _insert_edge!(graph, n1, parent)
+            _insert_edge!(graph, n1, parent, index)
         end
     end
 
