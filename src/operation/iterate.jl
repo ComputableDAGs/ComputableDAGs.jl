@@ -1,12 +1,10 @@
-import Base.iterate
-
 const _POSSIBLE_OPERATIONS_FIELDS = fieldnames(PossibleOperations)
 
 _POIteratorStateType = NamedTuple{
     (:result, :state),Tuple{Union{NodeReduction,NodeSplit},Tuple{Symbol,Int64}}
 }
 
-@inline function iterate(
+@inline function Base.iterate(
     possibleOperations::PossibleOperations
 )::Union{Nothing,_POIteratorStateType}
     for fieldname in _POSSIBLE_OPERATIONS_FIELDS
@@ -19,7 +17,7 @@ _POIteratorStateType = NamedTuple{
     return nothing
 end
 
-@inline function iterate(
+@inline function Base.iterate(
     possibleOperations::PossibleOperations, state
 )::Union{Nothing,_POIteratorStateType}
     newStateSym = state[1]

@@ -3,7 +3,7 @@
 
 Return whether `operations` is empty, i.e. all of its fields are empty.
 """
-function isempty(operations::PossibleOperations)
+function Base.isempty(operations::PossibleOperations)
     return isempty(operations.nodeReductions) && isempty(operations.nodeSplits)
 end
 
@@ -12,7 +12,7 @@ end
 
 Return a named tuple with the number of each of the operation types as a named tuple. The fields are named the same as the [`PossibleOperations`](@ref)'.
 """
-function length(operations::PossibleOperations)
+function Base.length(operations::PossibleOperations)
     return (
         nodeReductions=length(operations.nodeReductions),
         nodeSplits=length(operations.nodeSplits),
@@ -24,7 +24,7 @@ end
 
 Delete the given node reduction from the possible operations.
 """
-function delete!(operations::PossibleOperations, op::NodeReduction)
+function Base.delete!(operations::PossibleOperations, op::NodeReduction)
     delete!(operations.nodeReductions, op)
     return operations
 end
@@ -34,7 +34,7 @@ end
 
 Delete the given node split from the possible operations.
 """
-function delete!(operations::PossibleOperations, op::NodeSplit)
+function Base.delete!(operations::PossibleOperations, op::NodeSplit)
     delete!(operations.nodeSplits, op)
     return operations
 end
@@ -104,7 +104,7 @@ end
 
 Fallback implementation of operation equality. Return false. Actual comparisons are done by the overloads of same type operation comparisons.
 """
-function ==(op1::Operation, op2::Operation)
+function Base.:(==)(op1::Operation, op2::Operation)
     return false
 end
 
@@ -113,7 +113,7 @@ end
 
 Equality comparison between two node reductions. Two node reductions are considered equal when they have the same inputs.
 """
-function ==(op1::NodeReduction, op2::NodeReduction)
+function Base.:(==)(op1::NodeReduction, op2::NodeReduction)
     # node reductions are equal exactly if their first input is the same
     return op1.input[1].id == op2.input[1].id
 end
@@ -123,6 +123,6 @@ end
 
 Equality comparison between two node splits. Two node splits are considered equal if they have the same input node.
 """
-function ==(op1::NodeSplit, op2::NodeSplit)
+function Base.:(==)(op1::NodeSplit, op2::NodeSplit)
     return op1.input == op2.input
 end

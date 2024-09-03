@@ -58,18 +58,6 @@ export Machine
 export NumaNode
 export get_machine_info, cpu_st
 
-import Base.length
-import Base.show
-import Base.==
-import Base.+
-import Base.-
-import Base.in
-import Base.copy
-import Base.isempty
-import Base.delete!
-import Base.insert!
-import Base.collect
-
 include("devices/interface.jl")
 include("task/type.jl")
 include("node/type.jl")

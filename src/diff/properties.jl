@@ -4,7 +4,7 @@
 Return a named tuple of the lengths of the added/removed nodes/edges.
 The fields are `.addedNodes`, `.addedEdges`, `.removedNodes` and `.removedEdges`.
 """
-function length(diff::Diff)
+function Base.length(diff::Diff)
     return (
         addedNodes=length(diff.addedNodes),
         removedNodes=length(diff.removedNodes),

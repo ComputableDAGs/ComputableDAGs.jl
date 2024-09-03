@@ -22,9 +22,9 @@ function ComputeTaskNode(t::AbstractComputeTask)
     )
 end
 
-copy(m::Missing) = missing
-copy(n::ComputeTaskNode) = ComputeTaskNode(copy(task(n)))
-copy(n::DataTaskNode) = DataTaskNode(copy(task(n)), n.name)
+Base.copy(m::Missing) = missing
+Base.copy(n::ComputeTaskNode) = ComputeTaskNode(copy(task(n)))
+Base.copy(n::DataTaskNode) = DataTaskNode(copy(task(n)), n.name)
 
 """
     make_node(t::AbstractTask)

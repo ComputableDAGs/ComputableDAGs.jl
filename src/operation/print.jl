@@ -3,7 +3,7 @@
 
 Print a string representation of the set of possible operations to io.
 """
-function show(io::IO, ops::PossibleOperations)
+function Base.show(io::IO, ops::PossibleOperations)
     print(io, length(ops.nodeReductions))
     println(io, " Node Reductions: ")
     for nr in ops.nodeReductions
@@ -21,7 +21,7 @@ end
 
 Print a string representation of the node reduction to io.
 """
-function show(io::IO, op::NodeReduction)
+function Base.show(io::IO, op::NodeReduction)
     print(io, "NR: ")
     print(io, length(op.input))
     print(io, "x")
@@ -33,7 +33,7 @@ end
 
 Print a string representation of the node split to io.
 """
-function show(io::IO, op::NodeSplit)
+function Base.show(io::IO, op::NodeSplit)
     print(io, "NS: ")
     return print(io, task(op.input))
 end

@@ -83,7 +83,7 @@ end
 
 Insert the given node into the trie. It's sorted by its type in the first layer, then by its children in the following layers.
 """
-function insert!(
+function Base.insert!(
     trie::NodeTrie, node::NodeType
 ) where {TaskType<:AbstractDataTask,NodeType<:DataTaskNode{TaskType}}
     if (!haskey(trie.children, NodeType))
@@ -92,7 +92,7 @@ function insert!(
     return insert_helper!(trie.children[NodeType], node, 0)
 end
 # TODO: Remove this workaround once https://github.com/JuliaLang/julia/issues/54404 is fixed in julia 1.10+
-function insert!(
+function Base.insert!(
     trie::NodeTrie, node::NodeType
 ) where {TaskType<:AbstractComputeTask,NodeType<:ComputeTaskNode{TaskType}}
     if (!haskey(trie.children, NodeType))
@@ -122,7 +122,7 @@ end
 
 Return all sets of at least 2 [`Node`](@ref)s that have accumulated in leaves of the trie.
 """
-function collect(trie::NodeTrie)
+function Base.collect(trie::NodeTrie)
     acc = Set{Vector{Node}}()
     for (t, child) in trie.children
         collect_helper(child, acc)

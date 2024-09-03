@@ -38,7 +38,7 @@ data(t::AbstractDataTask)::Float64 = getfield(t, :data)
 
 Copy the data task and return it.
 """
-copy(t::DataTask) = DataTask(t.data)
+Base.copy(t::DataTask) = DataTask(t.data)
 
 """
     children(::DataTask)

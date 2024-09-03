@@ -22,7 +22,7 @@ end
 
 Print the given graph to io. If there are too many nodes it will print only a summary of them.
 """
-function show(io::IO, graph::DAG)
+function Base.show(io::IO, graph::DAG)
     apply_all!(graph)
     println(io, "Graph:")
     print(io, "  Nodes: ")

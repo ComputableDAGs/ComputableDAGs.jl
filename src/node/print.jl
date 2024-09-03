@@ -3,7 +3,7 @@
 
 Print a short string representation of the node to io.
 """
-function show(io::IO, n::Node)
+function Base.show(io::IO, n::Node)
     return print(io, "Node(", task(n), ")")
 end
 
@@ -12,7 +12,7 @@ end
 
 Print a short string representation of the edge to io.
 """
-function show(io::IO, e::Edge)
+function Base.show(io::IO, e::Edge)
     return print(io, "Edge(", e.edge[1], ", ", e.edge[2], ")")
 end
 
