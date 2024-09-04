@@ -1,23 +1,21 @@
-using oneAPI
-
 """
     oneAPIGPU <: AbstractGPU
 
 Representation of a specific Intel GPU that code can run on. Implements the [`AbstractDevice`](@ref) interface.
 """
-mutable struct oneAPIGPU <: AbstractGPU
+mutable struct oneAPIGPU <: GraphComputing.AbstractGPU
     device::Any
     cacheStrategy::CacheStrategy
     FLOPS::Float64
 end
 
-push!(DEVICE_TYPES, oneAPIGPU)
+push!(GraphComputing.DEVICE_TYPES, oneAPIGPU)
 
-CACHE_STRATEGIES[oneAPIGPU] = [LocalVariables()]
+GraphComputing.CACHE_STRATEGIES[oneAPIGPU] = [LocalVariables()]
 
-default_strategy(::Type{T}) where {T<:oneAPIGPU} = LocalVariables()
+GraphComputing.default_strategy(::Type{oneAPIGPU}) = LocalVariables()
 
-function measure_device!(device::oneAPIGPU; verbose::Bool)
+function GraphComputing.measure_device!(device::oneAPIGPU; verbose::Bool)
     if verbose
         println("Measuring oneAPI GPU $(device.device)")
     end
@@ -27,11 +25,11 @@ function measure_device!(device::oneAPIGPU; verbose::Bool)
 end
 
 """
-    get_devices(deviceType::Type{T}; verbose::Bool = false) where {T <: oneAPIGPU}
+    get_devices(::Type{oneAPIGPU}; verbose::Bool = false)
 
 Return a Vector of [`oneAPIGPU`](@ref)s available on the current machine. If `verbose` is true, print some additional information.
 """
-function get_devices(deviceType::Type{T}; verbose::Bool=false) where {T<:oneAPIGPU}
+function get_devices(::Type{oneAPIGPU}; verbose::Bool=false)
     devices = Vector{AbstractDevice}()
 
     if !oneAPI.functional()

@@ -31,11 +31,11 @@ export Operation, AppliedOperation
 export NodeReduction, NodeSplit
 export push_operation!, pop_operation!, can_pop
 export reset_graph!
-export get_operations
+export get_operationsr
 
 # code generation related
 export execute
-export get_compute_function, get_cuda_kernel
+export get_compute_function
 export gen_tape, execute_tape
 export unpack_identity
 
@@ -57,6 +57,11 @@ export problem_instance, input_type, graph, input_expr
 export Machine
 export NumaNode
 export get_machine_info, cpu_st
+export CacheStrategy, default_strategy
+export LocalVariables, Dictionary
+
+# CUDAExt
+export cuda_kernel
 
 include("devices/interface.jl")
 include("task/type.jl")
@@ -119,9 +124,6 @@ include("devices/detect.jl")
 include("devices/impl.jl")
 
 include("devices/numa/impl.jl")
-include("devices/cuda/impl.jl")
-include("devices/rocm/impl.jl")
-#include("devices/oneapi/impl.jl")
 
 include("scheduler/interface.jl")
 include("scheduler/greedy.jl")

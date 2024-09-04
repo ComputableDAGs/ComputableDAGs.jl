@@ -38,22 +38,10 @@ Order = [:type, :function]
 ```
 
 ### CUDA
-```@autodocs
-Modules = [GraphComputing]
-Pages = ["devices/cuda/impl.jl"]
-Order = [:type, :function]
-```
+For CUDA functionality to be available, the `CUDA.jl` package must be installed separately, as it is only a weak dependency.
 
 ### ROCm
-```@autodocs
-Modules = [GraphComputing]
-Pages = ["devices/rocm/impl.jl"]
-Order = [:type, :function]
-```
+For ROCm functionality to be available, the `AMDGPU.jl` package must be installed separately, as it is only a weak dependency.
 
 ### oneAPI
-```@autodocs
-Modules = [GraphComputing]
-Pages = ["devices/oneapi/impl.jl"]
-Order = [:type, :function]
-```
+For oneAPI functionality to be available, the `oneAPI.jl` package must be installed separately, as it is only a weak dependency.
