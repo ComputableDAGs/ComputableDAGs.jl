@@ -22,6 +22,7 @@ CUDAExt = "CUDA"
 oneAPIExt = "oneAPI"
 
 [compat]
+julia = "1.10"
 AMDGPU = "1"
 CUDA = "5"
 DataStructures = "0.18"
