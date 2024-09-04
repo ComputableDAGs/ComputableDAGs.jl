@@ -5,19 +5,19 @@ using AMDGPU
 
 Representation of a specific AMD GPU that code can run on. Implements the [`AbstractDevice`](@ref) interface.
 """
-mutable struct ROCmGPU <: AbstractGPU
+mutable struct ROCmGPU <: GraphComputing.AbstractGPU
     device::Any
     cacheStrategy::CacheStrategy
     FLOPS::Float64
 end
 
-push!(DEVICE_TYPES, ROCmGPU)
+push!(GraphComputing.DEVICE_TYPES, ROCmGPU)
 
-CACHE_STRATEGIES[ROCmGPU] = [LocalVariables()]
+GraphComputing.CACHE_STRATEGIES[ROCmGPU] = [LocalVariables()]
 
-default_strategy(::Type{T}) where {T<:ROCmGPU} = LocalVariables()
+GraphComputing.default_strategy(::Type{ROCmGPU}) = LocalVariables()
 
-function measure_device!(device::ROCmGPU; verbose::Bool)
+function GraphComputing.measure_device!(device::ROCmGPU; verbose::Bool)
     if verbose
         println("Measuring ROCm GPU $(device.device)")
     end
@@ -27,11 +27,11 @@ function measure_device!(device::ROCmGPU; verbose::Bool)
 end
 
 """
-    get_devices(deviceType::Type{T}; verbose::Bool = false) where {T <: ROCmGPU}
+    get_devices(::Type{ROCmGPU}; verbose::Bool = false)
 
 Return a Vector of [`ROCmGPU`](@ref)s available on the current machine. If `verbose` is true, print some additional information.
 """
-function get_devices(deviceType::Type{T}; verbose::Bool=false) where {T<:ROCmGPU}
+function get_devices(::Type{ROCmGPU}; verbose::Bool=false)
     devices = Vector{AbstractDevice}()
 
     if !AMDGPU.functional()

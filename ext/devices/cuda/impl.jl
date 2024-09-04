@@ -1,23 +1,21 @@
-using CUDA
-
 """
     CUDAGPU <: AbstractGPU
 
 Representation of a specific CUDA GPU that code can run on. Implements the [`AbstractDevice`](@ref) interface.
 """
-mutable struct CUDAGPU <: AbstractGPU
+mutable struct CUDAGPU <: GraphComputing.AbstractGPU
     device::Any # TODO: what's the cuda device type?
     cacheStrategy::CacheStrategy
     FLOPS::Float64
 end
 
-push!(DEVICE_TYPES, CUDAGPU)
+push!(GraphComputing.DEVICE_TYPES, CUDAGPU)
 
-CACHE_STRATEGIES[CUDAGPU] = [LocalVariables()]
+GraphComputing.CACHE_STRATEGIES[CUDAGPU] = [LocalVariables()]
 
-default_strategy(::Type{T}) where {T<:CUDAGPU} = LocalVariables()
+GraphComputing.default_strategy(::Type{CUDAGPU}) = LocalVariables()
 
-function measure_device!(device::CUDAGPU; verbose::Bool)
+function GraphComputing.measure_device!(device::CUDAGPU; verbose::Bool)
     if verbose
         println("Measuring CUDA GPU $(device.device)")
     end
@@ -27,16 +25,16 @@ function measure_device!(device::CUDAGPU; verbose::Bool)
 end
 
 """
-    get_devices(deviceType::Type{T}; verbose::Bool) where {T <: CUDAGPU}
+    get_devices(::Type{CUDAGPU}; verbose::Bool)
 
 Return a Vector of [`CUDAGPU`](@ref)s available on the current machine. If `verbose` is true, print some additional information.
 """
-function get_devices(deviceType::Type{T}; verbose::Bool=false) where {T<:CUDAGPU}
-    devices = Vector{AbstractDevice}()
+function get_devices(::Type{CUDAGPU}; verbose::Bool=false)
+    devices = Vector{GraphComputing.AbstractDevice}()
 
     if !CUDA.functional()
         if verbose
-            println("CUDA is non-functional")
+            println("CUDA.jl is non-functional")
         end
         return devices
     end
