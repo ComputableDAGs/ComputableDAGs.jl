@@ -2,21 +2,21 @@
 
 ## Interface
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["devices/interface.jl"]
 Order = [:type, :constant, :function]
 ```
 
 ## Detect
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["devices/detect.jl"]
 Order = [:function]
 ```
 
 ## Measure
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["devices/measure.jl"]
 Order = [:function]
 ```
@@ -25,14 +25,14 @@ Order = [:function]
 
 ### General
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["devices/impl.jl"]
 Order = [:type, :function]
 ```
 
 ### NUMA
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["devices/numa/impl.jl"]
 Order = [:type, :function]
 ```

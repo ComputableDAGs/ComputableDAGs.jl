@@ -2,10 +2,9 @@
 
 ## Application repositories
 
-There are several repositories using this package productively, which can be referred to as examples:
+The following repositories use this package productively, which can be referred to as examples:
 
-- QEDModelGraphComputing.jl
-- ABCModelGraphComputing.jl
+- [QEDFeynman](https://github.com/ComputableDAGs/QEDFeynman.jl): Compute differential cross-sections of scattering processes in ABC and QED models.
 
 ## Jupyter Notebooks
 

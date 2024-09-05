@@ -2,49 +2,49 @@
 
 ## Type
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["graph/type.jl"]
 Order   = [:type]
 ```
 
 ## Interface
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["graph/interface.jl"]
 Order   = [:function]
 ```
 
 ## Compare
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["graph/compare.jl"]
 Order   = [:function]
 ```
 
 ## Mute
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["graph/mute.jl"]
 Order   = [:function]
 ```
 
 ## Print
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["graph/print.jl"]
 Order   = [:function]
 ```
 
 ## Properties
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["graph/properties.jl"]
 Order   = [:function]
 ```
 
 ## Validate
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["graph/validate.jl"]
 Order   = [:function]
 ```

@@ -1,7 +1,7 @@
-# GraphComputing.jl
+# ComputableDAGs.jl
 
-[![Build Status](https://github.com/GraphComputing-jl/GraphComputing.jl/actions/workflows/unit_tests.yml/badge.svg?branch=main)](https://github.com/GraphComputing-jl/GraphComputing.jl/actions/workflows/unit_tests.yml/)
-[![Doc Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://graphcomputing-jl.github.io/GraphComputing.jl/dev/)
+[![Build Status](https://github.com/ComputableDAGs/ComputableDAGs.jl/actions/workflows/unit_tests.yml/badge.svg?branch=main)](https://github.com/ComputableDAGs/ComputableDAGs.jl/actions/workflows/unit_tests.yml/)
+[![Doc Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://ComputableDAGs.github.io/ComputableDAGs.jl/dev/)
 [![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
 
 Represent computations as Directed Acyclic Graphs (DAGs), analyze and optimize them, then compile to native code and run!

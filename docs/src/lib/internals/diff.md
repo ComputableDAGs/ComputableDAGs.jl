@@ -2,21 +2,21 @@
 
 ## Type
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["diff/type.jl"]
 Order   = [:type]
 ```
 
 ## Properties
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["diff/properties.jl"]
 Order   = [:function]
 ```
 
 ## Printing
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["diff/print.jl"]
 Order   = [:function]
 ```

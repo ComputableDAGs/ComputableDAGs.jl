@@ -4,7 +4,7 @@ project_path = Base.Filesystem.joinpath(Base.Filesystem.dirname(Base.source_path
 Pkg.develop(; path=project_path)
 
 using Documenter
-using GraphComputing
+using ComputableDAGs
 
 pages = [
     "index.md",
@@ -25,16 +25,16 @@ pages = [
 ]
 
 makedocs(;
-    modules=[GraphComputing],
+    modules=[ComputableDAGs],
     checkdocs=:exports,
     authors="Anton Reinhard",
-    repo=Documenter.Remotes.GitHub("GraphComputing-jl", "GraphComputing.jl"),
-    sitename="GraphComputing.jl",
+    repo=Documenter.Remotes.GitHub("ComputableDAGs", "ComputableDAGs.jl"),
+    sitename="ComputableDAGs.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://graphcomputing.gitlab.io/GraphComputing.jl",
+        canonical="https://ComputableDAGs.gitlab.io/ComputableDAGs.jl",
         assets=String[],
     ),
     pages=pages,
 )
-deploydocs(; repo="github.com/GraphComputing-jl/GraphComputing.jl.git", push_preview=false)
+deploydocs(; repo="github.com/ComputableDAGs/ComputableDAGs.jl.git", push_preview=false)

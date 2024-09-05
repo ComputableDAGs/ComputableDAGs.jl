@@ -8,7 +8,7 @@ permissions:
   pull-requests: write
 jobs:
   CompatHelper:
-    if: github.repository == 'GraphComputing-jl/GraphComputing.jl'
+    if: github.repository == 'ComputableDAGs/ComputableDAGs.jl'
     runs-on: ubuntu-latest
     steps:
       - name: Check if Julia is already available in the PATH

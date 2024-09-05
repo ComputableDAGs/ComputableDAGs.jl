@@ -118,6 +118,6 @@ function gen_access_expr end
 Return a function of signature `compute_<id>(input::CuVector, output::CuVector, n::Int64)`, which will return the result of the DAG computation of the input on the given output variable.
 
 !!! note
-    This function is only available when the CUDA Extension is loaded by `using CUDA` before `using GraphComputing`
+    This function is only available when the CUDA Extension is loaded by `using CUDA` before `using ComputableDAGs`
 """
 function cuda_kernel end

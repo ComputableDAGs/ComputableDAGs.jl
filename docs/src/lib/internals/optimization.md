@@ -5,7 +5,7 @@
 The interface that has to be implemented for an optimization algorithm.
 
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["optimization/interface.jl"]
 Order = [:type, :constant, :function]
 ```
@@ -15,7 +15,7 @@ Order = [:type, :constant, :function]
 Implementation of a random walk algorithm.
 
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["optimization/random_walk.jl"]
 Order = [:type, :function]
 ```
@@ -25,7 +25,7 @@ Order = [:type, :function]
 Implementation of a an optimizer that reduces as far as possible.
 
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["optimization/reduce.jl"]
 Order = [:type, :function]
 ```
@@ -35,7 +35,7 @@ Order = [:type, :function]
 Implementation of an optimizer that splits as far as possible.
 
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["optimization/split.jl"]
 Order = [:type, :function]
 ```
@@ -46,7 +46,7 @@ Order = [:type, :function]
 Implementation of a greedy optimization algorithm.
 
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["optimization/greedy.jl"]
 Order = [:type, :function]
 ```

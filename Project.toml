@@ -1,4 +1,4 @@
-name = "GraphComputing"
+name = "ComputableDAGs"
 uuid = "62933717-1c9d-4a3f-b06f-7ab7f17ca32d"
 authors = ["AntonReinhard <anton.reinhard@proton.me>"]
 version = "0.1.0"

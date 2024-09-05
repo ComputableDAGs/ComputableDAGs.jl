@@ -19,9 +19,9 @@ Function taking an `SVector`, returning it unpacked.
 Return a human readable string representation of the given number.
 
 ```jldoctest
-julia> using GraphComputing
+julia> using ComputableDAGs
 
-julia> GraphComputing.bytes_to_human_readable(4096)
+julia> ComputableDAGs.bytes_to_human_readable(4096)
 "4.0 KiB"
 ```
 """

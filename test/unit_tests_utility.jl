@@ -1,5 +1,5 @@
-using GraphComputing
-import GraphComputing.bytes_to_human_readable
+using ComputableDAGs
+import ComputableDAGs.bytes_to_human_readable
 
 @test bytes_to_human_readable(0) == "0.0 B"
 @test bytes_to_human_readable(1020) == "1020.0 B"

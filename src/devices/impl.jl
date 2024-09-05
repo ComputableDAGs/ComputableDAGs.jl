@@ -60,10 +60,10 @@ It is the simplest machine definition possible and produces a simple function wh
 function cpu_st()
     return Machine(
         [
-            GraphComputing.NumaNode(
+            ComputableDAGs.NumaNode(
                 0,
                 1,
-                GraphComputing.default_strategy(GraphComputing.NumaNode),
+                ComputableDAGs.default_strategy(ComputableDAGs.NumaNode),
                 -1.0,
                 UUIDs.uuid1(),
             ),
