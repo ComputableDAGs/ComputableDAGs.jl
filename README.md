@@ -30,6 +30,6 @@ Goal: For some operation, regenerate possible operations after that one has been
 
 Idea: Keep the original graph, a list of possible operations at the current state, and a queue of applied operations together. The "actual" graph is then the original graph with all operations in the queue applied. We can push and pop new operations to/from the queue, automatically updating the graph's global metrics and possible optimizations from there.
 
-## Pledge
+## Acknowledgements and Funding 
 
 This work was partly funded by the Center for Advanced Systems Understanding (CASUS) that is financed by Germany’s Federal Ministry of Education and Research (BMBF) and by the Saxon Ministry for Science, Culture and Tourism (SMWK) with tax funds on the basis of the budget approved by the Saxon State Parliament.
