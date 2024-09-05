@@ -1,17 +1,17 @@
 
-function GraphComputing.cuda_kernel(
+function ComputableDAGs.cuda_kernel(
     graph::DAG, instance, machine::Machine, context_module::Module
 )
-    tape = GraphComputing.gen_tape(graph, instance, machine, context_module)
+    tape = ComputableDAGs.gen_tape(graph, instance, machine, context_module)
 
     init_caches = Expr(:block, tape.initCachesCode...)
-    assign_inputs = Expr(:block, GraphComputing.expr_from_fc.(tape.inputAssignCode)...)
-    code = Expr(:block, GraphComputing.expr_from_fc.(tape.computeCode)...)
+    assign_inputs = Expr(:block, ComputableDAGs.expr_from_fc.(tape.inputAssignCode)...)
+    code = Expr(:block, ComputableDAGs.expr_from_fc.(tape.computeCode)...)
 
-    function_id = GraphComputing.to_var_name(UUIDs.uuid1(rng[1]))
+    function_id = ComputableDAGs.to_var_name(UUIDs.uuid1(rng[1]))
     res_sym = eval(
-        GraphComputing.gen_access_expr(
-            GraphComputing.entry_device(tape.machine), tape.outputSymbol
+        ComputableDAGs.gen_access_expr(
+            ComputableDAGs.entry_device(tape.machine), tape.outputSymbol
         ),
     )
     expr = Meta.parse(

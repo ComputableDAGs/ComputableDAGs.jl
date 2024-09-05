@@ -2,56 +2,56 @@
 
 ## Types
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["operation/type.jl"]
 Order   = [:type]
 ```
 
 ## Find
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["operation/find.jl"]
 Order   = [:function]
 ```
 
 ## Apply
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["operation/apply.jl"]
 Order   = [:function]
 ```
 
 ## Get
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["operation/get.jl"]
 Order   = [:function]
 ```
 
 ## Clean
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["operation/clean.jl"]
 Order   = [:function]
 ```
 
 ## Utility
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["operation/utility.jl"]
 Order   = [:function]
 ```
 
 ## Print
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["operation/print.jl"]
 Order   = [:function]
 ```
 
 ## Validate
 ```@autodocs
-Modules = [GraphComputing]
+Modules = [ComputableDAGs]
 Pages = ["operation/validate.jl"]
 Order   = [:function]
 ```

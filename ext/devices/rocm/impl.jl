@@ -5,19 +5,19 @@ using AMDGPU
 
 Representation of a specific AMD GPU that code can run on. Implements the [`AbstractDevice`](@ref) interface.
 """
-mutable struct ROCmGPU <: GraphComputing.AbstractGPU
+mutable struct ROCmGPU <: ComputableDAGs.AbstractGPU
     device::Any
     cacheStrategy::CacheStrategy
     FLOPS::Float64
 end
 
-push!(GraphComputing.DEVICE_TYPES, ROCmGPU)
+push!(ComputableDAGs.DEVICE_TYPES, ROCmGPU)
 
-GraphComputing.CACHE_STRATEGIES[ROCmGPU] = [LocalVariables()]
+ComputableDAGs.CACHE_STRATEGIES[ROCmGPU] = [LocalVariables()]
 
-GraphComputing.default_strategy(::Type{ROCmGPU}) = LocalVariables()
+ComputableDAGs.default_strategy(::Type{ROCmGPU}) = LocalVariables()
 
-function GraphComputing.measure_device!(device::ROCmGPU; verbose::Bool)
+function ComputableDAGs.measure_device!(device::ROCmGPU; verbose::Bool)
     if verbose
         println("Measuring ROCm GPU $(device.device)")
     end

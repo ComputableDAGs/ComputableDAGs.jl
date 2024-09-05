@@ -1,12 +1,12 @@
 # Public Documentation
 
-Documentation for `GraphComputing.jl`'s public interface.
+Documentation for `ComputableDAGs.jl`'s public interface.
 
 See the Internals section of the manual for documentation of everything else.
 
 ```@autodocs
-Modules = [GraphComputing]
-Pages   = ["GraphComputing.jl"]
+Modules = [ComputableDAGs]
+Pages   = ["ComputableDAGs.jl"]
 Order   = [:module]
 ```
 

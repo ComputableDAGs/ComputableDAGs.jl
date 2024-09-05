@@ -1,9 +1,9 @@
 """
-    GraphComputing
+    ComputableDAGs
 
-A module containing tools to work on DAGs.
+A module containing tools to represent computations as DAGs.
 """
-module GraphComputing
+module ComputableDAGs
 
 using RuntimeGeneratedFunctions
 RuntimeGeneratedFunctions.init(@__MODULE__)
@@ -31,7 +31,7 @@ export Operation, AppliedOperation
 export NodeReduction, NodeSplit
 export push_operation!, pop_operation!, can_pop
 export reset_graph!
-export get_operationsr
+export get_operations
 
 # code generation related
 export execute
@@ -132,4 +132,4 @@ include("code_gen/type.jl")
 include("code_gen/tape_machine.jl")
 include("code_gen/function.jl")
 
-end # module GraphComputing
+end # module ComputableDAGs

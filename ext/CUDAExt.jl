@@ -1,6 +1,6 @@
 module CUDAExt
 
-using GraphComputing
+using ComputableDAGs
 using CUDA
 using RuntimeGeneratedFunctions
 

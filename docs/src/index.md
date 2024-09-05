@@ -1,4 +1,4 @@
-# GraphComputing.jl
+# ComputableDAGs.jl
 
 *A domain-specific DAG-optimizer*
 
@@ -27,7 +27,7 @@ Some more soft requirements exist for the project to be *useful*:
 
 ![Parts of the Project](structure.png)
 
-The project consists of several parts that are designed to be mostly orthogonal interfaces, extendable with new implementations without having to change other parts of the code. For example implementations, refer to the [manual](manual.md), the tests, or other projects in the [GraphComputing project](https://github.com/GraphComputing-jl).
+The project consists of several parts that are designed to be mostly orthogonal interfaces, extendable with new implementations without having to change other parts of the code. For example implementations, refer to the [manual](manual.md), the tests, or other projects in the [ComputableDAGs project](https://github.com/ComputableDAGs).
 
 The [*Graph*](lib/internals/graph.md) is the central part. It consists of [*Nodes*](lib/internals/node.md) and *Edges*. Nodes represent a [*Task*](lib/internals/task.md), which is either a computation or a data transfer. Edges purely represent the dependencies between the nodes.
 

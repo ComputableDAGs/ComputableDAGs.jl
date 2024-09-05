@@ -3,19 +3,19 @@
 
 Representation of a specific Intel GPU that code can run on. Implements the [`AbstractDevice`](@ref) interface.
 """
-mutable struct oneAPIGPU <: GraphComputing.AbstractGPU
+mutable struct oneAPIGPU <: ComputableDAGs.AbstractGPU
     device::Any
     cacheStrategy::CacheStrategy
     FLOPS::Float64
 end
 
-push!(GraphComputing.DEVICE_TYPES, oneAPIGPU)
+push!(ComputableDAGs.DEVICE_TYPES, oneAPIGPU)
 
-GraphComputing.CACHE_STRATEGIES[oneAPIGPU] = [LocalVariables()]
+ComputableDAGs.CACHE_STRATEGIES[oneAPIGPU] = [LocalVariables()]
 
-GraphComputing.default_strategy(::Type{oneAPIGPU}) = LocalVariables()
+ComputableDAGs.default_strategy(::Type{oneAPIGPU}) = LocalVariables()
 
-function GraphComputing.measure_device!(device::oneAPIGPU; verbose::Bool)
+function ComputableDAGs.measure_device!(device::oneAPIGPU; verbose::Bool)
     if verbose
         println("Measuring oneAPI GPU $(device.device)")
     end
