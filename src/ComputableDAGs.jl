@@ -31,7 +31,7 @@ export Operation, AppliedOperation
 export NodeReduction, NodeSplit
 export push_operation!, pop_operation!, can_pop
 export reset_graph!
-export get_operationsr
+export get_operations
 
 # code generation related
 export execute
