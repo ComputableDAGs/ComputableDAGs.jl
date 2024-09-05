@@ -1,6 +1,6 @@
 name = "ComputableDAGs"
 uuid = "62933717-1c9d-4a3f-b06f-7ab7f17ca32d"
-authors = ["AntonReinhard <anton.reinhard@proton.me>"]
+authors = ["Anton Reinhard <a.reinhard@hzdr.de>", "Uwe Hernandez Acosta <u.hernandez@hzdr.de>"]
 version = "0.1.0"
 
 [deps]
