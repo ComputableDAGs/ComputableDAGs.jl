@@ -1,3 +1,4 @@
+using UUIDs
 
 function ComputableDAGs.cuda_kernel(
     graph::DAG, instance, machine::Machine, context_module::Module
