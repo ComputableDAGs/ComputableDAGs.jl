@@ -108,12 +108,7 @@ Return an `Expr` or `QuoteNode` accessing the variable identified by [`symbol`].
 function gen_access_expr end
 
 """
-    cuda_kernel(
-        graph::DAG,
-        instance,
-        machine::Machine,
-        context_module::Module
-    )
+    cuda_kernel(graph::DAG, instance, context_module::Module)
 
 Return a function of signature `compute_<id>(input::CuVector, output::CuVector, n::Int64)`, which will return the result of the DAG computation of the input on the given output variable.
 

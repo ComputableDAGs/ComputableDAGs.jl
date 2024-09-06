@@ -1,15 +1,14 @@
 using UUIDs
 
-function ComputableDAGs.cuda_kernel(
-    graph::DAG, instance, machine::Machine, context_module::Module
-)
+function ComputableDAGs.cuda_kernel(graph::DAG, instance, context_module::Module)
+    machine = cpu_st()
     tape = ComputableDAGs.gen_tape(graph, instance, machine, context_module)
 
     init_caches = Expr(:block, tape.initCachesCode...)
     assign_inputs = Expr(:block, ComputableDAGs.expr_from_fc.(tape.inputAssignCode)...)
     code = Expr(:block, ComputableDAGs.expr_from_fc.(tape.computeCode)...)
 
-    function_id = ComputableDAGs.to_var_name(UUIDs.uuid1(rng[1]))
+    function_id = ComputableDAGs.to_var_name(UUIDs.uuid1(ComputableDAGs.rng[1]))
     res_sym = eval(
         ComputableDAGs.gen_access_expr(
             ComputableDAGs.entry_device(tape.machine), tape.outputSymbol
