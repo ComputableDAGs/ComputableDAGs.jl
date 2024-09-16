@@ -3,7 +3,7 @@
 
 Representation of a specific Intel GPU that code can run on. Implements the [`AbstractDevice`](@ref) interface.
 """
-mutable struct oneAPIGPU <: ComputableDAGs.AbstractGPU
+mutable struct ComputableDAGs.oneAPIGPU <: ComputableDAGs.AbstractGPU
     device::Any
     cacheStrategy::CacheStrategy
     FLOPS::Float64
@@ -29,7 +29,7 @@ end
 
 Return a Vector of [`oneAPIGPU`](@ref)s available on the current machine. If `verbose` is true, print some additional information.
 """
-function get_devices(::Type{oneAPIGPU}; verbose::Bool=false)
+function ComputableDAGs.get_devices(::Type{oneAPIGPU}; verbose::Bool=false)
     devices = Vector{AbstractDevice}()
 
     if !oneAPI.functional()

@@ -3,7 +3,7 @@
 
 Representation of a specific CUDA GPU that code can run on. Implements the [`AbstractDevice`](@ref) interface.
 """
-mutable struct CUDAGPU <: ComputableDAGs.AbstractGPU
+mutable struct ComputableDAGs.CUDAGPU <: ComputableDAGs.AbstractGPU
     device::Any # TODO: what's the cuda device type?
     cacheStrategy::CacheStrategy
     FLOPS::Float64
@@ -29,7 +29,7 @@ end
 
 Return a Vector of [`CUDAGPU`](@ref)s available on the current machine. If `verbose` is true, print some additional information.
 """
-function get_devices(::Type{CUDAGPU}; verbose::Bool=false)
+function ComputableDAGs.get_devices(::Type{CUDAGPU}; verbose::Bool=false)
     devices = Vector{ComputableDAGs.AbstractDevice}()
 
     if !CUDA.functional()

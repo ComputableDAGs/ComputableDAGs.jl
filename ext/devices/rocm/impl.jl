@@ -3,7 +3,7 @@
 
 Representation of a specific AMD GPU that code can run on. Implements the [`AbstractDevice`](@ref) interface.
 """
-mutable struct ROCmGPU <: ComputableDAGs.AbstractGPU
+mutable struct ComputableDAGs.ROCmGPU <: ComputableDAGs.AbstractGPU
     device::Any
     cacheStrategy::CacheStrategy
     FLOPS::Float64
@@ -29,7 +29,7 @@ end
 
 Return a Vector of [`ROCmGPU`](@ref)s available on the current machine. If `verbose` is true, print some additional information.
 """
-function get_devices(::Type{ROCmGPU}; verbose::Bool=false)
+function ComputableDAGs.get_devices(::Type{ROCmGPU}; verbose::Bool=false)
     devices = Vector{AbstractDevice}()
 
     if !AMDGPU.functional()
