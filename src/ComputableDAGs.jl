@@ -60,8 +60,8 @@ export get_machine_info, cpu_st
 export CacheStrategy, default_strategy
 export LocalVariables, Dictionary
 
-# CUDAExt
-export cuda_kernel
+# GPU Extensions
+export kernel, CUDAGPU, ROCmGPU, oneAPIGPU
 
 include("devices/interface.jl")
 include("task/type.jl")

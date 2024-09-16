@@ -1,5 +1,3 @@
-using AMDGPU
-
 """
     ROCmGPU <: AbstractGPU
 

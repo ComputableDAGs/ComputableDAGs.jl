@@ -1,4 +1,4 @@
-function ComputableDAGs.kernel(::Type{CUDAGPU}, graph::DAG, instance)
+function ComputableDAGs.kernel(::Type{ROCmGPU}, graph::DAG, instance)
     machine = cpu_st()
     tape = ComputableDAGs.gen_tape(graph, instance, machine, context_module)
 
@@ -14,7 +14,7 @@ function ComputableDAGs.kernel(::Type{CUDAGPU}, graph::DAG, instance)
     )
     expr = Meta.parse(
         "function compute_$(function_id)(input_vector, output_vector, n::Int64)
-            id = (blockIdx().x - 1) * blockDim().x + threadIdx().x
+            id = (workgroupIdx().x - 1) * workgroupDim().x + workgroupIdx().x
             if (id > n)  
                 return
             end
