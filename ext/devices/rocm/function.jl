@@ -1,4 +1,6 @@
-function ComputableDAGs.kernel(::Type{ROCmGPU}, graph::DAG, instance)
+function ComputableDAGs.kernel(
+    ::Type{ROCmGPU}, graph::DAG, instance, context_module::Module
+)
     machine = cpu_st()
     tape = ComputableDAGs.gen_tape(graph, instance, machine, context_module)
 
