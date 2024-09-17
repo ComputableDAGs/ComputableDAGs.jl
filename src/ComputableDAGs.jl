@@ -60,8 +60,8 @@ export get_machine_info, cpu_st
 export CacheStrategy, default_strategy
 export LocalVariables, Dictionary
 
-# CUDAExt
-export cuda_kernel
+# GPU Extensions
+export kernel, CUDAGPU, ROCmGPU, oneAPIGPU
 
 include("devices/interface.jl")
 include("task/type.jl")
@@ -124,6 +124,7 @@ include("devices/detect.jl")
 include("devices/impl.jl")
 
 include("devices/numa/impl.jl")
+include("devices/ext.jl")
 
 include("scheduler/interface.jl")
 include("scheduler/greedy.jl")

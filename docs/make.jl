@@ -32,7 +32,7 @@ makedocs(;
     sitename="ComputableDAGs.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://ComputableDAGs.gitlab.io/ComputableDAGs.jl",
+        canonical="https://ComputableDAGs.github.io/ComputableDAGs.jl",
         assets=String[],
     ),
     pages=pages,
