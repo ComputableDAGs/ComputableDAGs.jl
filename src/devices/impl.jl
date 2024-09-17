@@ -59,15 +59,6 @@ It is the simplest machine definition possible and produces a simple function wh
 """
 function cpu_st()
     return Machine(
-        [
-            ComputableDAGs.NumaNode(
-                0,
-                1,
-                ComputableDAGs.default_strategy(ComputableDAGs.NumaNode),
-                -1.0,
-                UUIDs.uuid1(),
-            ),
-        ],
-        [-1.0;;],
+        [NumaNode(0, 1, default_strategy(NumaNode), -1.0, UUIDs.uuid1())], [-1.0;;]
     )
 end

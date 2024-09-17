@@ -134,6 +134,6 @@ A GPU function has more restrictions on what can be computed than general functi
 2. Function calls must not be dynamic. This means that type stability is required and the compiler must know in advance which method of a generic function to call. What this specifically entails may change with time and also differs between the different target GPU libraries. From experience, using the `always_inline = true` argument for `@cuda` calls can help with this.
 
 !!! warning
-    This feature is currently experimental.
+    This feature is currently experimental. There are still some unresolved issues with the generated kernels.
 """
 function kernel end
