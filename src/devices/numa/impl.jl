@@ -20,9 +20,7 @@ CACHE_STRATEGIES[NumaNode] = [LocalVariables()]
 default_strategy(::Type{T}) where {T<:NumaNode} = LocalVariables()
 
 function measure_device!(device::NumaNode; verbose::Bool)
-    if verbose
-        println("Measuring Numa Node $(device.numaId)")
-    end
+    verbose && @info "Measuring Numa Node $(device.numaId)"
 
     # TODO implement
     return nothing
@@ -37,9 +35,8 @@ function get_devices(deviceType::Type{T}; verbose::Bool=false) where {T<:NumaNod
     devices = Vector{AbstractDevice}()
     noNumaNodes = highest_numa_node()
 
-    if (verbose)
-        println("Found $(noNumaNodes + 1) NUMA nodes")
-    end
+    verbose && @info "Found $(noNumaNodes + 1) NUMA nodes"
+
     for i in 0:noNumaNodes
         push!(devices, NumaNode(i, 1, default_strategy(NumaNode), -1, UUIDs.uuid1(rng[1])))
     end
