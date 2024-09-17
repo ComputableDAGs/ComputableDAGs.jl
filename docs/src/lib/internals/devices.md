@@ -37,11 +37,10 @@ Pages = ["devices/numa/impl.jl"]
 Order = [:type, :function]
 ```
 
-### CUDA
-For CUDA functionality to be available, the `CUDA.jl` package must be installed separately, as it is only a weak dependency.
+### GPUs
 
-### ROCm
-For ROCm functionality to be available, the `AMDGPU.jl` package must be installed separately, as it is only a weak dependency.
-
-### oneAPI
-For oneAPI functionality to be available, the `oneAPI.jl` package must be installed separately, as it is only a weak dependency.
+```@autodocs
+Modules = [ComputableDAGs]
+Pages = ["devices/ext.jl"]
+Order = [:type]
+```
