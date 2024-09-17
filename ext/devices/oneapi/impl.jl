@@ -1,24 +1,7 @@
-"""
-    oneAPIGPU <: AbstractGPU
-
-Representation of a specific Intel GPU that code can run on. Implements the [`AbstractDevice`](@ref) interface.
-"""
-mutable struct ComputableDAGs.oneAPIGPU <: ComputableDAGs.AbstractGPU
-    device::Any
-    cacheStrategy::CacheStrategy
-    FLOPS::Float64
-end
-
-push!(ComputableDAGs.DEVICE_TYPES, oneAPIGPU)
-
-ComputableDAGs.CACHE_STRATEGIES[oneAPIGPU] = [LocalVariables()]
-
 ComputableDAGs.default_strategy(::Type{oneAPIGPU}) = LocalVariables()
 
 function ComputableDAGs.measure_device!(device::oneAPIGPU; verbose::Bool)
-    if verbose
-        println("Measuring oneAPI GPU $(device.device)")
-    end
+    verbose && @info "Measuring oneAPI GPU $(device.device)"
 
     # TODO implement
     return nothing
@@ -30,19 +13,15 @@ end
 Return a Vector of [`oneAPIGPU`](@ref)s available on the current machine. If `verbose` is true, print some additional information.
 """
 function ComputableDAGs.get_devices(::Type{oneAPIGPU}; verbose::Bool=false)
-    devices = Vector{AbstractDevice}()
+    devices = Vector{ComputableDAGs.AbstractDevice}()
 
     if !oneAPI.functional()
-        if verbose
-            println("oneAPI is non-functional")
-        end
+        @warn "the oneAPI extension is loaded but oneAPI.jl is non-functional"
         return devices
     end
 
     oneAPIDevices = oneAPI.devices()
-    if verbose
-        println("Found $(length(oneAPIDevices)) oneAPI devices")
-    end
+    verbose && @info "Found $(length(oneAPIDevices)) oneAPI devices"
     for device in oneAPIDevices
         push!(devices, oneAPIGPU(device, default_strategy(oneAPIGPU), -1))
     end

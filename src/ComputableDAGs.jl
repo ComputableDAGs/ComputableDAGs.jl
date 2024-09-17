@@ -124,6 +124,7 @@ include("devices/detect.jl")
 include("devices/impl.jl")
 
 include("devices/numa/impl.jl")
+include("devices/ext.jl")
 
 include("scheduler/interface.jl")
 include("scheduler/greedy.jl")
