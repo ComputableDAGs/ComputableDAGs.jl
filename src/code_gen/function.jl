@@ -26,7 +26,7 @@ function get_compute_function(
 
     initCaches = Expr(:block, tape.initCachesCode...)
     assignInputs = Expr(:block, expr_from_fc.(tape.inputAssignCode)...)
-    code = gen_function_body(tape.computeCode; closures_size=closures_size)
+    code = gen_function_body(tape; closures_size=closures_size)
 
     functionId = to_var_name(UUIDs.uuid1(rng[1]))
     resSym = eval(

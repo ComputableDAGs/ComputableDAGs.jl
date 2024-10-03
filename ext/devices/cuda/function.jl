@@ -7,7 +7,7 @@ function ComputableDAGs.kernel(
     init_caches = Expr(:block, tape.initCachesCode...)
     assign_inputs = Expr(:block, ComputableDAGs.expr_from_fc.(tape.inputAssignCode)...)
     # TODO: use gen_function_body here
-    code = Expr(:block, ComputableDAGs.expr_from_fc.(tape.computeCode)...)
+    code = Expr(:block, ComputableDAGs.expr_from_fc.(tape.schedule)...)
 
     function_id = ComputableDAGs.to_var_name(UUIDs.uuid1(ComputableDAGs.rng[1]))
     res_sym = eval(

@@ -94,7 +94,7 @@ Interface implementation, dispatched to from [`gen_local_init`](@ref).
 """
 function _gen_local_init(fc::FunctionCall, ::NumaNode, ::LocalVariables)
     s = Symbol("data_$(fc.return_symbol)")
-    quote_node = Expr(:local, s) # TODO: figure out how to get type info for this local variable
+    quote_node = Expr(:local, s, :(::), Symbol(fc.return_type)) # TODO: figure out how to get type info for this local variable
     return quote_node
 end
 
