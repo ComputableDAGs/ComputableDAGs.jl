@@ -52,9 +52,13 @@ end
 
 function expr_from_fc(fc::FunctionCall{VectorT,0}) where {VectorT}
     func_call = Expr(
-        :call, fc.func, eval.(gen_access_expr.(Ref(fc.device), fc.arguments))...
+        :call,
+        fc.func,
+        eval.(
+            _gen_access_expr.(Ref(fc.device), Ref(fc.device.cacheStrategy), fc.arguments)
+        )...,
     )
-    access_expr = eval(gen_access_expr(fc.device, fc.return_symbol))
+    access_expr = eval(gen_access_expr(fc))
 
     return Expr(:(=), access_expr, func_call)
 end
@@ -69,9 +73,11 @@ function expr_from_fc(fc::FunctionCall{VectorT,M}) where {VectorT,M}
         :call,
         fc.func,
         fc.value_arguments...,
-        eval.(gen_access_expr.(Ref(fc.device), fc.arguments))...,
+        eval.(
+            _gen_access_expr.(Ref(fc.device), Ref(fc.device.cacheStrategy), fc.arguments)
+        )...,
     )
-    access_expr = eval(gen_access_expr(fc.device, fc.return_symbol))
+    access_expr = eval(gen_access_expr(fc))
 
     return Expr(:(=), access_expr, func_call)
 end
@@ -131,6 +137,46 @@ function gen_input_assignment_code(
     end
 
     return assign_inputs
+end
+
+"""
+    gen_function_body(fc_vec::Vector{FunctionCall}; closures_size)
+
+Generate the function body from the given `Vector` of [`FunctionCall`](@ref)s.
+
+## Keyword Arguments
+`closures_size`: The size of closures to generate (in lines of code). Closures introduce function barriers in the function body, preventing some optimizations by the compiler and therefore greatly reducing compile time. A value of 1 or less will disable the use of closures entirely.
+"""
+function gen_function_body(fc_vec::Vector{FunctionCall}; closures_size::Int)
+    if (closures_size <= 1)
+        return Expr(:block, expr_from_fc.(fc_vec)...)
+    end
+
+    closures = Vector{Expr}()
+    for i in 1:closures_size:length(fc_vec)
+        code_block = fc_vec[i:min(i + closures_size, length(fc_vec))]
+
+        # collect `local var` statements that need to exist before the closure starts
+        # since the return symbols are always unique, this has to happen for each fc and there will be no duplicates
+        local_inits = gen_local_init.(code_block)
+
+        closure = Expr(         # call to the following closure (no arguments)
+            :call,
+            Expr(               # create the closure: () -> code block; return nothing
+                :->,
+                :(),
+                Expr(#          # actual function body of the closure
+                    :block,
+                    expr_from_fc.(code_block)...,
+                    Expr(:return, :nothing),
+                ),
+            ),
+        )
+        # combine to one closure call, including all the local inits and the actual call to the closure
+        push!(closures, Expr(:block, local_inits..., closure))
+    end
+
+    return Expr(:block, closures...)
 end
 
 """
