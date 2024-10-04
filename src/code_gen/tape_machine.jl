@@ -172,7 +172,6 @@ function gen_function_body(tape::Tape; closures_size::Int)
         local_inits = gen_local_init.(code_block)
 
         return_symbols = eval.(gen_access_expr.(code_block))
-        argument_symbols = Set{Symbol}()
 
         ret_symbols_set = Set(return_symbols)
         for fc in code_block
@@ -182,16 +181,13 @@ function gen_function_body(tape::Tape; closures_size::Int)
                 # symbol won't be defined if it is first calculated in the closure
                 # so don't add it to the arguments in this case
                 if !(symbol in ret_symbols_set)
-                    push!(argument_symbols, symbol)
+                    push!(undefined_argument_symbols, symbol)
                 end
             end
         end
-        union!(undefined_argument_symbols, argument_symbols)
 
         intersect!(ret_symbols_set, undefined_argument_symbols)
         return_symbols = Symbol[ret_symbols_set...]
-
-        argument_symbols = [argument_symbols...] # make sure there is an order (doesn't matter which)
 
         closure = Expr(
             :block,
@@ -200,9 +196,9 @@ function gen_function_body(tape::Tape; closures_size::Int)
                 Expr(:tuple, return_symbols...),
                 Expr(
                     :call,                                  # call to the following closure (no arguments)
-                    Expr(                                   # create the closure: (args) -> code block; return (locals)
+                    Expr(                                   # create the closure: () -> code block; return (locals)
                         :->,
-                        Expr(:tuple, argument_symbols...),  # arguments in the closure definition
+                        :(),                                # closure arguments (none)
                         Expr(                               # actual function body of the closure
                             :block,
                             local_inits...,                 # declare local variables with type information inside the closure
@@ -210,7 +206,6 @@ function gen_function_body(tape::Tape; closures_size::Int)
                             Expr(:return, Expr(:tuple, return_symbols...)),
                         ),
                     ),
-                    argument_symbols...,                    # arguments to the closure call
                 ),
             ),
         )
