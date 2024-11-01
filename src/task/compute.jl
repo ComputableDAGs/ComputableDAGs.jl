@@ -81,6 +81,11 @@ function result_type(fc::FunctionCall, known_res_types::Dict{Symbol,Type})
             "failure during type inference: function call $fc is type unstable, possible return types: $types",
         )
     end
+    if isempty(types)
+        throw(
+            "failure during type inference: function call $fc has no return types, this is likely because no method matches the arguments",
+        )
+    end
 
     return types[1]
 end

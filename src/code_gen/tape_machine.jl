@@ -212,13 +212,6 @@ function gen_function_body(tape::Tape; closures_size::Int)
 
         setdiff!(undefined_argument_symbols, ret_symbols_set)
 
-        #=Expr(
-            :macrocall,
-            Symbol("@closure"),
-            @__LINE__,
-            Expr( <closure...> )
-        )=#
-
         # combine to one closure call, including all the local inits and the actual call to the closure
         pushfirst!(closures, closure)
     end
