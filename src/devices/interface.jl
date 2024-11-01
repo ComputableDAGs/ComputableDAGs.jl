@@ -2,7 +2,7 @@
     AbstractDevice
 
 Abstract base type for every device, like GPUs, CPUs or any other compute devices.
-Every implementation needs to implement various functions and needs a member `cacheStrategy`.
+Every implementation needs to implement various functions.
 """
 abstract type AbstractDevice end
 
@@ -24,33 +24,6 @@ struct Machine
 end
 
 """
-    CacheStrategy
-
-Abstract base type for caching strategies.
-
-See also: [`strategies`](@ref)
-"""
-abstract type CacheStrategy end
-
-"""
-    LocalVariables <: CacheStrategy
-
-A caching strategy relying solely on local variables for every input and output.
-
-Implements the [`CacheStrategy`](@ref) interface.
-"""
-struct LocalVariables <: CacheStrategy end
-
-"""
-    Dictionary <: CacheStrategy
-
-A caching strategy relying on a dictionary of Symbols to store every input and output.
-
-Implements the [`CacheStrategy`](@ref) interface.
-"""
-struct Dictionary <: CacheStrategy end
-
-"""
     DEVICE_TYPES::Vector{Type}
 
 Global vector of available and implemented device types. Each implementation of a [`AbstractDevice`](@ref) should add its concrete type to this vector.
@@ -58,23 +31,6 @@ Global vector of available and implemented device types. Each implementation of 
 See also: [`device_types`](@ref), [`get_devices`](@ref)
 """
 DEVICE_TYPES = Vector{Type}()
-
-"""
-    CACHE_STRATEGIES::Dict{Type{AbstractDevice}, Symbol}
-
-Global dictionary of available caching strategies per device. Each implementation of [`AbstractDevice`](@ref) should add its available strategies to the dictionary.
-
-See also: [`strategies`](@ref)
-"""
-CACHE_STRATEGIES = Dict{Type,Vector{CacheStrategy}}()
-
-"""
-    default_strategy(deviceType::Type{T}) where {T <: AbstractDevice}
-
-Interface function that must be implemented for every subtype of [`AbstractDevice`](@ref). Returns the default [`CacheStrategy`](@ref) to use on the given device type.
-See also: [`cache_strategy`](@ref), [`set_cache_strategy`](@ref)
-"""
-function default_strategy end
 
 """
     get_devices(t::Type{T}; verbose::Bool) where {T <: AbstractDevice}
@@ -91,26 +47,17 @@ Interface function that must be implemented for every subtype of [`AbstractDevic
 function measure_device! end
 
 """
-    gen_cache_init_code(device::AbstractDevice)
+    _gen_access_expr(device::AbstractDevice, symbol::Symbol)
 
-Interface function that must be implemented for every subtype of [`AbstractDevice`](@ref) and at least one [`CacheStrategy`](@ref). Returns an `Expr` initializing this device's variable cache.
-    
-The strategy is a symbol
-"""
-function gen_cache_init_code end
-
-"""
-    _gen_access_expr(device::AbstractDevice, cache_strategy::CacheStrategy, symbol::Symbol)
-
-Interface function that must be implemented for every subtype of [`AbstractDevice`](@ref) and at least one [`CacheStrategy`](@ref).
+Interface function that must be implemented for every subtype of [`AbstractDevice`](@ref).
 Return an `Expr` or `QuoteNode` accessing the variable identified by [`symbol`].
 """
 function _gen_access_expr end
 
 """
-    _gen_local_init(fc::FunctionCall, device::AbstractDevice, cache_strategy::CacheStrategy)
+    _gen_local_init(fc::FunctionCall, device::AbstractDevice)
 
-Interface function that must be implemented for every subtype of [`AbstractDevice`](@ref) and at least one [`CacheStrategy`](@ref).
+Interface function that must be implemented for every subtype of [`AbstractDevice`](@ref).
 Return an `Expr` or `QuoteNode` that initializes the access expression returned by [`_gen_access_expr`](@ref) in the local scope.
 This expression may be empty. For local variables it should be `local <variable_name>::<Type>`.
 """

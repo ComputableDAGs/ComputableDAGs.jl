@@ -24,18 +24,11 @@ function get_compute_function(
 )
     tape = gen_tape(graph, instance, machine, context_module)
 
-    initCaches = Expr(:block, tape.initCachesCode...)
     assignInputs = Expr(:block, expr_from_fc.(tape.inputAssignCode)...)
     code = gen_function_body(tape; closures_size=closures_size)
 
     functionId = to_var_name(UUIDs.uuid1(rng[1]))
-    resSym = eval(
-        _gen_access_expr(
-            entry_device(tape.machine),
-            entry_device(tape.machine).cacheStrategy,
-            tape.outputSymbol,
-        ),
-    )
+    resSym = eval(_gen_access_expr(entry_device(tape.machine), tape.outputSymbol))
     expr = #
     Expr(
         :function, # function definition
@@ -44,7 +37,7 @@ function get_compute_function(
             Symbol("compute_$functionId"),
             Expr(:(::), :data_input, input_type(instance)),
         ), # function name and parameters
-        Expr(:block, initCaches, assignInputs, code, Expr(:return, resSym)), # function body
+        Expr(:block, assignInputs, code, Expr(:return, resSym)), # function body
     )
 
     return RuntimeGeneratedFunction(@__MODULE__, context_module, expr)

@@ -8,7 +8,6 @@ function __init__()
     @debug "Loading CUDAExt"
 
     push!(ComputableDAGs.DEVICE_TYPES, CUDAGPU)
-    ComputableDAGs.CACHE_STRATEGIES[CUDAGPU] = [LocalVariables()]
 
     return nothing
 end

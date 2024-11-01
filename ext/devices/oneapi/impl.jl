@@ -1,5 +1,3 @@
-ComputableDAGs.default_strategy(::Type{oneAPIGPU}) = LocalVariables()
-
 function ComputableDAGs.measure_device!(device::oneAPIGPU; verbose::Bool)
     verbose && @info "Measuring oneAPI GPU $(device.device)"
 
@@ -23,7 +21,7 @@ function ComputableDAGs.get_devices(::Type{oneAPIGPU}; verbose::Bool=false)
     oneAPIDevices = oneAPI.devices()
     verbose && @info "Found $(length(oneAPIDevices)) oneAPI devices"
     for device in oneAPIDevices
-        push!(devices, oneAPIGPU(device, default_strategy(oneAPIGPU), -1))
+        push!(devices, oneAPIGPU(device, -1))
     end
 
     return devices

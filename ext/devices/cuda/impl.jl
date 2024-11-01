@@ -1,5 +1,3 @@
-ComputableDAGs.default_strategy(::Type{CUDAGPU}) = LocalVariables()
-
 function ComputableDAGs.measure_device!(device::CUDAGPU; verbose::Bool)
     verbose && @info "Measuring CUDA GPU $(device.device)"
 
@@ -23,7 +21,7 @@ function ComputableDAGs.get_devices(::Type{CUDAGPU}; verbose::Bool=false)
     CUDADevices = CUDA.devices()
     verbose && @info "Found $(length(CUDADevices)) CUDA devices"
     for device in CUDADevices
-        push!(devices, CUDAGPU(device, default_strategy(CUDAGPU), -1))
+        push!(devices, CUDAGPU(device, -1))
     end
 
     return devices

@@ -57,8 +57,6 @@ export problem_instance, input_type, graph, input_expr
 export Machine
 export NumaNode
 export get_machine_info, cpu_st
-export CacheStrategy, default_strategy
-export LocalVariables, Dictionary
 
 # GPU Extensions
 export kernel, CUDAGPU, ROCmGPU, oneAPIGPU

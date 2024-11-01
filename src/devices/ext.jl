@@ -11,7 +11,6 @@ Representation of a specific CUDA GPU that code can run on. Implements the [`Abs
 """
 mutable struct CUDAGPU <: AbstractGPU
     device::Any # CuDevice
-    cacheStrategy::CacheStrategy
     FLOPS::Float64
 end
 
@@ -25,7 +24,6 @@ Representation of a specific Intel GPU that code can run on. Implements the [`Ab
 """
 mutable struct oneAPIGPU <: AbstractGPU
     device::Any # oneAPI.oneL0.ZeDevice
-    cacheStrategy::CacheStrategy
     FLOPS::Float64
 end
 
@@ -39,6 +37,5 @@ Representation of a specific AMD GPU that code can run on. Implements the [`Abst
 """
 mutable struct ROCmGPU <: AbstractGPU
     device::Any # HIPDevice
-    cacheStrategy::CacheStrategy
     FLOPS::Float64
 end

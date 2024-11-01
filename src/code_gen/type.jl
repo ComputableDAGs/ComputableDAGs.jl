@@ -10,12 +10,10 @@ TODO: update docs
 - `outputSymbol::Symbol`: The symbol of the final calculated value
 """
 struct Tape{INPUT}
-    initCachesCode::Vector{Expr}
     inputAssignCode::Vector{FunctionCall}
     schedule::Vector{FunctionCall}
     inputSymbols::Dict{String,Vector{Symbol}}
     outputSymbol::Symbol
-    cache::Dict{Symbol,Any}
     instance::Any
     machine::Machine
 end
