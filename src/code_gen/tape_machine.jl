@@ -52,11 +52,7 @@ end
 
 function expr_from_fc(fc::FunctionCall{VectorT,0}) where {VectorT}
     func_call = Expr(
-        :call,
-        fc.func,
-        eval.(
-            _gen_access_expr.(Ref(fc.device), Ref(fc.device.cacheStrategy), fc.arguments)
-        )...,
+        :call, fc.func, eval.(_gen_access_expr.(Ref(fc.device), fc.arguments))...
     )
     access_expr = eval(gen_access_expr(fc))
 
@@ -73,28 +69,11 @@ function expr_from_fc(fc::FunctionCall{VectorT,M}) where {VectorT,M}
         :call,
         fc.func,
         fc.value_arguments...,
-        eval.(
-            _gen_access_expr.(Ref(fc.device), Ref(fc.device.cacheStrategy), fc.arguments)
-        )...,
+        eval.(_gen_access_expr.(Ref(fc.device), fc.arguments))...,
     )
     access_expr = eval(gen_access_expr(fc))
 
     return Expr(:(=), access_expr, func_call)
-end
-
-"""
-    gen_cache_init_code(machine::Machine)
-
-For each [`AbstractDevice`](@ref) in the given [`Machine`](@ref), returning a `Vector{Expr}` doing the initialization.
-"""
-function gen_cache_init_code(machine::Machine)
-    initialize_caches = Vector{Expr}()
-
-    for device in machine.devices
-        push!(initialize_caches, gen_cache_init_code(device))
-    end
-
-    return initialize_caches
 end
 
 """
@@ -176,7 +155,7 @@ function gen_function_body(tape::Tape; closures_size::Int)
         ret_symbols_set = Set(return_symbols)
         for fc in code_block
             for arg in fc.arguments
-                symbol = eval(_gen_access_expr(fc.device, fc.device.cacheStrategy, arg))
+                symbol = eval(_gen_access_expr(fc.device, arg))
 
                 # symbol won't be defined if it is first calculated in the closure
                 # so don't add it to the arguments in this case
@@ -255,18 +234,10 @@ function gen_tape(
     # get outSymbol
     outSym = Symbol(to_var_name(get_exit_node(graph).id))
 
-    init_caches = gen_cache_init_code(machine)
     assign_inputs = gen_input_assignment_code(input_syms, instance, machine, context_module)
 
     return Tape{input_type(instance)}(
-        init_caches,
-        assign_inputs,
-        function_body,
-        input_syms,
-        outSym,
-        Dict(),
-        instance,
-        machine,
+        assign_inputs, function_body, input_syms, outSym, instance, machine
     )
 end
 
@@ -274,8 +245,6 @@ end
     execute_tape(tape::Tape, input::Input) where {Input}
 
 Execute the given tape with the given input.
-
-For implementation reasons, this disregards the set [`CacheStrategy`](@ref) of the devices and always uses a dictionary.
 
 !!! warning
     This is very slow and might not work. This is to be majorly revamped.
@@ -285,9 +254,6 @@ function execute_tape(tape::Tape, input)
     cache[:input] = input
     # simply execute all the code snippets here
     @assert typeof(input) <: input_type(tape.instance) "expected tape input type to fit $(input_type(tape.instance)) but got $(typeof(input))"
-    for expr in tape.initCachesCode
-        @eval $expr
-    end
 
     compute_code = tape.schedule
 

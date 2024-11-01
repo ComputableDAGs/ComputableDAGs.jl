@@ -8,7 +8,6 @@ function __init__()
     @debug "Loading oneAPIExt"
 
     push!(ComputableDAGs.DEVICE_TYPES, oneAPIGPU)
-    ComputableDAGs.CACHE_STRATEGIES[oneAPIGPU] = [LocalVariables()]
 
     return nothing
 end

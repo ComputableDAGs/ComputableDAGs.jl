@@ -1,5 +1,3 @@
-ComputableDAGs.default_strategy(::Type{ROCmGPU}) = LocalVariables()
-
 function ComputableDAGs.measure_device!(device::ROCmGPU; verbose::Bool)
     verbose && @info "Measuring ROCm GPU $(device.device)"
 
@@ -23,7 +21,7 @@ function ComputableDAGs.get_devices(::Type{ROCmGPU}; verbose::Bool=false)
     AMDDevices = AMDGPU.devices()
     verbose && @info "Found $(length(AMDDevices)) AMD devices"
     for device in AMDDevices
-        push!(devices, ROCmGPU(device, default_strategy(ROCmGPU), -1))
+        push!(devices, ROCmGPU(device, -1))
     end
 
     return devices
