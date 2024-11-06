@@ -42,7 +42,7 @@ function get_function_call(node::ComputeTaskNode)
 end
 
 function get_function_call(node::DataTaskNode)
-    @assert length(children(node)) == 1 "trying to call get_function_call on a data task node that has $(length(node.children)) children instead of 1"
+    @assert length(children(node)) == 1 "trying to call get_function_call on a data task node that has $(length(node.children)) children instead of 1\nchildren: $(node.children)"
 
     # TODO: dispatch to device implementations generating the copy commands
     return [

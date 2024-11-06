@@ -61,6 +61,18 @@ function _insert_node!(graph::DAG, node::Node; track=true, invalidate_cache=true
     return node
 end
 
+function _insert_edge!(
+    ::DAG, ::DataTaskNode, ::DataTaskNode, ::Int=0; track=true, invalidate_cache=true
+)
+    throw("trying to create an edge between two data nodes which is not allowed")
+end
+
+function _insert_edge!(
+    ::DAG, ::ComputeTaskNode, ::ComputeTaskNode, ::Int=0; track=true, invalidate_cache=true
+)
+    throw("trying to create an edge between two compute nodes which is not allowed")
+end
+
 """
     _insert_edge!(graph::DAG, node1::Node, node2::Node, index::Int=0; track = true, invalidate_cache = true)
 
