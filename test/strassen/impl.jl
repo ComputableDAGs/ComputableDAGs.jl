@@ -3,11 +3,14 @@ module MatrixMultiplicationImpl
 using ComputableDAGs
 
 const STRASSEN_MIN_SIZE = 64    # minimum matrix size to use Strassen algorithm instead of naive algorithm
+const DEFAULT_TYPE = Float64    # default type of matrix multiplication assumed
 
 # problem model definition
-struct MatrixMultiplication
+struct MatrixMultiplication{T}
     size::Int   # size of multiplication
 end
+
+MatrixMultiplication(size::Int) = MatrixMultiplication{DEFAULT_TYPE}(size)
 
 struct ComputeTask_Slice{X_SLICE,Y_SLICE} <: AbstractComputeTask end        # perform a matrix slicing operation, subindexing the matrix with the ranges X_SLICE and Y_SLICE
 struct ComputeTask_Add <: AbstractComputeTask end          # perform matrix addition
@@ -57,23 +60,23 @@ function ComputableDAGs.compute(
     ]
 end
 
-function ComputableDAGs.input_type(mm::MatrixMultiplication)
-    return Tuple{<:AbstractMatrix,<:AbstractMatrix}
-end
-
 # return data node with the result
 function _dag_build_helper!(
     g::DAG,
+    mm::MatrixMultiplication{T},
     A::DataTaskNode,    # Data node that contains matrix A
     B::DataTaskNode,    # Data node that contains matrix B
-    mm_size::Int,
-)
+) where {T}
+    mm_size = mm.size
     @assert iseven(mm_size) "matrix size is not even: $mm_size"
     mm_half_size = div(mm_size, 2)
 
+    data_size = mm.size^2 * sizeof(T)
+    data_size_half = div(data_size, 4)
+
     if mm_size < STRASSEN_MIN_SIZE
         mb_task = insert_node!(g, ComputeTask_MultBase())
-        mb_data = insert_node!(g, DataTask(0))
+        mb_data = insert_node!(g, DataTask(data_size))
 
         insert_edge!(g, A, mb_task, 1)
         insert_edge!(g, B, mb_task, 2)
@@ -95,13 +98,13 @@ function _dag_build_helper!(
     A22_t = insert_node!(g, ComputeTask_Slice{h2,h2}())
     insert_edge!(g, A, A22_t)
 
-    A11_d = insert_node!(g, DataTask(0))
+    A11_d = insert_node!(g, DataTask(data_size_half))
     insert_edge!(g, A11_t, A11_d)
-    A12_d = insert_node!(g, DataTask(0))
+    A12_d = insert_node!(g, DataTask(data_size_half))
     insert_edge!(g, A12_t, A12_d)
-    A21_d = insert_node!(g, DataTask(0))
+    A21_d = insert_node!(g, DataTask(data_size_half))
     insert_edge!(g, A21_t, A21_d)
-    A22_d = insert_node!(g, DataTask(0))
+    A22_d = insert_node!(g, DataTask(data_size_half))
     insert_edge!(g, A22_t, A22_d)
 
     B11_t = insert_node!(g, ComputeTask_Slice{h1,h1}())
@@ -113,13 +116,13 @@ function _dag_build_helper!(
     B22_t = insert_node!(g, ComputeTask_Slice{h2,h2}())
     insert_edge!(g, B, B22_t)
 
-    B11_d = insert_node!(g, DataTask(0))
+    B11_d = insert_node!(g, DataTask(data_size_half))
     insert_edge!(g, B11_t, B11_d)
-    B12_d = insert_node!(g, DataTask(0))
+    B12_d = insert_node!(g, DataTask(data_size_half))
     insert_edge!(g, B12_t, B12_d)
-    B21_d = insert_node!(g, DataTask(0))
+    B21_d = insert_node!(g, DataTask(data_size_half))
     insert_edge!(g, B21_t, B21_d)
-    B22_d = insert_node!(g, DataTask(0))
+    B22_d = insert_node!(g, DataTask(data_size_half))
     insert_edge!(g, B22_t, B22_d)
 
     # M1 = (A11 + A22) x (B11 + B22)
@@ -131,12 +134,14 @@ function _dag_build_helper!(
         insert_edge!(g, A22_d, A_sum_t, 2)
         insert_edge!(g, B11_d, B_sum_t, 1)
         insert_edge!(g, B22_d, B_sum_t, 2)
-        A_sum_d = insert_node!(g, DataTask(0))
-        B_sum_d = insert_node!(g, DataTask(0))
+        A_sum_d = insert_node!(g, DataTask(data_size_half))
+        B_sum_d = insert_node!(g, DataTask(data_size_half))
         insert_edge!(g, A_sum_t, A_sum_d)
         insert_edge!(g, B_sum_t, B_sum_d)
 
-        M1_d = _dag_build_helper!(g, A_sum_d, B_sum_d, mm_half_size)
+        M1_d = _dag_build_helper!(
+            g, MatrixMultiplication{T}(mm_half_size), A_sum_d, B_sum_d
+        )
     end
 
     # M2 = (A21 + A22) x B11
@@ -145,10 +150,10 @@ function _dag_build_helper!(
         A_sum_t = insert_node!(g, ComputeTask_Add()) # A21 + A22
         insert_edge!(g, A21_d, A_sum_t, 1)
         insert_edge!(g, A22_d, A_sum_t, 2)
-        A_sum_d = insert_node!(g, DataTask(0))
+        A_sum_d = insert_node!(g, DataTask(data_size_half))
         insert_edge!(g, A_sum_t, A_sum_d)
 
-        M2_d = _dag_build_helper!(g, A_sum_d, B11_d, mm_half_size)
+        M2_d = _dag_build_helper!(g, MatrixMultiplication{T}(mm_half_size), A_sum_d, B11_d)
     end
 
     # M3 = A11 x (B12 - B22)
@@ -157,10 +162,10 @@ function _dag_build_helper!(
         B_dif_t = insert_node!(g, ComputeTask_Sub()) # B12 - B22
         insert_edge!(g, B12_d, B_dif_t, 1)
         insert_edge!(g, B22_d, B_dif_t, 2)
-        B_dif_d = insert_node!(g, DataTask(0))
+        B_dif_d = insert_node!(g, DataTask(data_size_half))
         insert_edge!(g, B_dif_t, B_dif_d)
 
-        M3_d = _dag_build_helper!(g, A11_d, B_dif_d, mm_half_size)
+        M3_d = _dag_build_helper!(g, MatrixMultiplication{T}(mm_half_size), A11_d, B_dif_d)
     end
 
     # M4 = A22 x (B21 - B11)
@@ -169,10 +174,10 @@ function _dag_build_helper!(
         B_dif_t = insert_node!(g, ComputeTask_Sub()) # B21 - B11
         insert_edge!(g, B21_d, B_dif_t, 1)
         insert_edge!(g, B11_d, B_dif_t, 2)
-        B_dif_d = insert_node!(g, DataTask(0))
+        B_dif_d = insert_node!(g, DataTask(data_size_half))
         insert_edge!(g, B_dif_t, B_dif_d)
 
-        M4_d = _dag_build_helper!(g, A22_d, B_dif_d, mm_half_size)
+        M4_d = _dag_build_helper!(g, MatrixMultiplication{T}(mm_half_size), A22_d, B_dif_d)
     end
 
     # M5 = (A11 + A12) x B22
@@ -181,10 +186,10 @@ function _dag_build_helper!(
         A_sum_t = insert_node!(g, ComputeTask_Add()) # A11 + A12
         insert_edge!(g, A11_d, A_sum_t, 1)
         insert_edge!(g, A12_d, A_sum_t, 2)
-        A_sum_d = insert_node!(g, DataTask(0))
+        A_sum_d = insert_node!(g, DataTask(data_size_half))
         insert_edge!(g, A_sum_t, A_sum_d)
 
-        M5_d = _dag_build_helper!(g, A_sum_d, B22_d, mm_half_size)
+        M5_d = _dag_build_helper!(g, MatrixMultiplication{T}(mm_half_size), A_sum_d, B22_d)
     end
 
     # M6 = (A21 - A11) x (B11 + B12)
@@ -196,12 +201,14 @@ function _dag_build_helper!(
         insert_edge!(g, A11_d, A_dif_t, 2)
         insert_edge!(g, B11_d, B_sum_t, 1)
         insert_edge!(g, B12_d, B_sum_t, 2)
-        A_dif_d = insert_node!(g, DataTask(0))
-        B_sum_d = insert_node!(g, DataTask(0))
+        A_dif_d = insert_node!(g, DataTask(data_size_half))
+        B_sum_d = insert_node!(g, DataTask(data_size_half))
         insert_edge!(g, A_dif_t, A_dif_d)
         insert_edge!(g, B_sum_t, B_sum_d)
 
-        M6_d = _dag_build_helper!(g, A_dif_d, B_sum_d, mm_half_size)
+        M6_d = _dag_build_helper!(
+            g, MatrixMultiplication{T}(mm_half_size), A_dif_d, B_sum_d
+        )
     end
 
     # M7 = (A12 - A22) x (B21 + B22)
@@ -213,12 +220,14 @@ function _dag_build_helper!(
         insert_edge!(g, A22_d, A_dif_t, 2)
         insert_edge!(g, B21_d, B_sum_t, 1)
         insert_edge!(g, B22_d, B_sum_t, 2)
-        A_dif_d = insert_node!(g, DataTask(0))
-        B_sum_d = insert_node!(g, DataTask(0))
+        A_dif_d = insert_node!(g, DataTask(data_size_half))
+        B_sum_d = insert_node!(g, DataTask(data_size_half))
         insert_edge!(g, A_dif_t, A_dif_d)
         insert_edge!(g, B_sum_t, B_sum_d)
 
-        M7_d = _dag_build_helper!(g, A_dif_d, B_sum_d, mm_half_size)
+        M7_d = _dag_build_helper!(
+            g, MatrixMultiplication{T}(mm_half_size), A_dif_d, B_sum_d
+        )
     end
 
     # C11 = M1 + M4 - M5 + M7
@@ -232,15 +241,15 @@ function _dag_build_helper!(
         insert_edge!(g, M7_d, s2_t, 1)  # +M7
         insert_edge!(g, M5_d, s2_t, 2)  # -M5
 
-        s1_d = insert_node!(g, DataTask(0))
-        s2_d = insert_node!(g, DataTask(0))
+        s1_d = insert_node!(g, DataTask(data_size_half))
+        s2_d = insert_node!(g, DataTask(data_size_half))
         insert_edge!(g, s1_t, s1_d)
         insert_edge!(g, s2_t, s2_d)
 
         insert_edge!(g, s1_d, C11_t, 1)
         insert_edge!(g, s2_d, C11_t, 2)
 
-        C11_d = insert_node!(g, DataTask(0))
+        C11_d = insert_node!(g, DataTask(data_size_half))
         insert_edge!(g, C11_t, C11_d)
     end
 
@@ -248,7 +257,7 @@ function _dag_build_helper!(
     local C12_d::DataTaskNode
     begin
         C12_t = insert_node!(g, ComputeTask_Add())
-        C12_d = insert_node!(g, DataTask(0))
+        C12_d = insert_node!(g, DataTask(data_size_half))
         insert_edge!(g, M3_d, C12_t, 1)
         insert_edge!(g, M5_d, C12_t, 2)
         insert_edge!(g, C12_t, C12_d)
@@ -258,7 +267,7 @@ function _dag_build_helper!(
     local C21_d::DataTaskNode
     begin
         C21_t = insert_node!(g, ComputeTask_Add())
-        C21_d = insert_node!(g, DataTask(0))
+        C21_d = insert_node!(g, DataTask(data_size_half))
         insert_edge!(g, M2_d, C21_t, 1)
         insert_edge!(g, M4_d, C21_t, 2)
         insert_edge!(g, C21_t, C21_d)
@@ -275,15 +284,15 @@ function _dag_build_helper!(
         insert_edge!(g, M3_d, s2_t, 1)  # +M3
         insert_edge!(g, M6_d, s2_t, 2)  # +M6
 
-        s1_d = insert_node!(g, DataTask(0))
-        s2_d = insert_node!(g, DataTask(0))
+        s1_d = insert_node!(g, DataTask(data_size_half))
+        s2_d = insert_node!(g, DataTask(data_size_half))
         insert_edge!(g, s1_t, s1_d)
         insert_edge!(g, s2_t, s2_d)
 
         insert_edge!(g, s1_d, C22_t, 1)
         insert_edge!(g, s2_d, C22_t, 2)
 
-        C22_d = insert_node!(g, DataTask(0))
+        C22_d = insert_node!(g, DataTask(data_size_half))
         insert_edge!(g, C22_t, C22_d)
     end
 
@@ -295,19 +304,19 @@ function _dag_build_helper!(
     insert_edge!(g, C21_d, assemble_t, 3)
     insert_edge!(g, C22_d, assemble_t, 4)
 
-    C_d = insert_node!(g, DataTask(0))
+    C_d = insert_node!(g, DataTask(data_size))
     insert_edge!(g, assemble_t, C_d)
 
     return C_d
 end
 
-function ComputableDAGs.graph(mm::MatrixMultiplication)
+function ComputableDAGs.graph(mm::MatrixMultiplication{T}) where {T}
     g = DAG()
 
-    A_d = insert_node!(g, DataTask(0), "A")
-    B_d = insert_node!(g, DataTask(0), "B")
+    A_d = insert_node!(g, DataTask(mm.size^2 * sizeof(T)), "A")
+    B_d = insert_node!(g, DataTask(mm.size^2 * sizeof(T)), "B")
 
-    C_d = _dag_build_helper!(g, A_d, B_d, mm.size)
+    C_d = _dag_build_helper!(g, mm, A_d, B_d)
 
     return g
 end
@@ -322,6 +331,10 @@ function ComputableDAGs.input_expr(
     else
         throw("unknown data node name $name")
     end
+end
+
+function ComputableDAGs.input_type(mm::MatrixMultiplication{T}) where {T}
+    return Tuple{<:AbstractMatrix{T},<:AbstractMatrix{T}}
 end
 
 export MatrixMultiplication
