@@ -78,13 +78,16 @@ function result_type(fc::FunctionCall, known_res_types::Dict{Symbol,Type})
 
     if length(types) > 1
         throw(
-            "failure during type inference: function call $fc is type unstable, possible return types: $types",
+            "failure during type inference: function call $fc with argument types $(argument_types) is type unstable, possible return types: $types",
         )
     end
     if isempty(types)
         throw(
-            "failure during type inference: function call $fc has no return types, this is likely because no method matches the arguments",
+            "failure during type inference: function call $fc with argument types $(argument_types) has no return types, this is likely because no method matches the arguments",
         )
+    end
+    if types[1] == Any
+        @warn "inferred return type 'Any' in task $fc with argument types $(argument_types)"
     end
 
     return types[1]

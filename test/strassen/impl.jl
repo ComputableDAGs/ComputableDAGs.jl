@@ -2,7 +2,7 @@ module MatrixMultiplicationImpl
 
 using ComputableDAGs
 
-const STRASSEN_MIN_SIZE = 64    # minimum matrix size to use Strassen algorithm instead of naive algorithm
+const STRASSEN_MIN_SIZE = 32    # minimum matrix size to use Strassen algorithm instead of naive algorithm
 const DEFAULT_TYPE = Float64    # default type of matrix multiplication assumed
 
 # problem model definition
@@ -37,23 +37,15 @@ ComputableDAGs.compute_effort(::ComputeTask_MultStrassen) = 0
     A + B
 @inline ComputableDAGs.compute(::ComputeTask_Sub, A::AbstractMatrix, B::AbstractMatrix) =
     A - B
-@inline ComputableDAGs.compute(
-    ::ComputeTask_MultBase, A::AbstractMatrix, B::AbstractMatrix
-) = A * B
+@inline function ComputableDAGs.compute(
+    ::ComputeTask_MultBase, A::MATRIX_T, B::MATRIX_T
+)::MATRIX_T where {MATRIX_T<:AbstractMatrix}
+    return A * B
+end
 
 function ComputableDAGs.compute(
-    ::ComputeTask_MultStrassen,
-    C11::AbstractMatrix,
-    C12::AbstractMatrix,
-    C21::AbstractMatrix,
-    C22::AbstractMatrix,
-)
-    # One Strassen step from precomputed matrices M1...M7
-    # result will be [C11 C12; C21 C22], where
-    # C11 = M1 + M4 - M5 + M7
-    # C12 = M3 + M5
-    # C21 = M2 + M4
-    # C22 = M1 - M2 + M3 + M6
+    ::ComputeTask_MultStrassen, C11::MATRIX_T, C12::MATRIX_T, C21::MATRIX_T, C22::MATRIX_T
+) where {MATRIX_T<:AbstractMatrix}
     return [
         C11 C12
         C21 C22
@@ -334,7 +326,7 @@ function ComputableDAGs.input_expr(
 end
 
 function ComputableDAGs.input_type(mm::MatrixMultiplication{T}) where {T}
-    return Tuple{<:AbstractMatrix{T},<:AbstractMatrix{T}}
+    return Tuple{Matrix{T},Matrix{T}}
 end
 
 export MatrixMultiplication

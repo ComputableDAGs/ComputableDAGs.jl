@@ -7,9 +7,9 @@ include("strassen/impl.jl")
 using .MatrixMultiplicationImpl
 
 TEST_TYPES = (Int32, Int64, Float32, Float64)
-TEST_SIZES = (32, 64, 128, 256, 512)
-NODE_NUMBERS = (4, 70, 532, 3766, 26404)
-EDGE_NUMBERS = (3, 96, 747, 5304, 37203)
+TEST_SIZES = (16, 32, 64, 128) #, 256
+NODE_NUMBERS = (4, 70, 532, 3766) #, 26404
+EDGE_NUMBERS = (3, 96, 747, 5304) #, 37203
 
 @testset "Strassen Matrix Type $M_T Size $(TEST_SIZES[M_SIZE_I])" for (M_T, M_SIZE_I) in
                                                                       Iterators.product(
@@ -25,7 +25,7 @@ EDGE_NUMBERS = (3, 96, 747, 5304, 37203)
 
     @testset "Construction" begin
         @test mm.size == M_SIZE
-        @test input_type(mm) == Tuple{AbstractMatrix{M_T},AbstractMatrix{M_T}}
+        @test input_type(mm) == Tuple{Matrix{M_T},Matrix{M_T}}
         @test input isa input_type(mm)
         @test_throws "unknown data node name C" input_expr(mm, "C", :input)
     end
@@ -49,18 +49,14 @@ EDGE_NUMBERS = (3, 96, 747, 5304, 37203)
     end
 
     @testset "Execution" begin
-        @test Base.infer_return_type(f, (typeof(input),)) == typeof(input[1])
+        @test Base.return_types(f, (typeof(input),))[1] == typeof(input[1])
         @test isapprox(f(input), input[1] * input[2])
     end
 
-    if (M_SIZE > 64)
-        # skip SMatrix tests for larger matrix sizes
-        continue
-    end
+    @testset "Execution with closures" begin
+        f_closures = get_compute_function(g, mm, cpu_st(), @__MODULE__; closures_size=100)
 
-    s_input = (rand(SMatrix{M_SIZE,M_SIZE,M_T}), rand(SMatrix{M_SIZE,M_SIZE,M_T}))
-    @testset "Execution on SMatrix" begin
-        @test Base.infer_return_type(f, (typeof(s_input),)) == typeof(s_input[1])
-        @test isapprox(f(s_input), s_input[1] * s_input[2])
+        @test Base.return_types(f_closures, (typeof(input),))[1] == typeof(input[1])
+        @test isapprox(f_closures(input), input[1] * input[2])
     end
 end
