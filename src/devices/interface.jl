@@ -55,7 +55,7 @@ Return an `Expr` or `QuoteNode` accessing the variable identified by [`symbol`].
 function _gen_access_expr end
 
 """
-    _gen_local_init(fc::FunctionCall, device::AbstractDevice)
+    _gen_local_init(device::AbstractDevice, symbol::Symbol, type::Type)
 
 Interface function that must be implemented for every subtype of [`AbstractDevice`](@ref).
 Return an `Expr` or `QuoteNode` that initializes the access expression returned by [`_gen_access_expr`](@ref) in the local scope.

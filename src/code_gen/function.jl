@@ -24,20 +24,20 @@ function get_compute_function(
 )
     tape = gen_tape(graph, instance, machine, context_module)
 
-    assignInputs = Expr(:block, expr_from_fc.(tape.inputAssignCode)...)
+    assign_inputs = Expr(:block, expr_from_fc.(tape.input_assign_code)...)
     code = gen_function_body(tape; closures_size=closures_size)
 
-    functionId = to_var_name(UUIDs.uuid1(rng[1]))
-    resSym = eval(_gen_access_expr(entry_device(tape.machine), tape.outputSymbol))
+    function_id = to_var_name(UUIDs.uuid1(rng[1]))
+    res_sym = _gen_access_expr(entry_device(tape.machine), tape.output_symbol)
     expr = #
     Expr(
         :function, # function definition
         Expr(
             :call,
-            Symbol("compute_$functionId"),
+            Symbol("compute_$function_id"),
             Expr(:(::), :data_input, input_type(instance)),
         ), # function name and parameters
-        Expr(:block, assignInputs, code, Expr(:return, resSym)), # function body
+        Expr(:block, assign_inputs, code, Expr(:return, res_sym)), # function body
     )
 
     return RuntimeGeneratedFunction(@__MODULE__, context_module, expr)

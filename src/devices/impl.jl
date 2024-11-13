@@ -31,17 +31,44 @@ end
 """
     gen_access_expr(fc::FunctionCall)
 
-Dispatch from the given [`FunctionCall`](@ref) to the interface function `_gen_access_expr`(@ref).
+Dispatch from the given [`FunctionCall`](@ref) to the interface function [`_gen_access_expr`](@ref).
 """
-function gen_access_expr(fc::FunctionCall)
-    return _gen_access_expr(fc.device, fc.return_symbol)
+function gen_access_expr(fc::FunctionCall{VAL_T,N_ARG,N_RET}) where {VAL_T,N_ARG,N_RET}
+    vec = Expr[]
+    for ret_symbols in fc.return_symbols
+        push!(vec, unroll_symbol_vector(_gen_access_expr.(Ref(fc.device), ret_symbols)))
+    end
+    if length(vec) > 1
+        return unroll_symbol_vector(vec)
+    else
+        return vec[1]
+    end
+end
+
+function gen_access_expr(fc::FunctionCall{VAL_T,N_ARG,1}) where {VAL_T,N_ARG}
+    vec = Symbol[]
+    for ret_symbols in fc.return_symbols
+        push!(vec, _gen_access_expr.(Ref(fc.device), ret_symbols[1]))
+    end
+    if length(vec) > 1
+        return unroll_symbol_vector(vec)
+    else
+        return vec[1]
+    end
 end
 
 """
     gen_local_init(fc::FunctionCall)
 
-Dispatch from the given [`FunctionCall`](@ref) to the interface function `_gen_local_init`(@ref).
+Dispatch from the given [`FunctionCall`](@ref) to the interface function [`_gen_local_init`](@ref).
 """
 function gen_local_init(fc::FunctionCall)
-    return _gen_local_init(fc, fc.device)
+    return Expr(
+        :block,
+        _gen_local_init.(
+            Ref(fc.device),
+            Iterators.flatten(fc.return_symbols),
+            Iterators.cycle(fc.return_types, length(fc.return_symbols)),
+        )...,
+    )
 end

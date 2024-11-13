@@ -6,14 +6,6 @@ Function with no arguments, returns nothing, does nothing. Useful for noop [`Fun
 @inline noop() = nothing
 
 """
-    unpack_identity(x::SVector)
-
-Function taking an `SVector`, returning it unpacked.
-"""
-@inline unpack_identity(x::SVector{1,<:Any}) = x[1]
-@inline unpack_identity(x) = x
-
-"""
     bytes_to_human_readable(bytes)
 
 Return a human readable string representation of the given number.
@@ -118,17 +110,6 @@ end
 
 Return the given vector as single String without quotation marks or brackets.
 """
-function unroll_symbol_vector(vec::Vector)
-    result = ""
-    for s in vec
-        if (result != "")
-            result *= ", "
-        end
-        result *= "$s"
-    end
-    return result
-end
-
-function unroll_symbol_vector(vec::SVector)
-    return unroll_symbol_vector(Vector(vec))
+function unroll_symbol_vector(vec::VEC) where {VEC<:Union{AbstractVector,Tuple}}
+    return Expr(:tuple, vec...)
 end

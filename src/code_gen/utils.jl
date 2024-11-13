@@ -10,16 +10,26 @@ function infer_types!(tape::Tape)
     # the only initially known type
     known_result_types[:input] = input_type(tape.instance)
 
-    for fc in tape.inputAssignCode
-        res_type = result_type(fc, known_result_types)
-        fc.return_type = res_type
-        known_result_types[fc.return_symbol] = res_type
+    for fc in tape.input_assign_code
+        res_types = result_types(fc, known_result_types)
+        fc.return_types = res_types
+        for (s, t) in Iterators.zip(
+            Iterators.flatten(fc.return_symbols),
+            Iterators.cycle(res_types, length(fc.return_symbols)),
+        )
+            known_result_types[s] = t
+        end
     end
 
     for fc in tape.schedule
-        res_type = result_type(fc, known_result_types)
-        fc.return_type = res_type
-        known_result_types[fc.return_symbol] = res_type
+        res_types = result_types(fc, known_result_types)
+        fc.return_types = res_types
+        for (s, t) in Iterators.zip(
+            Iterators.flatten(fc.return_symbols),
+            Iterators.cycle(res_types, length(fc.return_symbols)),
+        )
+            known_result_types[s] = t
+        end
     end
 
     return nothing
@@ -37,7 +47,7 @@ function lower(schedule::Vector{Node}, machine::Machine)
         if (node isa DataTaskNode && length(children(node)) == 0)
             push!(calls, get_init_function_call(node, entry_device(machine)))
         else
-            push!(calls, get_function_call(node)...)
+            push!(calls, get_function_call(node))
         end
     end
 

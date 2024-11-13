@@ -6,14 +6,12 @@ TODO: update docs
 - `INPUT` the input type of the problem instance
 
 - `code::Vector{Expr}`: The julia expression containing the code for the whole graph.
-- `inputSymbols::Dict{String, Vector{Symbol}}`: A dictionary of symbols mapping the names of the input nodes of the graph to the symbols their inputs should be provided on.
-- `outputSymbol::Symbol`: The symbol of the final calculated value
+- `output_symbol::Symbol`: The symbol of the final calculated value
 """
 struct Tape{INPUT}
-    inputAssignCode::Vector{FunctionCall}
+    input_assign_code::Vector{FunctionCall}
     schedule::Vector{FunctionCall}
-    inputSymbols::Dict{String,Vector{Symbol}}
-    outputSymbol::Symbol
+    output_symbol::Symbol
     instance::Any
     machine::Machine
 end

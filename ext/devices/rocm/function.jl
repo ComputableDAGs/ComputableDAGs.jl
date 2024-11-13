@@ -4,7 +4,7 @@ function ComputableDAGs.kernel(
     machine = cpu_st()
     tape = ComputableDAGs.gen_tape(graph, instance, machine, context_module)
 
-    assign_inputs = Expr(:block, ComputableDAGs.expr_from_fc.(tape.inputAssignCode)...)
+    assign_inputs = Expr(:block, ComputableDAGs.expr_from_fc.(tape.input_assign_code)...)
 
     # TODO use gen_function_body here
     code = Expr(:block, ComputableDAGs.expr_from_fc.(tape.schedule)...)
@@ -12,7 +12,7 @@ function ComputableDAGs.kernel(
     function_id = ComputableDAGs.to_var_name(UUIDs.uuid1(ComputableDAGs.rng[1]))
     res_sym = eval(
         ComputableDAGs._gen_access_expr(
-            ComputableDAGs.entry_device(tape.machine), tape.outputSymbol
+            ComputableDAGs.entry_device(tape.machine), tape.output_symbol
         ),
     )
     expr = Meta.parse(

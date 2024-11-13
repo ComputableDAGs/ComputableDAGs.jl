@@ -50,29 +50,21 @@ function call_fc(fc::FunctionCall{VectorT,M}, cache::Dict{Symbol,Any}) where {Ve
     return nothing
 end
 
-function expr_from_fc(fc::FunctionCall{VectorT,0}) where {VectorT}
-    func_call = Expr(
-        :call, fc.func, eval.(_gen_access_expr.(Ref(fc.device), fc.arguments))...
-    )
-    access_expr = eval(gen_access_expr(fc))
-
-    return Expr(:(=), access_expr, func_call)
-end
-
-"""
-    expr_from_fc(fc::FunctionCall)
-
-For a given function call, return an expression evaluating it.
-"""
-function expr_from_fc(fc::FunctionCall{VectorT,M}) where {VectorT,M}
-    func_call = Expr(
-        :call,
-        fc.func,
-        fc.value_arguments...,
-        eval.(_gen_access_expr.(Ref(fc.device), fc.arguments))...,
-    )
-    access_expr = eval(gen_access_expr(fc))
-
+function expr_from_fc(fc::FunctionCall{VAL_T,N_ARG,N_RET}) where {VAL_T,N_ARG,N_RET}
+    if length(fc) == 1
+        func_call = Expr(
+            :call,
+            fc.func,
+            (
+                fc.value_arguments[1]...,
+                _gen_access_expr.(Ref(fc.device), fc.arguments[1])...,
+            )...,
+        )
+    else
+        # TBW; dispatch to device specific vectorization
+        throw("unimplemented")
+    end
+    access_expr = gen_access_expr(fc)
     return Expr(:(=), access_expr, func_call)
 end
 
@@ -101,10 +93,10 @@ function gen_input_assignment_code(
 
             fc = FunctionCall(
                 context_module.eval(Expr(:->, :x, input_expr(instance, name, :x))),
-                SVector{0,Any}(),
-                SVector{1,Symbol}(:input),
-                symbol,
-                Nothing,
+                (),
+                (:input,),
+                (symbol,),
+                (Nothing,),
                 device,
             )
 
@@ -140,7 +132,7 @@ function gen_function_body(tape::Tape; closures_size::Int)
     # this helps because we can collect all undefined arguments to the closures that have to be returned somewhere earlier
     undefined_argument_symbols = Set{Symbol}()
     # the final return symbol is the return of the entire generated function, it always has to be returned
-    push!(undefined_argument_symbols, eval(gen_access_expr(fc_vec[end])))
+    push!(undefined_argument_symbols, gen_access_expr(fc_vec[end]))
 
     for i in length(fc_vec):(-closures_size):1
         e = i
@@ -150,12 +142,12 @@ function gen_function_body(tape::Tape; closures_size::Int)
         # collect `local var` statements that need to exist before the closure starts
         local_inits = gen_local_init.(code_block)
 
-        return_symbols = eval.(gen_access_expr.(code_block))
+        return_symbols = gen_access_expr.(code_block)
 
         ret_symbols_set = Set(return_symbols)
         for fc in code_block
             for arg in fc.arguments
-                symbol = eval(_gen_access_expr(fc.device, arg))
+                symbol = _gen_access_expr(fc.device, arg)
 
                 # symbol won't be defined if it is first calculated in the closure
                 # so don't add it to the arguments in this case
@@ -237,7 +229,7 @@ function gen_tape(
     assign_inputs = gen_input_assignment_code(input_syms, instance, machine, context_module)
 
     return Tape{input_type(instance)}(
-        assign_inputs, function_body, input_syms, outSym, instance, machine
+        assign_inputs, function_body, outSym, instance, machine
     )
 end
 
@@ -257,12 +249,12 @@ function execute_tape(tape::Tape, input)
 
     compute_code = tape.schedule
 
-    for function_call in tape.inputAssignCode
+    for function_call in tape.input_assign_code
         call_fc(function_call, cache)
     end
     for function_call in compute_code
         call_fc(function_call, cache)
     end
 
-    return cache[tape.outputSymbol]
+    return cache[tape.output_symbol]
 end
