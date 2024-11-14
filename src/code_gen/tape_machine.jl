@@ -108,86 +108,127 @@ function gen_input_assignment_code(
 end
 
 """
-    gen_function_body(tape::Tape; closures_size)
+    gen_function_body(tape::Tape, context_module::Module; closures_size)
 
 Generate the function body from the given [`Tape`](@ref).
 
 ## Keyword Arguments
 `closures_size`: The size of closures to generate (in lines of code). Closures introduce function barriers in the function body, preventing some optimizations by the compiler and therefore greatly reducing compile time. A value of 1 or less will disable the use of closures entirely.
 """
-function gen_function_body(tape::Tape; closures_size::Int)
-    if closures_size > 1
-        # only need to annotate types later when using closures
-        infer_types!(tape)
-    end
+function gen_function_body(tape::Tape, context_module::Module; closures_size::Int)
+    # only need to annotate types later when using closures
+    types = infer_types!(tape)
 
-    fc_vec = tape.schedule
+    # TODO calculate closures size better
 
-    if (closures_size <= 1)
+    return _gen_function_body(
+        tape.schedule, types, tape.machine, context_module; closures_size=closures_size
+    )
+end
+
+function _gen_function_body(
+    fc_vec::AbstractVector{FunctionCall},
+    type_dict::Dict{Symbol,Type},
+    machine::Machine,
+    context_module::Module;
+    closures_size=0,
+)
+    if closures_size <= 1 || closures_size >= length(fc_vec)
         return Expr(:block, expr_from_fc.(fc_vec)...)
     end
 
-    closures = Vector{Expr}()
     # iterate from end to beginning
     # this helps because we can collect all undefined arguments to the closures that have to be returned somewhere earlier
     undefined_argument_symbols = Set{Symbol}()
     # the final return symbol is the return of the entire generated function, it always has to be returned
     push!(undefined_argument_symbols, gen_access_expr(fc_vec[end]))
 
+    closured_fc_vec = FunctionCall[]
     for i in length(fc_vec):(-closures_size):1
         e = i
         b = max(i - closures_size, 1)
         code_block = fc_vec[b:e]
 
-        # collect `local var` statements that need to exist before the closure starts
-        local_inits = gen_local_init.(code_block)
-
-        return_symbols = gen_access_expr.(code_block)
-
-        ret_symbols_set = Set(return_symbols)
-        for fc in code_block
-            for arg in fc.arguments
-                symbol = _gen_access_expr(fc.device, arg)
-
-                # symbol won't be defined if it is first calculated in the closure
-                # so don't add it to the arguments in this case
-                if !(symbol in ret_symbols_set)
-                    push!(undefined_argument_symbols, symbol)
-                end
-            end
-        end
-
-        intersect!(ret_symbols_set, undefined_argument_symbols)
-        return_symbols = Symbol[ret_symbols_set...]
-
-        closure = Expr(
-            :block,
-            Expr(
-                :(=),
-                Expr(:tuple, return_symbols...),
-                Expr(
-                    :call,                                  # call to the following closure (no arguments)
-                    Expr(                                   # create the closure: () -> code block; return (locals)
-                        :->,
-                        :(),                                # closure arguments (none)
-                        Expr(                               # actual function body of the closure
-                            :block,
-                            local_inits...,                 # declare local variables with type information inside the closure
-                            expr_from_fc.(code_block)...,
-                            Expr(:return, Expr(:tuple, return_symbols...)),
-                        ),
-                    ),
-                ),
+        pushfirst!(
+            closured_fc_vec,
+            _closure_fc(
+                code_block, type_dict, machine, undefined_argument_symbols, context_module
             ),
         )
-
-        setdiff!(undefined_argument_symbols, ret_symbols_set)
-
-        # combine to one closure call, including all the local inits and the actual call to the closure
-        pushfirst!(closures, closure)
     end
 
-    return Expr(:block, closures...)
+    return _gen_function_body(
+        closured_fc_vec, type_dict, machine, context_module; closures_size=closures_size
+    )
+end
+
+"""
+    _closure_fc()
+
+From the given function calls, make and return a new function call representing all of them together.
+The undefined_argument_symbols is the set of all Symbols that need to be returned if available inside the code_block. They get updated inside this function.
+"""
+function _closure_fc(
+    code_block::AbstractVector{FunctionCall},
+    types::Dict{Symbol,Type},
+    machine::Machine,
+    undefined_argument_symbols::Set{Symbol},
+    context_module::Module,
+)
+    return_symbols = Symbol[]
+    for s in
+        Iterators.flatten(Iterators.flatten(getfield.(code_block, Ref(:return_symbols))))
+        push!(return_symbols, s)
+    end
+
+    ret_symbols_set = Set(return_symbols)
+    arg_symbols_set = Set{Symbol}()
+    for fc in code_block
+        for symbol in Iterators.flatten(fc.arguments)
+            # symbol won't be defined if it is first calculated in the closure
+            # so don't add it to the arguments in this case
+            if !(symbol in ret_symbols_set)
+                push!(undefined_argument_symbols, symbol)
+
+                push!(arg_symbols_set, symbol)
+            end
+        end
+    end
+
+    setdiff!(arg_symbols_set, ret_symbols_set)
+    intersect!(ret_symbols_set, undefined_argument_symbols)
+
+    arg_symbols_t = (arg_symbols_set...,)
+    ret_symbols_t = (ret_symbols_set...,)
+
+    closure = context_module.eval(
+        Expr(                                   # create the closure: () -> code block; return (locals)
+            :->,
+            Expr(:tuple, arg_symbols_t...),     # closure arguments
+            Expr(                               # actual function body of the closure
+                :block,
+                expr_from_fc.(code_block)...,
+                Expr(
+                    :return,                    # have to make sure to not return a tuple of length 1
+                    if length(ret_symbols_t) == 1
+                        ret_symbols_t[1]
+                    else
+                        Expr(:tuple, ret_symbols_t...)
+                    end,
+                ),
+            ),
+        ),
+    )
+
+    ret_types = (getindex.(Ref(types), ret_symbols_t))
+
+    fc = FunctionCall(
+        closure, (), arg_symbols_t, ret_symbols_t, ret_types, entry_device(machine)
+    )
+
+    setdiff!(undefined_argument_symbols, ret_symbols_set)
+
+    return fc
 end
 
 """

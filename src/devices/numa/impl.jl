@@ -46,9 +46,9 @@ Interface implementation, dispatched to from [`gen_access_expr`](@ref).
 """
 function _gen_access_expr(::NumaNode, symbol::Symbol)
     # TODO rewrite these with Expr instead of quote node
-    s = Symbol("data_$symbol")
-    quote_node = Meta.parse(":($s)")
-    return eval(quote_node)
+    #=s = Symbol("data_$symbol")
+    quote_node = Meta.parse(":($s)")=#
+    return symbol
 end
 
 """
@@ -57,7 +57,7 @@ end
 Interface implementation, dispatched to from [`gen_local_init`](@ref).
 """
 function _gen_local_init(::NumaNode, symbol::Symbol, type::Type)
-    s = Symbol("data_$(symbol)")
-    quote_node = Expr(:local, s, :(::), Symbol(type))
+    #s = Symbol("data_$(symbol)")
+    quote_node = Expr(:local, symbol, :(::), Symbol(type))
     return quote_node
 end

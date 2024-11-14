@@ -3,6 +3,8 @@
 
 Infer the result type of each function call in the given schedule. Returns a dictionary with the result type for each [`Node`](@ref). This assumes that each node has only one statically inferrable return type and will throw an exceptin otherwise.
 This also assumes that the given `Vector` contains a topological ordering of its nodes, such as returned by a call to [`schedule_dag`](@ref).
+
+Also returns the inferred types as a `Dict{Symbol, Type}`.
 """
 function infer_types!(tape::Tape)
     known_result_types = Dict{Symbol,Type}()
@@ -32,7 +34,7 @@ function infer_types!(tape::Tape)
         end
     end
 
-    return nothing
+    return known_result_types
 end
 
 """

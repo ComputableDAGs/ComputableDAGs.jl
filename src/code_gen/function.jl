@@ -25,7 +25,7 @@ function get_compute_function(
     tape = gen_tape(graph, instance, machine, context_module)
 
     assign_inputs = Expr(:block, expr_from_fc.(tape.input_assign_code)...)
-    code = gen_function_body(tape; closures_size=closures_size)
+    code = gen_function_body(tape, context_module; closures_size=closures_size)
 
     function_id = to_var_name(UUIDs.uuid1(rng[1]))
     res_sym = _gen_access_expr(entry_device(tape.machine), tape.output_symbol)
@@ -33,9 +33,7 @@ function get_compute_function(
     Expr(
         :function, # function definition
         Expr(
-            :call,
-            Symbol("compute_$function_id"),
-            Expr(:(::), :data_input, input_type(instance)),
+            :call, Symbol("compute_$function_id"), Expr(:(::), :input, input_type(instance))
         ), # function name and parameters
         Expr(:block, assign_inputs, code, Expr(:return, res_sym)), # function body
     )

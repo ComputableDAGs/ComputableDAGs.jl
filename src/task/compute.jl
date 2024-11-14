@@ -88,7 +88,7 @@ end
 function result_types(
     fc::FunctionCall{VAL_T,N_ARG,N_RET}, known_res_types::Dict{Symbol,Type}
 ) where {VAL_T,N_ARG,N_RET}
-    arg_types = (_value_argument_types(fc)..., _argument_types(fc)...)
+    arg_types = (_value_argument_types(fc)..., _argument_types(known_res_types, fc)...)
     types = Base.return_types(fc.func, arg_types)
 
     if length(types) > 1

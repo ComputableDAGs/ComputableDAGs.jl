@@ -21,7 +21,7 @@ function ComputableDAGs.kernel(
             if (id > n)
                 return
             end
-            @inline data_input = input_vector[id]
+            @inline input = input_vector[id]
             $(assign_inputs)
             $code
             @inline output_vector[id] = $res_sym

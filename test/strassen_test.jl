@@ -53,12 +53,10 @@ EDGE_NUMBERS = (3, 96, 747, 5304) #, 37203
         @test isapprox(f(input), input[1] * input[2])
     end
 
-    #= TODO: reenable when closures work again
     @testset "Execution with closures" begin
         f_closures = get_compute_function(g, mm, cpu_st(), @__MODULE__; closures_size=100)
 
         @test Base.return_types(f_closures, (typeof(input),))[1] == typeof(input[1])
         @test isapprox(f_closures(input), input[1] * input[2])
     end
-    =#
 end
