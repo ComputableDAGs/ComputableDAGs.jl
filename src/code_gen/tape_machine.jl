@@ -55,10 +55,8 @@ function expr_from_fc(fc::FunctionCall{VAL_T,N_ARG,N_RET}) where {VAL_T,N_ARG,N_
         func_call = Expr(
             :call,
             fc.func,
-            (
-                fc.value_arguments[1]...,
-                _gen_access_expr.(Ref(fc.device), fc.arguments[1])...,
-            )...,
+            fc.value_arguments[1]...,
+            _gen_access_expr.(Ref(fc.device), fc.arguments[1])...,
         )
     else
         # TBW; dispatch to device specific vectorization
@@ -119,7 +117,13 @@ function gen_function_body(tape::Tape, context_module::Module; closures_size::In
     # only need to annotate types later when using closures
     types = infer_types!(tape)
 
-    # TODO calculate closures size better
+    if closures_size >= 1
+        s = log(closures_size, length(tape.schedule))
+        closures_depth = ceil(Int, s) # tend towards more levels/smaller closures
+        closures_size = ceil(Int, length(tape.schedule)^(1 / closures_depth))
+    end
+
+    @info "generating function body with closure size $closures_size"
 
     return _gen_function_body(
         tape.schedule, types, tape.machine, context_module; closures_size=closures_size
@@ -133,6 +137,7 @@ function _gen_function_body(
     context_module::Module;
     closures_size=0,
 )
+    @info "generating function body from $(length(fc_vec)) function calls with closure size $closures_size"
     if closures_size <= 1 || closures_size >= length(fc_vec)
         return Expr(:block, expr_from_fc.(fc_vec)...)
     end
@@ -251,6 +256,7 @@ function gen_tape(
     context_module::Module,
     scheduler::AbstractScheduler=GreedyScheduler(),
 )
+    @debug "generating tape"
     schedule = schedule_dag(scheduler, graph, machine)
     function_body = lower(schedule, machine)
 
