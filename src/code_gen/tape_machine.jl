@@ -1,3 +1,4 @@
+#=
 # TODO: do this with macros
 function call_fc(
     fc::FunctionCall{VectorT,0}, cache::Dict{Symbol,Any}
@@ -49,8 +50,9 @@ function call_fc(fc::FunctionCall{VectorT,M}, cache::Dict{Symbol,Any}) where {Ve
     )
     return nothing
 end
+=#
 
-function expr_from_fc(fc::FunctionCall{VAL_T,N_ARG,N_RET}) where {VAL_T,N_ARG,N_RET}
+function expr_from_fc(fc::FunctionCall{VAL_T}) where {VAL_T}
     if length(fc) == 1
         func_call = Expr(
             :call,
@@ -92,9 +94,9 @@ function gen_input_assignment_code(
             fc = FunctionCall(
                 context_module.eval(Expr(:->, :x, input_expr(instance, name, :x))),
                 (),
-                (:input,),
-                (symbol,),
-                (Nothing,),
+                [:input],
+                [symbol],
+                [Nothing],
                 device,
             )
 
@@ -203,8 +205,8 @@ function _closure_fc(
     setdiff!(arg_symbols_set, ret_symbols_set)
     intersect!(ret_symbols_set, undefined_argument_symbols)
 
-    arg_symbols_t = (arg_symbols_set...,)
-    ret_symbols_t = (ret_symbols_set...,)
+    arg_symbols_t = [arg_symbols_set...]
+    ret_symbols_t = [ret_symbols_set...]
 
     closure = context_module.eval(
         Expr(                                   # create the closure: () -> code block; return (locals)

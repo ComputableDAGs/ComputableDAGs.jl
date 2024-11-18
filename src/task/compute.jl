@@ -12,7 +12,7 @@ function get_function_call(
     in_symbols::NTuple{N,Symbol},
     out_symbol::Symbol,
 ) where {N}
-    return FunctionCall(compute, (t,), in_symbols, (out_symbol,), (Any,), device)
+    return FunctionCall(compute, (t,), [in_symbols...], [out_symbol], [Any], device)
 end
 
 function get_function_call(node::ComputeTaskNode)
@@ -37,9 +37,9 @@ function get_function_call(node::DataTaskNode)
     return FunctionCall(
         identity,
         (),
-        (Symbol(to_var_name(first(children(node))[1].id)),),
-        (Symbol(to_var_name(node.id)),),
-        (Any,),
+        [Symbol(to_var_name(first(children(node))[1].id))],
+        [Symbol(to_var_name(node.id))],
+        [Any],
         first(children(node))[1].device,
     )
 end
@@ -50,9 +50,9 @@ function get_init_function_call(node::DataTaskNode, device::AbstractDevice)
     return FunctionCall(
         identity,
         (),
-        (Symbol("$(to_var_name(node.id))_in"),),
-        (Symbol(to_var_name(node.id)),),
-        (Any,),
+        [Symbol("$(to_var_name(node.id))_in")],
+        [Symbol(to_var_name(node.id))],
+        [Any],
         device,
     )
 end
@@ -63,33 +63,12 @@ function _argument_types(known_res_types::Dict{Symbol,Type}, fc::FunctionCall)
 end
 
 function result_types(
-    fc::FunctionCall{VAL_T,N_ARG,1}, known_res_types::Dict{Symbol,Type}
-) where {VAL_T,N_ARG}
+    fc::FunctionCall{VAL_T}, known_res_types::Dict{Symbol,Type}
+) where {VAL_T}
     arg_types = (_value_argument_types(fc)..., _argument_types(known_res_types, fc)...)
     types = Base.return_types(fc.func, arg_types)
 
-    if length(types) > 1
-        throw(
-            "failure during type inference: function call $fc with argument types $(arg_types) is type unstable, possible return types: $types",
-        )
-    end
-    if isempty(types)
-        throw(
-            "failure during type inference: function call $fc with argument types $(arg_types) has no return types, this is likely because no method matches the arguments",
-        )
-    end
-    if types[1] == Any
-        @warn "inferred return type 'Any' in task $fc with argument types $(arg_types)"
-    end
-
-    return (types[1],)
-end
-
-function result_types(
-    fc::FunctionCall{VAL_T,N_ARG,N_RET}, known_res_types::Dict{Symbol,Type}
-) where {VAL_T,N_ARG,N_RET}
-    arg_types = (_value_argument_types(fc)..., _argument_types(known_res_types, fc)...)
-    types = Base.return_types(fc.func, arg_types)
+    N_RET = length(fc.return_types)
 
     if length(types) > 1
         throw(
@@ -104,11 +83,15 @@ function result_types(
     if types[1] == Any
         @warn "inferred return type 'Any' in task $fc with argument types $(arg_types)"
     end
+
+    if (N_RET == 1)
+        return [types[1]]
+    end
+
     if !(types[1] isa Tuple) || length(types[1].parameters) != N_RET
         throw(
             "failure durng type inference: function call $(fc.func) was expected to return a Tuple with $N_RET elements, but returns $(types[1])",
         )
     end
-
-    return (types[1].parameters...,)
+    return [types[1].parameters...]
 end

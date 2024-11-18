@@ -33,19 +33,21 @@ end
 
 Dispatch from the given [`FunctionCall`](@ref) to the interface function [`_gen_access_expr`](@ref).
 """
-function gen_access_expr(fc::FunctionCall{VAL_T,N_ARG,N_RET}) where {VAL_T,N_ARG,N_RET}
-    vec = Expr[]
-    for ret_symbols in fc.return_symbols
-        push!(vec, unroll_symbol_vector(_gen_access_expr.(Ref(fc.device), ret_symbols)))
+function gen_access_expr(fc::FunctionCall{VAL_T}) where {VAL_T}
+    if length(fc.return_types) != 1
+        # general case
+        vec = Expr[]
+        for ret_symbols in fc.return_symbols
+            push!(vec, unroll_symbol_vector(_gen_access_expr.(Ref(fc.device), ret_symbols)))
+        end
+        if length(vec) > 1
+            return unroll_symbol_vector(vec)
+        else
+            return vec[1]
+        end
     end
-    if length(vec) > 1
-        return unroll_symbol_vector(vec)
-    else
-        return vec[1]
-    end
-end
 
-function gen_access_expr(fc::FunctionCall{VAL_T,N_ARG,1}) where {VAL_T,N_ARG}
+    # no vectorization case
     vec = Symbol[]
     for ret_symbols in fc.return_symbols
         push!(vec, _gen_access_expr.(Ref(fc.device), ret_symbols[1]))

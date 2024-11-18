@@ -5,24 +5,25 @@ Type representing a function call. Contains the function to call, argument symbo
 
 TODO: extend docs
 """
-mutable struct FunctionCall{VAL_T<:Tuple,N_ARG,N_RET}
+mutable struct FunctionCall{VAL_T<:Tuple}
     func::Function
-    value_arguments::Vector{VAL_T}                          # tuple of value arguments for the function call, will be prepended to the other arguments
-    arguments::Vector{NTuple{N_ARG,Symbol}}                 # symbols of the inputs to the function call
-    return_symbols::Vector{NTuple{N_RET,Symbol}}            # the return symbols
-    return_types::NTuple{N_RET,Type}                        # the return type of the function call(s); there can only be one return type since we require type stability
+    value_arguments::Vector{VAL_T}          # tuple of value arguments for the function call, will be prepended to the other arguments
+    arguments::Vector{Vector{Symbol}}       # symbols of the inputs to the function call
+    return_symbols::Vector{Vector{Symbol}}  # the return symbols
+    return_types::Vector{<:Type}              # the return type of the function call(s); there can only be one return type since we require type stability
     device::AbstractDevice
 end
 
 function FunctionCall(
     func::Function,
     value_arguments::VAL_T,
-    arguments::NTuple{N_ARG,Symbol},
-    return_symbol::NTuple{N_RET,Symbol},
-    return_types::NTuple{N_RET,Type},
+    arguments::Vector{Symbol},
+    return_symbol::Vector{Symbol},
+    return_types::Vector{<:Type},
     device::AbstractDevice,
-) where {VAL_T<:Tuple,N_ARG,N_RET}
+) where {VAL_T<:Tuple}
     # convenience constructor for function calls that do not use vectorization, which is most of the use cases
+    @assert length(return_types) == 0 || length(return_types) == length(return_symbol) "number of return types $(length(return_types)) does not match the number of return symbols $(length(return_symbol))"
     return FunctionCall(
         func, [value_arguments], [arguments], [return_symbol], return_types, device
     )
