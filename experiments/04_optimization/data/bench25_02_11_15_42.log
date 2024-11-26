@@ -1,0 +1,114 @@
+   Resolving package versions...
+  No Changes to `~/repos/ComputableDAGs.jl/Project.toml`
+  No Changes to `~/repos/ComputableDAGs.jl/Manifest.toml`
+[ Info: == Reductions benchmark ==
+[ Info: kkke->ke
+[ Info:     Steps: 0
+[ Info:     Steps: 10
+[ Info:     Steps: 20
+[ Info:     Steps: 30
+[ Info:     Steps: 40
+[ Info:     Steps: 50
+[ Info:     Steps: 60
+[ Info:     Steps: 70
+[ Info:     Steps: 80
+[ Info: kkkke->ke
+[ Info:     Steps: 0
+[ Info:     Steps: 10
+[ Info:     Steps: 20
+[ Info:     Steps: 30
+[ Info:     Steps: 40
+[ Info:     Steps: 50
+[ Info:     Steps: 60
+[ Info:     Steps: 70
+[ Info:     Steps: 80
+[ Info:     Steps: 90
+[ Info:     Steps: 100
+[ Info:     Steps: 110
+[ Info:     Steps: 120
+[ Info:     Steps: 130
+[ Info:     Steps: 140
+[ Info:     Steps: 150
+[ Info:     Steps: 160
+[ Info:     Steps: 170
+[ Info:     Steps: 180
+[ Info:     Steps: 190
+[ Info:     Steps: 200
+[ Info:     Steps: 210
+[ Info:     Steps: 220
+[ Info:     Steps: 230
+[ Info:     Steps: 240
+[ Info:     Steps: 250
+[ Info:     Steps: 260
+[ Info:     Steps: 270
+[ Info:     Steps: 280
+[ Info: kkkkke->ke
+ERROR: LoadError: CUDA error: invalid argument (code 1, ERROR_INVALID_VALUE)
+Stacktrace:
+  [1] throw_api_error(res::CUDA.cudaError_enum)
+    @ CUDA ~/.julia/packages/CUDA/1kIOw/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ ~/.julia/packages/CUDA/1kIOw/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuLaunchKernel
+    @ ~/.julia/packages/CUDA/1kIOw/lib/utils/call.jl:34 [inlined]
+  [4] (::CUDA.var"#966#967"{Bool, Int64, CuStream, CuFunction, CuDim3, CuDim3})(kernelParams::Vector{Ptr{Nothing}})
+    @ CUDA ~/.julia/packages/CUDA/1kIOw/lib/cudadrv/execution.jl:66
+  [5] macro expansion
+    @ ~/.julia/packages/CUDA/1kIOw/lib/cudadrv/execution.jl:33 [inlined]
+  [6] macro expansion
+    @ ./none:0 [inlined]
+  [7] pack_arguments(::CUDA.var"#966#967"{Bool, Int64, CuStream, CuFunction, CuDim3, CuDim3}, ::CUDA.KernelState, ::CuDeviceVector{PhaseSpacePoint{ScatteringProcess{Tuple{Photon, Photon, Photon, Photon, Photon, Electron}, Tuple{Photon, Electron}, Tuple{PolarizationX, PolarizationX, PolarizationX, PolarizationX, PolarizationX, SpinUp}, Tuple{PolarizationX, SpinUp}}, PerturbativeQED, PhasespaceDefinition{SphericalCoordinateSystem, ElectronRestFrame}, Tuple{ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Electron, SFourMomentum}}, Tuple{ParticleStateful{Outgoing, Photon, SFourMomentum}, ParticleStateful{Outgoing, Electron, SFourMomentum}}, SFourMomentum}, 1}, ::CuDeviceVector{Float64, 1}, ::Int64)
+    @ CUDA ./none:0
+  [8] launch(::CuFunction, ::CUDA.KernelState, ::CuDeviceVector{PhaseSpacePoint{ScatteringProcess{Tuple{Photon, Photon, Photon, Photon, Photon, Electron}, Tuple{Photon, Electron}, Tuple{PolarizationX, PolarizationX, PolarizationX, PolarizationX, PolarizationX, SpinUp}, Tuple{PolarizationX, SpinUp}}, PerturbativeQED, PhasespaceDefinition{SphericalCoordinateSystem, ElectronRestFrame}, Tuple{ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Electron, SFourMomentum}}, Tuple{ParticleStateful{Outgoing, Photon, SFourMomentum}, ParticleStateful{Outgoing, Electron, SFourMomentum}}, SFourMomentum}, 1}, ::CuDeviceVector{Float64, 1}, ::Int64; blocks::Int64, threads::Int64, cooperative::Bool, shmem::Int64, stream::CuStream)
+    @ CUDA ~/.julia/packages/CUDA/1kIOw/lib/cudadrv/execution.jl:59
+  [9] launch
+    @ ~/.julia/packages/CUDA/1kIOw/lib/cudadrv/execution.jl:52 [inlined]
+ [10] #972
+    @ ~/.julia/packages/CUDA/1kIOw/lib/cudadrv/execution.jl:189 [inlined]
+ [11] macro expansion
+    @ ~/.julia/packages/CUDA/1kIOw/lib/cudadrv/execution.jl:149 [inlined]
+ [12] macro expansion
+    @ ./none:0 [inlined]
+ [13] convert_arguments
+    @ ./none:0 [inlined]
+ [14] #cudacall#971
+    @ ~/.julia/packages/CUDA/1kIOw/lib/cudadrv/execution.jl:191 [inlined]
+ [15] cudacall
+    @ ~/.julia/packages/CUDA/1kIOw/lib/cudadrv/execution.jl:187 [inlined]
+ [16] macro expansion
+    @ ~/.julia/packages/CUDA/1kIOw/src/compiler/execution.jl:279 [inlined]
+ [17] macro expansion
+    @ ./none:0 [inlined]
+ [18] AbstractKernel
+    @ ./none:0 [inlined]
+ [19] macro expansion
+    @ ~/.julia/packages/CUDA/1kIOw/src/compiler/execution.jl:114 [inlined]
+ [20] macro expansion
+    @ ~/.julia/packages/CUDA/1kIOw/src/utilities.jl:35 [inlined]
+ [21] var"##core#257"(N#234::Int64, N#235::Int64, cu_func#236::typeof(compute__96b8c0a0_e889_11ef_1e37_871fd8ef373b), cu_inputs#237::CuArray{PhaseSpacePoint{ScatteringProcess{Tuple{Photon, Photon, Photon, Photon, Photon, Electron}, Tuple{Photon, Electron}, Tuple{PolarizationX, PolarizationX, PolarizationX, PolarizationX, PolarizationX, SpinUp}, Tuple{PolarizationX, SpinUp}}, PerturbativeQED, PhasespaceDefinition{SphericalCoordinateSystem, ElectronRestFrame}, Tuple{ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Electron, SFourMomentum}}, Tuple{ParticleStateful{Outgoing, Photon, SFourMomentum}, ParticleStateful{Outgoing, Electron, SFourMomentum}}, SFourMomentum}, 1, CUDA.DeviceMemory}, cu_outputs#238::CuArray{Float64, 1, CUDA.DeviceMemory}, n::Int64, t::Int64, b::Int64, k::typeof(compute__96b8c0a0_e889_11ef_1e37_871fd8ef373b), in::CuArray{PhaseSpacePoint{ScatteringProcess{Tuple{Photon, Photon, Photon, Photon, Photon, Electron}, Tuple{Photon, Electron}, Tuple{PolarizationX, PolarizationX, PolarizationX, PolarizationX, PolarizationX, SpinUp}, Tuple{PolarizationX, SpinUp}}, PerturbativeQED, PhasespaceDefinition{SphericalCoordinateSystem, ElectronRestFrame}, Tuple{ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Electron, SFourMomentum}}, Tuple{ParticleStateful{Outgoing, Photon, SFourMomentum}, ParticleStateful{Outgoing, Electron, SFourMomentum}}, SFourMomentum}, 1, CUDA.DeviceMemory}, out::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ Main ~/.julia/packages/BenchmarkTools/1i1mY/src/execution.jl:598
+ [22] var"##sample#258"(::Tuple{Int64, Int64, typeof(compute__96b8c0a0_e889_11ef_1e37_871fd8ef373b), CuArray{PhaseSpacePoint{ScatteringProcess{Tuple{Photon, Photon, Photon, Photon, Photon, Electron}, Tuple{Photon, Electron}, Tuple{PolarizationX, PolarizationX, PolarizationX, PolarizationX, PolarizationX, SpinUp}, Tuple{PolarizationX, SpinUp}}, PerturbativeQED, PhasespaceDefinition{SphericalCoordinateSystem, ElectronRestFrame}, Tuple{ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Photon, SFourMomentum}, ParticleStateful{Incoming, Electron, SFourMomentum}}, Tuple{ParticleStateful{Outgoing, Photon, SFourMomentum}, ParticleStateful{Outgoing, Electron, SFourMomentum}}, SFourMomentum}, 1, CUDA.DeviceMemory}, CuArray{Float64, 1, CUDA.DeviceMemory}}, __params::BenchmarkTools.Parameters)
+    @ Main ~/.julia/packages/BenchmarkTools/1i1mY/src/execution.jl:607
+ [23] _lineartrial(b::BenchmarkTools.Benchmark, p::BenchmarkTools.Parameters; maxevals::Int64, kwargs::@Kwargs{})
+    @ BenchmarkTools ~/.julia/packages/BenchmarkTools/1i1mY/src/execution.jl:186
+ [24] _lineartrial(b::BenchmarkTools.Benchmark, p::BenchmarkTools.Parameters)
+    @ BenchmarkTools ~/.julia/packages/BenchmarkTools/1i1mY/src/execution.jl:181
+ [25] #invokelatest#2
+    @ ./essentials.jl:1055 [inlined]
+ [26] invokelatest
+    @ ./essentials.jl:1052 [inlined]
+ [27] #lineartrial#46
+    @ ~/.julia/packages/BenchmarkTools/1i1mY/src/execution.jl:51 [inlined]
+ [28] lineartrial
+    @ ~/.julia/packages/BenchmarkTools/1i1mY/src/execution.jl:50 [inlined]
+ [29] tune!(b::BenchmarkTools.Benchmark, p::BenchmarkTools.Parameters; progressid::Nothing, nleaves::Float64, ndone::Float64, verbose::Bool, pad::String, kwargs::@Kwargs{})
+    @ BenchmarkTools ~/.julia/packages/BenchmarkTools/1i1mY/src/execution.jl:299
+ [30] tune!
+    @ ~/.julia/packages/BenchmarkTools/1i1mY/src/execution.jl:288 [inlined]
+ [31] tune!(b::BenchmarkTools.Benchmark)
+    @ BenchmarkTools ~/.julia/packages/BenchmarkTools/1i1mY/src/execution.jl:288
+ [32] macro expansion
+    @ ~/.julia/packages/BenchmarkTools/1i1mY/src/execution.jl:461 [inlined]
+ [33] top-level scope
+    @ ~/repos/ComputableDAGs.jl/experiments/04_optimization/run.jl:77
+in expression starting at /home/reinha57/repos/ComputableDAGs.jl/experiments/04_optimization/run.jl:37

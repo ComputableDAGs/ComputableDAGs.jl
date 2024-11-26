@@ -22,6 +22,7 @@ function ComputableDAGs.kernel(graph::DAG, instance, context_module::Module)
             @inline output_vector[id] = $(tape.output_symbol)
         end"
     )
+    #!format: on
 
     return expr
 end

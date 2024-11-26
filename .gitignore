@@ -33,3 +33,5 @@ Manifest.toml
 # Ignore files created by literate:
 docs/src/examples/*.md
 docs/src/examples/*.ipynb
+
+AB->ABBBBBBBBB.txt

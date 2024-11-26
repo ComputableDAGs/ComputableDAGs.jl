@@ -1,0 +1,44 @@
+   Resolving package versions...
+  No Changes to `~/repos/ComputableDAGs.jl/Project.toml`
+  No Changes to `~/repos/ComputableDAGs.jl/Manifest.toml`
+[ Info: == Reductions benchmark ==
+[ Info: kkke->ke
+[ Info:     Steps: 0
+[ Info:     Steps: 10
+[ Info:     Steps: 20
+[ Info:     Steps: 30
+[ Info:     Steps: 40
+[ Info:     Steps: 50
+[ Info:     Steps: 60
+[ Info:     Steps: 70
+[ Info:     Steps: 80
+[ Info: kkkke->ke
+[ Info:     Steps: 0
+[ Info:     Steps: 10
+[ Info:     Steps: 20
+[ Info:     Steps: 30
+[ Info:     Steps: 40
+[ Info:     Steps: 50
+[ Info:     Steps: 60
+[ Info:     Steps: 70
+[ Info:     Steps: 80
+[ Info:     Steps: 90
+[ Info:     Steps: 100
+[ Info:     Steps: 110
+[ Info:     Steps: 120
+[ Info:     Steps: 130
+[ Info:     Steps: 140
+[ Info:     Steps: 150
+[ Info:     Steps: 160
+[ Info:     Steps: 170
+[ Info:     Steps: 180
+[ Info:     Steps: 190
+[ Info:     Steps: 200
+[ Info:     Steps: 210
+[ Info:     Steps: 220
+[ Info:     Steps: 230
+[ Info:     Steps: 240
+[ Info:     Steps: 250
+[ Info:     Steps: 260
+[ Info:     Steps: 270
+[ Info:     Steps: 280
