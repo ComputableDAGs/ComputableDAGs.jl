@@ -13,8 +13,11 @@ function infer_types!(tape::Tape)
     known_result_types[:input] = input_type(tape.instance)
 
     for fc in tape.input_assign_code
-        res_types = result_types(fc, known_result_types)
-        fc.return_types = res_types
+        if typeof(fc.func) isa Expr
+            continue
+        end
+        # for input assign code, the return types are set on construction
+        res_types = fc.return_types
         for (s, t) in Iterators.zip(
             Iterators.flatten(fc.return_symbols),
             Iterators.cycle(res_types, length(fc.return_symbols)),

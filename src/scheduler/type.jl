@@ -5,17 +5,17 @@ Type representing a function call. Contains the function to call, argument symbo
 
 TODO: extend docs
 """
-mutable struct FunctionCall{VAL_T<:Tuple}
-    func::Function
+mutable struct FunctionCall{VAL_T<:Tuple,FUNC_T<:Union{Function,Expr}}
+    func::FUNC_T
     value_arguments::Vector{VAL_T}          # tuple of value arguments for the function call, will be prepended to the other arguments
     arguments::Vector{Vector{Symbol}}       # symbols of the inputs to the function call
     return_symbols::Vector{Vector{Symbol}}  # the return symbols
-    return_types::Vector{<:Type}              # the return type of the function call(s); there can only be one return type since we require type stability
+    return_types::Vector{<:Type}            # the return type of the function call(s); there can only be one return type since we require type stability
     device::AbstractDevice
 end
 
 function FunctionCall(
-    func::Function,
+    func::Union{Function,Expr},
     value_arguments::VAL_T,
     arguments::Vector{Symbol},
     return_symbol::Vector{Symbol},

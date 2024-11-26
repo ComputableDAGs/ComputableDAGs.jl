@@ -63,8 +63,8 @@ function _argument_types(known_res_types::Dict{Symbol,Type}, fc::FunctionCall)
 end
 
 function result_types(
-    fc::FunctionCall{VAL_T}, known_res_types::Dict{Symbol,Type}
-) where {VAL_T}
+    fc::FunctionCall{VAL_T,F_T}, known_res_types::Dict{Symbol,Type}
+) where {VAL_T,F_T<:Function}
     arg_types = (_value_argument_types(fc)..., _argument_types(known_res_types, fc)...)
     types = Base.return_types(fc.func, arg_types)
 
@@ -94,4 +94,12 @@ function result_types(
         )
     end
     return [types[1].parameters...]
+end
+
+function result_types(
+    fc::FunctionCall{VAL_T,Expr}, known_res_types::Dict{Symbol,Type}
+) where {VAL_T}
+    # assume that the return type is already set
+    @assert length(fc.return_types) == 1
+    return [fc.return_types[1]]
 end

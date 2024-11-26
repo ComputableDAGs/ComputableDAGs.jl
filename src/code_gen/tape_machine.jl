@@ -52,7 +52,7 @@ function call_fc(fc::FunctionCall{VectorT,M}, cache::Dict{Symbol,Any}) where {Ve
 end
 =#
 
-function expr_from_fc(fc::FunctionCall{VAL_T}) where {VAL_T}
+function expr_from_fc(fc::FunctionCall{VAL_T,F_T}) where {VAL_T,F_T<:Function}
     if length(fc) == 1
         func_call = Expr(
             :call,
@@ -68,11 +68,17 @@ function expr_from_fc(fc::FunctionCall{VAL_T}) where {VAL_T}
     return Expr(:(=), access_expr, func_call)
 end
 
+function expr_from_fc(fc::FunctionCall{VAL_T,Expr}) where {VAL_T}
+    @assert length(fc) == 1 && isempty(fc.arguments[1]) && isempty(fc.value_arguments[1]) "function call assigning an expression has an unallowed combination of arguments, which is not allowed\n$fc"
+    return Expr(:(=), gen_access_expr(fc), fc.func)
+end
+
 """
     gen_input_assignment_code(
         input_symbols::Dict{String, Vector{Symbol}},
         instance::AbstractProblemInstance,
         machine::Machine,
+        input_type::Type,
         context_module::Module
     )
 
@@ -82,24 +88,37 @@ function gen_input_assignment_code(
     input_symbols::Dict{String,Vector{Symbol}},
     instance,
     machine::Machine,
+    input_type::Type,
     context_module::Module,
 )
     assign_inputs = Vector{FunctionCall}()
     for (name, symbols) in input_symbols
-        # make a function for this, since we can't use anonymous functions in the FunctionCall
-
         for symbol in symbols
             device = entry_device(machine)
 
-            fc = FunctionCall(
-                context_module.eval(Expr(:->, :x, input_expr(instance, name, :x))),
+            f_id = Symbol(to_var_name(UUIDs.uuid1(rng[threadid()])))
+
+            fc_setup = FunctionCall(
+                Expr(:->, :x, input_expr(instance, name, :x)),
                 (),
-                [:input],
-                [symbol],
-                [Nothing],
+                Symbol[],
+                Symbol[f_id],
+                Type[Nothing],
                 device,
             )
 
+            fc = FunctionCall(
+                _call, (), Symbol[f_id, :input], Symbol[symbol], Type[Nothing], device
+            )
+
+            ret_expr = Expr(
+                :call, Base.return_types, fc_setup.func, Expr(:tuple, input_type)
+            )
+            ret_type = context_module.eval(ret_expr)
+            @assert length(ret_type) == 1
+            fc.return_types = [ret_type[1]]
+
+            push!(assign_inputs, fc_setup)
             push!(assign_inputs, fc)
         end
     end
@@ -125,7 +144,7 @@ function gen_function_body(tape::Tape, context_module::Module; closures_size::In
         closures_size = ceil(Int, length(tape.schedule)^(1 / closures_depth))
     end
 
-    @info "generating function body with closure size $closures_size"
+    @debug "generating function body with closure size $closures_size"
 
     return _gen_function_body(
         tape.schedule, types, tape.machine, context_module; closures_size=closures_size
@@ -139,7 +158,7 @@ function _gen_function_body(
     context_module::Module;
     closures_size=0,
 )
-    @info "generating function body from $(length(fc_vec)) function calls with closure size $closures_size"
+    @debug "generating function body from $(length(fc_vec)) function calls with closure size $closures_size"
     if closures_size <= 1 || closures_size >= length(fc_vec)
         return Expr(:block, expr_from_fc.(fc_vec)...)
     end
@@ -275,11 +294,12 @@ function gen_tape(
     # get outSymbol
     outSym = Symbol(to_var_name(get_exit_node(graph).id))
 
-    assign_inputs = gen_input_assignment_code(input_syms, instance, machine, context_module)
-
-    return Tape{input_type(instance)}(
-        assign_inputs, function_body, outSym, instance, machine
+    INPUT_T = input_type(instance)
+    assign_inputs = gen_input_assignment_code(
+        input_syms, instance, machine, INPUT_T, context_module
     )
+
+    return Tape{INPUT_T}(assign_inputs, function_body, outSym, instance, machine)
 end
 
 """

@@ -113,3 +113,7 @@ Return the given vector as single String without quotation marks or brackets.
 function unroll_symbol_vector(vec::VEC) where {VEC<:Union{AbstractVector,Tuple}}
     return Expr(:tuple, vec...)
 end
+
+@inline function _call(f, args::Vararg)
+    return f(args...)
+end
