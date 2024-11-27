@@ -1,4 +1,4 @@
-function expr_from_fc(fc::FunctionCall{VAL_T,F_T}) where {VAL_T,F_T<:Function}
+function expr_from_fc(fc::FunctionCall{VAL_T,<:Function}) where {VAL_T}
     if length(fc) == 1
         func_call = Expr(:call, fc.func, fc.value_arguments[1]..., fc.arguments[1]...)
     else
@@ -10,14 +10,35 @@ function expr_from_fc(fc::FunctionCall{VAL_T,F_T}) where {VAL_T,F_T<:Function}
 end
 
 function expr_from_fc(fc::FunctionCall{VAL_T,Expr}) where {VAL_T}
-    @assert length(fc) == 1 && isempty(fc.arguments[1]) && isempty(fc.value_arguments[1]) "function call assigning an expression has an unallowed combination of arguments, which is not allowed\n$fc"
-    return Expr(:(=), gen_access_expr(fc), fc.func)
+    @assert length(fc) == 1 && isempty(fc.value_arguments[1]) "function call assigning an expression cannot be vectorized and cannot contain value arguments\n$fc"
+
+    fc_expr_in_let = Expr(
+        :let,
+        Expr(:block, fc.return_symbols[1]...),
+        fc.func,                                # anonymous function code block
+    )
+
+    func_call = Expr(
+        :call,                      # call
+        Expr(
+            :->,                    # anonymous function
+            Expr(
+                :tuple,             # anonymous function arguments
+                fc.arguments[1]...,
+            ),
+            fc_expr_in_let,
+        ),
+        fc.arguments[1]...,         # runtime arguments passed to the anonymous function
+    )
+
+    access_expr = gen_access_expr(fc)
+    return Expr(:(=), access_expr, func_call)
 end
 
 """
     gen_input_assignment_code(
         input_symbols::Dict{String, Vector{Symbol}},
-        instance::AbstractProblemInstance,
+        instance::Any,
         machine::Machine,
         input_type::Type,
         context_module::Module
@@ -26,40 +47,22 @@ end
 Return a `Vector{Expr}` doing the input assignments from the given `problem_input` onto the `input_symbols`.
 """
 function gen_input_assignment_code(
-    input_symbols::Dict{String,Vector{Symbol}},
-    instance,
-    machine::Machine,
-    input_type::Type,
-    context_module::Module,
+    input_symbols::Dict{String,Vector{Symbol}}, instance, machine::Machine
 )
     assign_inputs = Vector{FunctionCall}()
     for (name, symbols) in input_symbols
         for symbol in symbols
             device = entry_device(machine)
 
-            f_id = Symbol(to_var_name(UUIDs.uuid1(rng[threadid()])))
-
-            fc_setup = FunctionCall(
-                Expr(:->, :x, input_expr(instance, name, :x)),
+            fc = FunctionCall(
+                input_expr(instance, name, :input),
                 (),
-                Symbol[],
-                Symbol[f_id],
+                Symbol[:input],
+                Symbol[symbol],
                 Type[Nothing],
                 device,
             )
 
-            fc = FunctionCall(
-                _call, (), Symbol[f_id, :input], Symbol[symbol], Type[Nothing], device
-            )
-
-            ret_expr = Expr(
-                :call, Base.return_types, fc_setup.func, Expr(:tuple, input_type)
-            )
-            ret_type = context_module.eval(ret_expr)
-            @assert length(ret_type) == 1
-            fc.return_types = [ret_type[1]]
-
-            push!(assign_inputs, fc_setup)
             push!(assign_inputs, fc)
         end
     end
@@ -73,13 +76,15 @@ end
 Generate the function body from the given [`Tape`](@ref).
 
 ## Keyword Arguments
-`closures_size`: The size of closures to generate (in lines of code). Closures introduce function barriers in the function body, preventing some optimizations by the compiler and therefore greatly reducing compile time. A value of 1 or less will disable the use of closures entirely.
+`closures_size`: The size of closures to generate (in lines of code). Closures introduce function barriers
+    in the function body, preventing some optimizations by the compiler and therefore greatly reducing
+    compile time. A value of 0 will disable the use of closures entirely.
 """
 function gen_function_body(tape::Tape, context_module::Module; closures_size::Int)
     # only need to annotate types later when using closures
-    types = infer_types!(tape)
+    types = infer_types!(tape, context_module)
 
-    if closures_size >= 1
+    if closures_size > 1
         s = log(closures_size, length(tape.schedule))
         closures_depth = ceil(Int, s) # tend towards more levels/smaller closures
         closures_size = ceil(Int, length(tape.schedule)^(1 / closures_depth))
@@ -113,15 +118,14 @@ function _gen_function_body(
     closured_fc_vec = FunctionCall[]
     for i in length(fc_vec):(-closures_size):1
         e = i
-        b = max(i - closures_size, 1)
+        b = max(i - closures_size + 1, 1)
         code_block = fc_vec[b:e]
 
-        pushfirst!(
-            closured_fc_vec,
-            _closure_fc(
-                code_block, type_dict, machine, undefined_argument_symbols, context_module
-            ),
+        closure_fc = _closure_fc(
+            code_block, type_dict, machine, undefined_argument_symbols, context_module
         )
+
+        pushfirst!(closured_fc_vec, closure_fc)
     end
 
     return _gen_function_body(
@@ -130,9 +134,16 @@ function _gen_function_body(
 end
 
 """
-    _closure_fc()
+    _closure_fc(
+        code_block::AbstractVector{FunctionCall},
+        types::Dict{Symbol,Type},
+        machine::Machine,
+        undefined_argument_symbols::Set{Symbol},
+        context_module::Module,
+    )
 
-From the given function calls, make and return a new function call representing all of them together.
+From the given function calls, make and return 2 function calls representing all of them together. 2 function calls are necessary, one for setting up the anonymous
+function and the second for calling it.
 The undefined_argument_symbols is the set of all Symbols that need to be returned if available inside the code_block. They get updated inside this function.
 """
 function _closure_fc(
@@ -168,29 +179,28 @@ function _closure_fc(
     arg_symbols_t = [arg_symbols_set...]
     ret_symbols_t = [ret_symbols_set...]
 
-    closure = context_module.eval(
-        Expr(                                   # create the closure: () -> code block; return (locals)
-            :->,
-            Expr(:tuple, arg_symbols_t...),     # closure arguments
-            Expr(                               # actual function body of the closure
-                :block,
-                expr_from_fc.(code_block)...,
-                Expr(
-                    :return,                    # have to make sure to not return a tuple of length 1
-                    if length(ret_symbols_t) == 1
-                        ret_symbols_t[1]
-                    else
-                        Expr(:tuple, ret_symbols_t...)
-                    end,
-                ),
-            ),
+    ret_types = (getindex.(Ref(types), ret_symbols_t))
+
+    fc_expr = Expr(                               # actual function body of the closure
+        :block,
+        expr_from_fc.(code_block)...,
+        Expr(
+            :return,                    # have to make sure to not return a tuple of length 1
+            if length(ret_symbols_t) == 1
+                ret_symbols_t[1]
+            else
+                Expr(:tuple, ret_symbols_t...)
+            end,
         ),
     )
 
-    ret_types = (getindex.(Ref(types), ret_symbols_t))
-
     fc = FunctionCall(
-        closure, (), arg_symbols_t, ret_symbols_t, ret_types, entry_device(machine)
+        fc_expr,
+        (),
+        Symbol[arg_symbols_t...],
+        ret_symbols_t,
+        ret_types,
+        entry_device(machine),
     )
 
     setdiff!(undefined_argument_symbols, ret_symbols_set)
@@ -201,7 +211,7 @@ end
 """
     gen_tape(
         graph::DAG,
-        instance::AbstractProblemInstance,
+        instance::Any,
         machine::Machine,
         context_module::Module,
         scheduler::AbstractScheduler = GreedyScheduler()
@@ -233,10 +243,8 @@ function gen_tape(
     # get outSymbol
     outSym = Symbol(to_var_name(get_exit_node(graph).id))
 
-    INPUT_T = input_type(instance)
-    assign_inputs = gen_input_assignment_code(
-        input_syms, instance, machine, INPUT_T, context_module
-    )
+    assign_inputs = gen_input_assignment_code(input_syms, instance, machine)
 
+    INPUT_T = input_type(instance)
     return Tape{INPUT_T}(assign_inputs, function_body, outSym, instance, machine)
 end

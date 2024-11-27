@@ -62,14 +62,8 @@ function _argument_types(known_res_types::Dict{Symbol,Type}, fc::FunctionCall)
     return getindex.(Ref(known_res_types), fc.arguments[1])
 end
 
-function result_types(
-    fc::FunctionCall{VAL_T,F_T}, known_res_types::Dict{Symbol,Type}
-) where {VAL_T,F_T<:Function}
-    arg_types = (_value_argument_types(fc)..., _argument_types(known_res_types, fc)...)
-    types = Base.return_types(fc.func, arg_types)
-
+function _validate_result_types(fc::FunctionCall, types, arg_types)
     N_RET = length(fc.return_types)
-
     if length(types) > 1
         throw(
             "failure during type inference: function call $(fc.func) with argument types $(arg_types) is type unstable, possible return types: $types",
@@ -85,21 +79,60 @@ function result_types(
     end
 
     if (N_RET == 1)
-        return [types[1]]
+        return nothing
     end
 
     if !(types[1] isa Tuple) || length(types[1].parameters) != N_RET
         throw(
-            "failure durng type inference: function call $(fc.func) was expected to return a Tuple with $N_RET elements, but returns $(types[1])",
+            "failure during type inference: function call $(fc.func) was expected to return a Tuple with $N_RET elements, but returns $(types[1])",
         )
     end
+    return nothing
+end
+
+function result_types(
+    fc::FunctionCall{VAL_T,F_T}, known_res_types::Dict{Symbol,Type}, context_module::Module
+) where {VAL_T,F_T<:Function}
+    arg_types = (_value_argument_types(fc)..., _argument_types(known_res_types, fc)...)
+    types = Base.return_types(fc.func, arg_types)
+
+    _validate_result_types(fc, types, arg_types)
+
+    N_RET = length(fc.return_types)
+    if (N_RET == 1)
+        return [types[1]]
+    end
+
     return [types[1].parameters...]
 end
 
 function result_types(
-    fc::FunctionCall{VAL_T,Expr}, known_res_types::Dict{Symbol,Type}
+    fc::FunctionCall{VAL_T,Expr}, known_res_types::Dict{Symbol,Type}, context_module::Module
 ) where {VAL_T}
-    # assume that the return type is already set
-    @assert length(fc.return_types) == 1
-    return [fc.return_types[1]]
+    arg_types = _argument_types(known_res_types, fc)
+    ret_expr = Expr(
+        :call,
+        Base.return_types,          # return types call
+        Expr(                       # function argument to return_types
+            :->,                        # anonymous function
+            Expr(
+                :tuple,                 # anonymous function arguments
+                fc.arguments[1]...,
+            ),
+            fc.func,                    # anonymous function code block
+        ),
+        Expr(:tuple, arg_types...), # types arguments to return_types
+    )
+    types = context_module.eval(ret_expr)
+
+    #@info "evaluation of expression\n$ret_expr\ngives\n$types"
+
+    _validate_result_types(fc, types, arg_types)
+
+    N_RET = length(fc.return_types)
+    if (N_RET == 1)
+        return [types[1]]
+    end
+
+    return [types[1].parameters...]
 end
