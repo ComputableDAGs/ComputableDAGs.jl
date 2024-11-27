@@ -56,7 +56,7 @@ function _insert_node!(graph::DAG, node::Node; track=true, invalidate_cache=true
     if (!invalidate_cache)
         return node
     end
-    push!(graph.dirtyNodes, node)
+    push!(graph.dirty_nodes, node)
 
     return node
 end
@@ -110,8 +110,8 @@ function _insert_edge!(
     invalidate_operation_caches!(graph, node1)
     invalidate_operation_caches!(graph, node2)
 
-    push!(graph.dirtyNodes, node1)
-    push!(graph.dirtyNodes, node2)
+    push!(graph.dirty_nodes, node1)
+    push!(graph.dirty_nodes, node2)
 
     return nothing
 end
@@ -145,7 +145,7 @@ function _remove_node!(graph::DAG, node::Node; track=true, invalidate_cache=true
     end
 
     invalidate_operation_caches!(graph, node)
-    delete!(graph.dirtyNodes, node)
+    delete!(graph.dirty_nodes, node)
 
     return nothing
 end
@@ -207,10 +207,10 @@ function _remove_edge!(
     invalidate_operation_caches!(graph, node1)
     invalidate_operation_caches!(graph, node2)
     if (node1 in graph)
-        push!(graph.dirtyNodes, node1)
+        push!(graph.dirty_nodes, node1)
     end
     if (node2 in graph)
-        push!(graph.dirtyNodes, node2)
+        push!(graph.dirty_nodes, node2)
     end
 
     return removed_node_index
@@ -235,7 +235,7 @@ Invalidate the operation caches for a given [`NodeReduction`](@ref).
 This deletes the operation from the graph's possible operations and from the involved nodes' own operation caches.
 """
 function invalidate_caches!(graph::DAG, operation::NodeReduction)
-    delete!(graph.possibleOperations, operation)
+    delete!(graph.possible_operations, operation)
 
     for node in operation.input
         node.nodeReduction = missing
@@ -252,7 +252,7 @@ Invalidate the operation caches for a given [`NodeSplit`](@ref).
 This deletes the operation from the graph's possible operations and from the involved nodes' own operation caches.
 """
 function invalidate_caches!(graph::DAG, operation::NodeSplit)
-    delete!(graph.possibleOperations, operation)
+    delete!(graph.possible_operations, operation)
 
     # delete the operation from all caches of nodes involved in the operation
     # for node split there is only one node

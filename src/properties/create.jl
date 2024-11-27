@@ -5,7 +5,11 @@ Create an empty [`GraphProperties`](@ref) object.
 """
 function GraphProperties()
     return (
-        data=0.0, computeEffort=0.0, computeIntensity=0.0, noNodes=0, noEdges=0
+        data=0.0,
+        compute_effort=0.0,
+        compute_intensity=0.0,
+        number_of_nodes=0,
+        number_of_edges=0,
     )::GraphProperties
 end
 
@@ -41,10 +45,10 @@ function GraphProperties(graph::DAG)
 
     return (
         data=d,
-        computeEffort=ce,
-        computeIntensity=(d == 0) ? 0.0 : ce / d,
-        noNodes=length(graph.nodes),
-        noEdges=ed,
+        compute_effort=ce,
+        compute_intensity=(d == 0) ? 0.0 : ce / d,
+        number_of_nodes=length(graph.nodes),
+        number_of_edges=ed,
     )::GraphProperties
 end
 
@@ -66,9 +70,9 @@ function GraphProperties(diff::Diff)
 
     return (
         data=d,
-        computeEffort=ce,
-        computeIntensity=(d == 0) ? 0.0 : ce / d,
-        noNodes=length(diff.addedNodes) - length(diff.removedNodes),
-        noEdges=length(diff.addedEdges) - length(diff.removedEdges),
+        compute_effort=ce,
+        compute_intensity=(d == 0) ? 0.0 : ce / d,
+        number_of_nodes=length(diff.addedNodes) - length(diff.removedNodes),
+        number_of_edges=length(diff.addedEdges) - length(diff.removedEdges),
     )::GraphProperties
 end

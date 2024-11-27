@@ -4,15 +4,15 @@
 Apply all unapplied operations in the DAG. Is automatically called in all functions that require the latest state of the [`DAG`](@ref).
 """
 function apply_all!(graph::DAG)
-    while !isempty(graph.operationsToApply)
+    while !isempty(graph.operations_to_apply)
         # get next operation to apply from front of the deque
-        op = popfirst!(graph.operationsToApply)
+        op = popfirst!(graph.operations_to_apply)
 
         # apply it
         appliedOp = apply_operation!(graph, op)
 
-        # push to the end of the appliedOperations deque
-        push!(graph.appliedOperations, appliedOp)
+        # push to the end of the applied_operations deque
+        push!(graph.applied_operations, appliedOp)
     end
     return nothing
 end

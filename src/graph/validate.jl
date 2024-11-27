@@ -30,18 +30,18 @@ function is_valid(graph::DAG)
         @assert is_valid(graph, node)
     end
 
-    for op in graph.operationsToApply
+    for op in graph.operations_to_apply
         @assert is_valid(graph, op)
     end
 
-    for nr in graph.possibleOperations.nodeReductions
+    for nr in graph.possible_operations.node_reductions
         @assert is_valid(graph, nr)
     end
-    for ns in graph.possibleOperations.nodeSplits
+    for ns in graph.possible_operations.node_splits
         @assert is_valid(graph, ns)
     end
 
-    for node in graph.dirtyNodes
+    for node in graph.dirty_nodes
         @assert node in graph "Dirty Node is not part of the graph!"
         @assert ismissing(node.nodeReduction) "Dirty Node has a NodeReduction!"
         @assert ismissing(node.nodeSplit) "Dirty Node has a NodeSplit!"

@@ -7,8 +7,8 @@ A struct storing all possible operations on a [`DAG`](@ref).
 To get the [`PossibleOperations`](@ref) on a [`DAG`](@ref), use [`get_operations`](@ref).
 """
 mutable struct PossibleOperations
-    nodeReductions::Set{NodeReduction}
-    nodeSplits::Set{NodeSplit}
+    node_reductions::Set{NodeReduction}
+    node_splits::Set{NodeSplit}
 end
 
 """ 
@@ -24,16 +24,16 @@ mutable struct DAG
     nodes::Set{Union{DataTaskNode,ComputeTaskNode}}
 
     # The operations currently applied to the set of nodes
-    appliedOperations::Stack{AppliedOperation}
+    applied_operations::Stack{AppliedOperation}
 
     # The operations not currently applied but part of the current state of the DAG
-    operationsToApply::Deque{Operation}
+    operations_to_apply::Deque{Operation}
 
     # The possible operations at the current state of the DAG
-    possibleOperations::PossibleOperations
+    possible_operations::PossibleOperations
 
     # The set of nodes whose possible operations need to be reevaluated
-    dirtyNodes::Set{Union{DataTaskNode,ComputeTaskNode}}
+    dirty_nodes::Set{Union{DataTaskNode,ComputeTaskNode}}
 
     # "snapshot" system: keep track of added/removed nodes/edges since last snapshot
     # these are muted in insert_node! etc.

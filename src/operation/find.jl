@@ -25,25 +25,25 @@ function insert_operation!(ns::NodeSplit)
 end
 
 """
-    nr_insertion!(operations::PossibleOperations, nodeReductions::Vector{Vector{NodeReduction}})
+    nr_insertion!(operations::PossibleOperations, node_reductions::Vector{Vector{NodeReduction}})
 
 Insert the node reductions into the graph and the nodes' caches. Employs multithreading for speedup.
 """
 function nr_insertion!(
-    operations::PossibleOperations, nodeReductions::Vector{Vector{NodeReduction}}
+    operations::PossibleOperations, node_reductions::Vector{Vector{NodeReduction}}
 )
     total_len = 0
-    for vec in nodeReductions
+    for vec in node_reductions
         total_len += length(vec)
     end
-    sizehint!(operations.nodeReductions, total_len)
+    sizehint!(operations.node_reductions, total_len)
 
-    t = @task for vec in nodeReductions
-        union!(operations.nodeReductions, Set(vec))
+    t = @task for vec in node_reductions
+        union!(operations.node_reductions, Set(vec))
     end
     schedule(t)
 
-    @threads for vec in nodeReductions
+    @threads for vec in node_reductions
         for op in vec
             insert_operation!(op)
         end
@@ -55,25 +55,25 @@ function nr_insertion!(
 end
 
 """
-    ns_insertion!(operations::PossibleOperations, nodeSplits::Vector{Vector{NodeSplits}})
+    ns_insertion!(operations::PossibleOperations, node_splits::Vector{Vector{NodeSplits}})
 
 Insert the node splits into the graph and the nodes' caches. Employs multithreading for speedup.
 """
 function ns_insertion!(
-    operations::PossibleOperations, nodeSplits::Vector{Vector{NodeSplit}}
+    operations::PossibleOperations, node_splits::Vector{Vector{NodeSplit}}
 )
     total_len = 0
-    for vec in nodeSplits
+    for vec in node_splits
         total_len += length(vec)
     end
-    sizehint!(operations.nodeSplits, total_len)
+    sizehint!(operations.node_splits, total_len)
 
-    t = @task for vec in nodeSplits
-        union!(operations.nodeSplits, Set(vec))
+    t = @task for vec in node_splits
+        union!(operations.node_splits, Set(vec))
     end
     schedule(t)
 
-    @threads for vec in nodeSplits
+    @threads for vec in node_splits
         for op in vec
             insert_operation!(op)
         end
@@ -124,11 +124,11 @@ function generate_operations(graph::DAG)
             insert!(trie, candidate)
         end
 
-        nodeReductions = collect(trie)
+        node_reductions = collect(trie)
 
-        for nrVec in nodeReductions
+        for nrVec in node_reductions
             # parent sets are ordered and any node can only be part of one nodeReduction, so a NodeReduction is uniquely identifiable by its first element
-            # this prevents duplicate nodeReductions being generated
+            # this prevents duplicate node_reductions being generated
             lock(checkedNodesLock)
             if (nrVec[1] in checkedNodes)
                 unlock(checkedNodesLock)
@@ -144,7 +144,7 @@ function generate_operations(graph::DAG)
 
     # launch thread for node reduction insertion
     # remove duplicates
-    nr_task = @spawn nr_insertion!(graph.possibleOperations, generatedReductions)
+    nr_task = @spawn nr_insertion!(graph.possible_operations, generatedReductions)
 
     # find possible node splits
     @threads for node in nodeArray
@@ -154,9 +154,9 @@ function generate_operations(graph::DAG)
     end
 
     # launch thread for node split insertion
-    ns_task = @spawn ns_insertion!(graph.possibleOperations, generatedSplits)
+    ns_task = @spawn ns_insertion!(graph.possible_operations, generatedSplits)
 
-    empty!(graph.dirtyNodes)
+    empty!(graph.dirty_nodes)
 
     wait(nr_task)
     wait(ns_task)

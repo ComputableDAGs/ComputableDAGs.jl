@@ -7,14 +7,14 @@ Also take care to keep consistent compute intensity.
 function Base.:-(prop1::GraphProperties, prop2::GraphProperties)
     return (
         data=prop1.data - prop2.data,
-        computeEffort=prop1.computeEffort - prop2.computeEffort,
-        computeIntensity=if (prop1.data - prop2.data == 0)
+        compute_effort=prop1.compute_effort - prop2.compute_effort,
+        compute_intensity=if (prop1.data - prop2.data == 0)
             0.0
         else
-            (prop1.computeEffort - prop2.computeEffort) / (prop1.data - prop2.data)
+            (prop1.compute_effort - prop2.compute_effort) / (prop1.data - prop2.data)
         end,
-        noNodes=prop1.noNodes - prop2.noNodes,
-        noEdges=prop1.noEdges - prop2.noEdges,
+        number_of_nodes=prop1.number_of_nodes - prop2.number_of_nodes,
+        number_of_edges=prop1.number_of_edges - prop2.number_of_edges,
     )::GraphProperties
 end
 
@@ -27,28 +27,28 @@ Also take care to keep consistent compute intensity.
 function Base.:+(prop1::GraphProperties, prop2::GraphProperties)
     return (
         data=prop1.data + prop2.data,
-        computeEffort=prop1.computeEffort + prop2.computeEffort,
-        computeIntensity=if (prop1.data + prop2.data == 0)
+        compute_effort=prop1.compute_effort + prop2.compute_effort,
+        compute_intensity=if (prop1.data + prop2.data == 0)
             0.0
         else
-            (prop1.computeEffort + prop2.computeEffort) / (prop1.data + prop2.data)
+            (prop1.compute_effort + prop2.compute_effort) / (prop1.data + prop2.data)
         end,
-        noNodes=prop1.noNodes + prop2.noNodes,
-        noEdges=prop1.noEdges + prop2.noEdges,
+        number_of_nodes=prop1.number_of_nodes + prop2.number_of_nodes,
+        number_of_edges=prop1.number_of_edges + prop2.number_of_edges,
     )::GraphProperties
 end
 
 """
     -(prop::GraphProperties)
 
-Unary negation of the graph properties. `.computeIntensity` will not be negated because `.data` and `.computeEffort` both are.
+Unary negation of the graph properties. `.compute_intensity` will not be negated because `.data` and `.compute_effort` both are.
 """
 function Base.:-(prop::GraphProperties)
     return (
         data=-prop.data,
-        computeEffort=-prop.computeEffort,
-        computeIntensity=prop.computeIntensity,   # no negation here!
-        noNodes=-prop.noNodes,
-        noEdges=-prop.noEdges,
+        compute_effort=-prop.compute_effort,
+        compute_intensity=prop.compute_intensity,   # no negation here!
+        number_of_nodes=-prop.number_of_nodes,
+        number_of_edges=-prop.number_of_edges,
     )::GraphProperties
 end

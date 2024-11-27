@@ -4,14 +4,14 @@
 Print a string representation of the set of possible operations to io.
 """
 function Base.show(io::IO, ops::PossibleOperations)
-    print(io, length(ops.nodeReductions))
+    print(io, length(ops.node_reductions))
     println(io, " Node Reductions: ")
-    for nr in ops.nodeReductions
+    for nr in ops.node_reductions
         println(io, "  - ", nr)
     end
-    print(io, length(ops.nodeSplits))
+    print(io, length(ops.node_splits))
     println(io, " Node Splits: ")
-    for ns in ops.nodeSplits
+    for ns in ops.node_splits
         println(io, "  - ", ns)
     end
 end

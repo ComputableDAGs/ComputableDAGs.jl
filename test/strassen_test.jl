@@ -38,8 +38,8 @@ EDGE_NUMBERS = (3, 96, 747, 5304) #, 37203
         @test get_exit_node(g) isa DataTaskNode
 
         props = get_properties(g)
-        @test NODE_NUM_EXPECTED == props.noNodes
-        @test EDGE_NUM_EXPECTED == props.noEdges
+        @test NODE_NUM_EXPECTED == props.number_of_nodes
+        @test EDGE_NUM_EXPECTED == props.number_of_edges
     end
 
     f = get_compute_function(g, mm, cpu_st(), @__MODULE__)

@@ -8,7 +8,7 @@ function get_properties(graph::DAG)
     apply_all!(graph)
 
     # TODO: tests stop working without the if condition, which means there is probably a bug in the lazy evaluation and in the tests
-    if (graph.properties.computeEffort <= 0.0)
+    if (graph.properties.compute_effort <= 0.0)
         graph.properties = GraphProperties(graph)
     end
 
@@ -51,5 +51,5 @@ end
 Return the number of operations applied to the graph.
 """
 function operation_stack_length(graph::DAG)
-    return length(graph.appliedOperations) + length(graph.operationsToApply)
+    return length(graph.applied_operations) + length(graph.operations_to_apply)
 end

@@ -30,11 +30,11 @@ function find_reductions!(graph::DAG, node::Node)
 
     if reductionVector !== nothing
         nr = NodeReduction(reductionVector)
-        push!(graph.possibleOperations.nodeReductions, nr)
+        push!(graph.possible_operations.node_reductions, nr)
         for node in reductionVector
             if !ismissing(node.nodeReduction)
                 # it can happen that the dirty node becomes part of an existing NodeReduction and overrides those ones now
-                # this is only a problem insofar the existing NodeReduction has to be deleted and replaced also in the possibleOperations
+                # this is only a problem insofar the existing NodeReduction has to be deleted and replaced also in the possible_operations
                 invalidate_caches!(graph, node.nodeReduction)
             end
             node.nodeReduction = nr
@@ -56,7 +56,7 @@ function find_splits!(graph::DAG, node::Node)
 
     if (can_split(node))
         ns = NodeSplit(node)
-        push!(graph.possibleOperations.nodeSplits, ns)
+        push!(graph.possible_operations.node_splits, ns)
         node.nodeSplit = ns
     end
 

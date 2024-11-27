@@ -72,18 +72,18 @@ function mem(graph::DAG)
         size += mem(n)
     end
 
-    size += sizeof(graph.appliedOperations)
-    size += sizeof(graph.operationsToApply)
+    size += sizeof(graph.applied_operations)
+    size += sizeof(graph.operations_to_apply)
 
-    size += sizeof(graph.possibleOperations)
-    for op in graph.possibleOperations.nodeReductions
+    size += sizeof(graph.possible_operations)
+    for op in graph.possible_operations.node_reductions
         size += mem(op)
     end
-    for op in graph.possibleOperations.nodeSplits
+    for op in graph.possible_operations.node_splits
         size += mem(op)
     end
 
-    size += Base.summarysize(graph.dirtyNodes; exclude=Union{Node})
+    size += Base.summarysize(graph.dirty_nodes; exclude=Union{Node})
     return size += sizeof(diff)
 end
 
