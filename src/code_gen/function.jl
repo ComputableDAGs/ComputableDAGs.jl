@@ -40,25 +40,3 @@ function get_compute_function(
 
     return RuntimeGeneratedFunction(@__MODULE__, context_module, expr)
 end
-
-"""
-    execute(
-        graph::DAG,
-        instance,
-        machine::Machine,
-        input,
-        context_module::Module
-    )
-
-Execute the code of the given `graph` on the given input values.
-
-This is essentially shorthand for
-```julia
-tape = gen_tape(graph, instance, machine, context_module)
-return execute_tape(tape, input)
-```
-"""
-function execute(graph::DAG, instance, machine::Machine, input, context_module::Module)
-    tape = gen_tape(graph, instance, machine, context_module)
-    return execute_tape(tape, input)
-end

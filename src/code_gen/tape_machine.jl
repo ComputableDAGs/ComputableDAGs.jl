@@ -1,57 +1,3 @@
-#=
-# TODO: do this with macros
-function call_fc(
-    fc::FunctionCall{VectorT,0}, cache::Dict{Symbol,Any}
-) where {VectorT<:SVector{1}}
-    cache[fc.return_symbol] = fc.func(cache[fc.arguments[1]])
-    return nothing
-end
-
-function call_fc(
-    fc::FunctionCall{VectorT,1}, cache::Dict{Symbol,Any}
-) where {VectorT<:SVector{1}}
-    cache[fc.return_symbol] = fc.func(fc.value_arguments[1], cache[fc.arguments[1]])
-    return nothing
-end
-
-function call_fc(
-    fc::FunctionCall{VectorT,0}, cache::Dict{Symbol,Any}
-) where {VectorT<:SVector{2}}
-    cache[fc.return_symbol] = fc.func(cache[fc.arguments[1]], cache[fc.arguments[2]])
-    return nothing
-end
-
-function call_fc(
-    fc::FunctionCall{VectorT,1}, cache::Dict{Symbol,Any}
-) where {VectorT<:SVector{2}}
-    cache[fc.return_symbol] = fc.func(
-        fc.value_arguments[1], cache[fc.arguments[1]], cache[fc.arguments[2]]
-    )
-    return nothing
-end
-
-function call_fc(fc::FunctionCall{VectorT,1}, cache::Dict{Symbol,Any}) where {VectorT}
-    cache[fc.return_symbol] = fc.func(
-        fc.value_arguments[1], getindex.(Ref(cache), fc.arguments)...
-    )
-    return nothing
-end
-
-"""
-    call_fc(fc::FunctionCall, cache::Dict{Symbol, Any})
-
-Execute the given [`FunctionCall`](@ref) on the dictionary.
-
-Several more specialized versions of this function exist to reduce vector unrolling work for common cases.
-"""
-function call_fc(fc::FunctionCall{VectorT,M}, cache::Dict{Symbol,Any}) where {VectorT,M}
-    cache[fc.return_symbol] = fc.func(
-        fc.value_arguments..., getindex.(Ref(cache), fc.arguments)...
-    )
-    return nothing
-end
-=#
-
 function expr_from_fc(fc::FunctionCall{VAL_T,F_T}) where {VAL_T,F_T<:Function}
     if length(fc) == 1
         func_call = Expr(
@@ -267,8 +213,6 @@ end
     )
 
 Generate the code for a given graph. The return value is a [`Tape`](@ref).
-
-See also: [`execute`](@ref), [`execute_tape`](@ref)
 """
 function gen_tape(
     graph::DAG,
@@ -300,30 +244,4 @@ function gen_tape(
     )
 
     return Tape{INPUT_T}(assign_inputs, function_body, outSym, instance, machine)
-end
-
-"""
-    execute_tape(tape::Tape, input::Input) where {Input}
-
-Execute the given tape with the given input.
-
-!!! warning
-    This is very slow and might not work. This is to be majorly revamped.
-"""
-function execute_tape(tape::Tape, input)
-    cache = Dict{Symbol,Any}()
-    cache[:input] = input
-    # simply execute all the code snippets here
-    @assert typeof(input) <: input_type(tape.instance) "expected tape input type to fit $(input_type(tape.instance)) but got $(typeof(input))"
-
-    compute_code = tape.schedule
-
-    for function_call in tape.input_assign_code
-        call_fc(function_call, cache)
-    end
-    for function_call in compute_code
-        call_fc(function_call, cache)
-    end
-
-    return cache[tape.output_symbol]
 end

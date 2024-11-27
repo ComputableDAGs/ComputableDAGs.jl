@@ -34,9 +34,8 @@ export reset_graph!
 export get_operations
 
 # code generation related
-export execute
 export get_compute_function
-export gen_tape, execute_tape
+export gen_tape
 
 # estimator
 export cost_type, graph_cost, operation_effect
