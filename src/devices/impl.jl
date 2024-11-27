@@ -31,14 +31,14 @@ end
 """
     gen_access_expr(fc::FunctionCall)
 
-Dispatch from the given [`FunctionCall`](@ref) to the interface function [`_gen_access_expr`](@ref).
+Return the 
 """
 function gen_access_expr(fc::FunctionCall{VAL_T}) where {VAL_T}
     if length(fc.return_types) != 1
         # general case
         vec = Expr[]
         for ret_symbols in fc.return_symbols
-            push!(vec, unroll_symbol_vector(_gen_access_expr.(Ref(fc.device), ret_symbols)))
+            push!(vec, unroll_symbol_vector(ret_symbols))
         end
         if length(vec) > 1
             return unroll_symbol_vector(vec)
@@ -47,10 +47,10 @@ function gen_access_expr(fc::FunctionCall{VAL_T}) where {VAL_T}
         end
     end
 
-    # no vectorization case
+    # single return value per function
     vec = Symbol[]
     for ret_symbols in fc.return_symbols
-        push!(vec, _gen_access_expr.(Ref(fc.device), ret_symbols[1]))
+        push!(vec, ret_symbols[1])
     end
     if length(vec) > 1
         return unroll_symbol_vector(vec)
@@ -62,15 +62,30 @@ end
 """
     gen_local_init(fc::FunctionCall)
 
-Dispatch from the given [`FunctionCall`](@ref) to the interface function [`_gen_local_init`](@ref).
+Dispatch from the given [`FunctionCall`](@ref) to the lower-level function [`_gen_local_init`](@ref).
+
+!!! note
+    This is currently unused, but may become useful in the future again.
 """
 function gen_local_init(fc::FunctionCall)
     return Expr(
         :block,
         _gen_local_init.(
-            Ref(fc.device),
             Iterators.flatten(fc.return_symbols),
             Iterators.cycle(fc.return_types, length(fc.return_symbols)),
         )...,
     )
+end
+
+"""
+    _gen_local_init(symbol::Symbol, type::Type)
+
+Return an `Expr` that initializes the symbol in the local scope.
+The result looks like `local <symbol>::<type>`.
+
+!!! note
+    This is currently unused, but may become useful in the future again.
+"""
+function _gen_local_init(symbol::Symbol, type::Type)
+    return Expr(:local, symbol, :(::), Symbol(type))
 end

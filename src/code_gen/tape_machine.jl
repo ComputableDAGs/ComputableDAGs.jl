@@ -1,11 +1,6 @@
 function expr_from_fc(fc::FunctionCall{VAL_T,F_T}) where {VAL_T,F_T<:Function}
     if length(fc) == 1
-        func_call = Expr(
-            :call,
-            fc.func,
-            fc.value_arguments[1]...,
-            _gen_access_expr.(Ref(fc.device), fc.arguments[1])...,
-        )
+        func_call = Expr(:call, fc.func, fc.value_arguments[1]..., fc.arguments[1]...)
     else
         # TBW; dispatch to device specific vectorization
         throw("unimplemented")

@@ -38,26 +38,3 @@ function get_devices(deviceType::Type{T}; verbose::Bool=false) where {T<:NumaNod
 
     return devices
 end
-
-"""
-    _gen_access_expr(device::NumaNode, symbol::Symbol)
-
-Interface implementation, dispatched to from [`gen_access_expr`](@ref).
-"""
-function _gen_access_expr(::NumaNode, symbol::Symbol)
-    # TODO rewrite these with Expr instead of quote node
-    #=s = Symbol("data_$symbol")
-    quote_node = Meta.parse(":($s)")=#
-    return symbol
-end
-
-"""
-    _gen_local_init(device::NumaNode, symbol::Symbol, type::Type)
-
-Interface implementation, dispatched to from [`gen_local_init`](@ref).
-"""
-function _gen_local_init(::NumaNode, symbol::Symbol, type::Type)
-    #s = Symbol("data_$(symbol)")
-    quote_node = Expr(:local, symbol, :(::), Symbol(type))
-    return quote_node
-end

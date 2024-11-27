@@ -17,7 +17,10 @@ in your top level.
 
 ## Keyword Arguments
 
-`closures_size` (default=0 (off)): The size of closures to use in the main generated code. This specifies the size of code blocks across which the compiler cannot optimize. For sufficiently large functions, a larger value means longer compile times but potentially faster execution time.
+`closures_size` (default=0 (off)): The size of closures to use in the main generated code. This specifies the size of code blocks across which the 
+        compiler cannot optimize. For sufficiently large functions, a larger value means longer compile times but potentially faster execution time.
+        **Note** that the actually used closure size might be different than the one passed here, since the function automatically chooses a size that
+        is close to a n-th root of the total number of loc, based off the given size.
 """
 function get_compute_function(
     graph::DAG, instance, machine::Machine, context_module::Module; closures_size=0
@@ -28,7 +31,7 @@ function get_compute_function(
     code = gen_function_body(tape, context_module; closures_size=closures_size)
 
     function_id = to_var_name(UUIDs.uuid1(rng[1]))
-    res_sym = _gen_access_expr(entry_device(tape.machine), tape.output_symbol)
+    res_sym = tape.output_symbol
     expr = #
     Expr(
         :function, # function definition

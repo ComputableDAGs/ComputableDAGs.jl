@@ -9,11 +9,6 @@ function ComputableDAGs.kernel(
     code = Expr(:block, ComputableDAGs.expr_from_fc.(tape.schedule)...)
 
     function_id = ComputableDAGs.to_var_name(UUIDs.uuid1(ComputableDAGs.rng[1]))
-    res_sym = eval(
-        ComputableDAGs._gen_access_expr(
-            ComputableDAGs.entry_device(tape.machine), tape.output_symbol
-        ),
-    )
     expr = Meta.parse(
         "function compute_$(function_id)(input_vector, output_vector, n::Int64)
             id = (blockIdx().x - 1) * blockDim().x + threadIdx().x
@@ -23,7 +18,7 @@ function ComputableDAGs.kernel(
             @inline input = input_vector[id]
             $(assign_inputs)
             $code
-            @inline output_vector[id] = $res_sym
+            @inline output_vector[id] = $(tape.output_symbol)
             return nothing
         end"
     )
