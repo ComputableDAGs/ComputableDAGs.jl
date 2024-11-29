@@ -27,13 +27,12 @@ function get_compute_function(
 )
     tape = gen_tape(graph, instance, machine, context_module)
 
-    assign_inputs = Expr(:block, expr_from_fc.(tape.input_assign_code)...)
     code = gen_function_body(tape, context_module; closures_size=closures_size)
+    assign_inputs = Expr(:block, expr_from_fc.(tape.input_assign_code)...)
 
     function_id = to_var_name(UUIDs.uuid1(rng[1]))
     res_sym = tape.output_symbol
-    expr = #
-    Expr(
+    expr = Expr(
         :function, # function definition
         Expr(
             :call, Symbol("compute_$function_id"), Expr(:(::), :input, input_type(instance))

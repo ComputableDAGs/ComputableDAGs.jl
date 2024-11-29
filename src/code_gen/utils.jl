@@ -17,6 +17,7 @@ function infer_types!(tape::Tape, context_module::Module)
 
     for fc in tape.input_assign_code
         res_types = result_types(fc, known_result_types, context_module)
+        fc.return_types = res_types
         for (s, t) in Iterators.zip(
             Iterators.flatten(fc.return_symbols),
             Iterators.cycle(res_types, length(fc.return_symbols)),

@@ -63,9 +63,6 @@ end
     gen_local_init(fc::FunctionCall)
 
 Dispatch from the given [`FunctionCall`](@ref) to the lower-level function [`_gen_local_init`](@ref).
-
-!!! note
-    This is currently unused, but may become useful in the future again.
 """
 function gen_local_init(fc::FunctionCall)
     return Expr(
@@ -82,10 +79,26 @@ end
 
 Return an `Expr` that initializes the symbol in the local scope.
 The result looks like `local <symbol>::<type>`.
-
-!!! note
-    This is currently unused, but may become useful in the future again.
 """
 function _gen_local_init(symbol::Symbol, type::Type)
     return Expr(:local, symbol, :(::), Symbol(type))
+end
+
+"""
+    wrap_in_let_statement(expr, symbols)
+
+For a given expression and a collection of symbols, generate a let statement that wraps the expression in a let statement with all the symbols, like
+`let <symbol[1]>=<symbol[1]>, ..., <symbol[end]>=<symbol[end]> <expr> end`
+"""
+@inline function wrap_in_let_statement(expr, symbols)
+    return Expr(:let, Expr(:block, _gen_let_statement.(symbols)...), expr)
+end
+
+"""
+    _gen_let_statement(symbol::Symbol)
+
+Return a let-`Expr` like `<symbol> = <symbol>`.
+"""
+function _gen_let_statement(symbol::Symbol)
+    return Expr(:(=), symbol, symbol)
 end

@@ -12,23 +12,36 @@ end
 function expr_from_fc(fc::FunctionCall{VAL_T,Expr}) where {VAL_T}
     @assert length(fc) == 1 && isempty(fc.value_arguments[1]) "function call assigning an expression cannot be vectorized and cannot contain value arguments\n$fc"
 
-    fc_expr_in_let = Expr(
-        :let,
-        Expr(:block, fc.return_symbols[1]...),
-        fc.func,                                # anonymous function code block
+    fc_expr = Expr(
+        :block,
+        gen_local_init(fc),
+        fc.func,    # anonymous function code block
+        Expr(       # return the symbols
+            :return,
+            (
+                if length(fc.return_symbols[1]) == 1
+                    fc.return_symbols[1][1]
+                else
+                    Expr(:tuple, fc.return_symbols[1]...)
+                end
+            ),
+        ),
     )
 
     func_call = Expr(
         :call,                      # call
+        #wrap_in_let_statement(  # wrap in let statement to prevent boxing of local variables
         Expr(
             :->,                    # anonymous function
             Expr(
                 :tuple,             # anonymous function arguments
-                fc.arguments[1]...,
+                #fc.arguments[1]...,
             ),
-            fc_expr_in_let,
+            fc_expr,            # anonymous function code block
         ),
-        fc.arguments[1]...,         # runtime arguments passed to the anonymous function
+        #fc.arguments[1],
+        #),
+        #fc.arguments[1]...,         # runtime arguments passed to the anonymous function call
     )
 
     access_expr = gen_access_expr(fc)
@@ -55,7 +68,7 @@ function gen_input_assignment_code(
             device = entry_device(machine)
 
             fc = FunctionCall(
-                input_expr(instance, name, :input),
+                Expr(:(=), symbol, input_expr(instance, name, :input)),
                 (),
                 Symbol[:input],
                 Symbol[symbol],
@@ -110,7 +123,7 @@ function _gen_function_body(
     end
 
     # iterate from end to beginning
-    # this helps because we can collect all undefined arguments to the closures that have to be returned somewhere earlier
+    # this helps because we can collect all undefined arguments to the closures that have to be defined somewhere earlier
     undefined_argument_symbols = Set{Symbol}()
     # the final return symbol is the return of the entire generated function, it always has to be returned
     push!(undefined_argument_symbols, gen_access_expr(fc_vec[end]))
@@ -183,15 +196,7 @@ function _closure_fc(
 
     fc_expr = Expr(                               # actual function body of the closure
         :block,
-        expr_from_fc.(code_block)...,
-        Expr(
-            :return,                    # have to make sure to not return a tuple of length 1
-            if length(ret_symbols_t) == 1
-                ret_symbols_t[1]
-            else
-                Expr(:tuple, ret_symbols_t...)
-            end,
-        ),
+        expr_from_fc.(code_block)...,             # no return statement necessary, will be done via capture and local init
     )
 
     fc = FunctionCall(
