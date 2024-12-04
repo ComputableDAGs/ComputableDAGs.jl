@@ -182,13 +182,14 @@ function node_split!(
     get_snapshot_diff(graph)
 
     n1_parents = copy(parents(n1))
+    local parent_indices = Dict()
     n1_children = copy(children(n1))
 
     for parent in n1_parents
-        _remove_edge!(graph, n1, parent)
+        parent_indices[parent] = _remove_edge!(graph, n1, parent)
     end
     for (child, index) in n1_children
-        _remove_edge!(graph, child, n1)
+        @assert index == _remove_edge!(graph, child, n1)
     end
     _remove_node!(graph, n1)
 
@@ -196,10 +197,10 @@ function node_split!(
         n_copy = copy(n1)
 
         _insert_node!(graph, n_copy)
-        _insert_edge!(graph, n_copy, parent)
+        _insert_edge!(graph, n_copy, parent, parent_indices[parent])
 
         for (child, index) in n1_children
-            _insert_edge!(graph, child, n_copy)
+            _insert_edge!(graph, child, n_copy, index)
         end
     end
 

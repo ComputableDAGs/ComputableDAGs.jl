@@ -7,7 +7,7 @@ Find node reductions involving the given node. The function pushes the found [`N
 """
 function find_reductions!(graph::DAG, node::Node)
     # there can only be one reduction per node, avoid adding duplicates
-    if !ismissing(node.nodeReduction)
+    if !ismissing(node.node_reduction)
         return nothing
     end
 
@@ -32,12 +32,12 @@ function find_reductions!(graph::DAG, node::Node)
         nr = NodeReduction(reductionVector)
         push!(graph.possible_operations.node_reductions, nr)
         for node in reductionVector
-            if !ismissing(node.nodeReduction)
+            if !ismissing(node.node_reduction)
                 # it can happen that the dirty node becomes part of an existing NodeReduction and overrides those ones now
                 # this is only a problem insofar the existing NodeReduction has to be deleted and replaced also in the possible_operations
-                invalidate_caches!(graph, node.nodeReduction)
+                invalidate_caches!(graph, node.node_reduction)
             end
-            node.nodeReduction = nr
+            node.node_reduction = nr
         end
     end
 
@@ -50,14 +50,14 @@ end
 Find the node split of the given node. The function pushes the found [`NodeSplit`](@ref) (if any) everywhere it needs to be and returns nothing.
 """
 function find_splits!(graph::DAG, node::Node)
-    if !ismissing(node.nodeSplit)
+    if !ismissing(node.node_split)
         return nothing
     end
 
     if (can_split(node))
         ns = NodeSplit(node)
         push!(graph.possible_operations.node_splits, ns)
-        node.nodeSplit = ns
+        node.node_split = ns
     end
 
     return nothing

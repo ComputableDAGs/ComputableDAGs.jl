@@ -22,11 +22,11 @@ function is_valid_node(graph::DAG, node::Node)
         @assert node in child.parents "Node is not a parent of its child!"
     end
 
-    #=if !ismissing(node.nodeReduction)
-        @assert is_valid(graph, node.nodeReduction)
+    #=if !ismissing(node.node_reduction)
+        @assert is_valid(graph, node.node_reduction)
     end
-    if !ismissing(node.nodeSplit)
-        @assert is_valid(graph, node.nodeSplit)
+    if !ismissing(node.node_split)
+        @assert is_valid(graph, node.node_split)
     end=#
 
     return true

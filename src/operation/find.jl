@@ -9,7 +9,7 @@ Insert the given node reduction into its input nodes' operation caches. This is 
 """
 function insert_operation!(nr::NodeReduction)
     for n in nr.input
-        n.nodeReduction = nr
+        n.node_reduction = nr
     end
     return nothing
 end
@@ -20,7 +20,7 @@ end
 Insert the given node split into its input node's operation cache. This is thread-safe.
 """
 function insert_operation!(ns::NodeSplit)
-    ns.input.nodeSplit = ns
+    ns.input.node_split = ns
     return nothing
 end
 
@@ -127,7 +127,7 @@ function generate_operations(graph::DAG)
         node_reductions = collect(trie)
 
         for nrVec in node_reductions
-            # parent sets are ordered and any node can only be part of one nodeReduction, so a NodeReduction is uniquely identifiable by its first element
+            # parent sets are ordered and any node can only be part of one node_reduction, so a NodeReduction is uniquely identifiable by its first element
             # this prevents duplicate node_reductions being generated
             lock(checkedNodesLock)
             if (nrVec[1] in checkedNodes)

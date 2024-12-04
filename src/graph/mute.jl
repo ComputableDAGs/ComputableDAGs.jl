@@ -238,7 +238,7 @@ function invalidate_caches!(graph::DAG, operation::NodeReduction)
     delete!(graph.possible_operations, operation)
 
     for node in operation.input
-        node.nodeReduction = missing
+        node.node_reduction = missing
     end
 
     return nothing
@@ -256,7 +256,7 @@ function invalidate_caches!(graph::DAG, operation::NodeSplit)
 
     # delete the operation from all caches of nodes involved in the operation
     # for node split there is only one node
-    operation.input.nodeSplit = missing
+    operation.input.node_split = missing
 
     return nothing
 end
@@ -267,11 +267,11 @@ end
 Invalidate the operation caches of the given node through calls to the respective [`invalidate_caches!`](@ref) functions.
 """
 function invalidate_operation_caches!(graph::DAG, node::ComputeTaskNode)
-    if !ismissing(node.nodeReduction)
-        invalidate_caches!(graph, node.nodeReduction)
+    if !ismissing(node.node_reduction)
+        invalidate_caches!(graph, node.node_reduction)
     end
-    if !ismissing(node.nodeSplit)
-        invalidate_caches!(graph, node.nodeSplit)
+    if !ismissing(node.node_split)
+        invalidate_caches!(graph, node.node_split)
     end
     return nothing
 end
@@ -282,11 +282,11 @@ end
 Invalidate the operation caches of the given node through calls to the respective [`invalidate_caches!`](@ref) functions.
 """
 function invalidate_operation_caches!(graph::DAG, node::DataTaskNode)
-    if !ismissing(node.nodeReduction)
-        invalidate_caches!(graph, node.nodeReduction)
+    if !ismissing(node.node_reduction)
+        invalidate_caches!(graph, node.node_reduction)
     end
-    if !ismissing(node.nodeSplit)
-        invalidate_caches!(graph, node.nodeSplit)
+    if !ismissing(node.node_split)
+        invalidate_caches!(graph, node.node_split)
     end
     return nothing
 end

@@ -43,8 +43,8 @@ function is_valid(graph::DAG)
 
     for node in graph.dirty_nodes
         @assert node in graph "Dirty Node is not part of the graph!"
-        @assert ismissing(node.nodeReduction) "Dirty Node has a NodeReduction!"
-        @assert ismissing(node.nodeSplit) "Dirty Node has a NodeSplit!"
+        @assert ismissing(node.node_reduction) "Dirty Node has a NodeReduction!"
+        @assert ismissing(node.node_split) "Dirty Node has a NodeSplit!"
     end
 
     @assert is_connected(graph) "Graph is not connected!"
