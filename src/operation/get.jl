@@ -10,12 +10,12 @@ Return the [`PossibleOperations`](@ref) of the graph at the current state.
 function get_operations(graph::DAG)
     apply_all!(graph)
 
-    if isempty(graph.possibleOperations)
+    if isempty(graph.possible_operations)
         generate_operations(graph)
     end
 
-    clean_node!.(Ref(graph), graph.dirtyNodes)
-    empty!(graph.dirtyNodes)
+    clean_node!.(Ref(graph), graph.dirty_nodes)
+    empty!(graph.dirty_nodes)
 
-    return graph.possibleOperations
+    return graph.possible_operations
 end

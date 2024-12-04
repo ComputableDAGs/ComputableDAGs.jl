@@ -28,14 +28,14 @@ function Base.show(io::IO, graph::DAG)
     print(io, "  Nodes: ")
 
     nodeDict = Dict{Type,Int64}()
-    noEdges = 0
+    number_of_edges = 0
     for node in graph.nodes
         if haskey(nodeDict, typeof(task(node)))
             nodeDict[typeof(task(node))] = nodeDict[typeof(task(node))] + 1
         else
             nodeDict[typeof(task(node))] = 1
         end
-        noEdges += length(parents(node))
+        number_of_edges += length(parents(node))
     end
 
     if length(graph.nodes) <= 20
@@ -58,9 +58,9 @@ function Base.show(io::IO, graph::DAG)
         end
     end
     println(io)
-    println(io, "  Edges: ", noEdges)
+    println(io, "  Edges: ", number_of_edges)
     properties = get_properties(graph)
-    println(io, "  Total Compute Effort: ", properties.computeEffort)
+    println(io, "  Total Compute Effort: ", properties.compute_effort)
     println(io, "  Total Data Transfer: ", properties.data)
-    return println(io, "  Total Compute Intensity: ", properties.computeIntensity)
+    return println(io, "  Total Compute Intensity: ", properties.compute_intensity)
 end

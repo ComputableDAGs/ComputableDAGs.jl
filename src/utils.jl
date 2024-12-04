@@ -6,14 +6,6 @@ Function with no arguments, returns nothing, does nothing. Useful for noop [`Fun
 @inline noop() = nothing
 
 """
-    unpack_identity(x::SVector)
-
-Function taking an `SVector`, returning it unpacked.
-"""
-@inline unpack_identity(x::SVector{1,<:Any}) = x[1]
-@inline unpack_identity(x) = x
-
-"""
     bytes_to_human_readable(bytes)
 
 Return a human readable string representation of the given number.
@@ -80,18 +72,18 @@ function mem(graph::DAG)
         size += mem(n)
     end
 
-    size += sizeof(graph.appliedOperations)
-    size += sizeof(graph.operationsToApply)
+    size += sizeof(graph.applied_operations)
+    size += sizeof(graph.operations_to_apply)
 
-    size += sizeof(graph.possibleOperations)
-    for op in graph.possibleOperations.nodeReductions
+    size += sizeof(graph.possible_operations)
+    for op in graph.possible_operations.node_reductions
         size += mem(op)
     end
-    for op in graph.possibleOperations.nodeSplits
+    for op in graph.possible_operations.node_splits
         size += mem(op)
     end
 
-    size += Base.summarysize(graph.dirtyNodes; exclude=Union{Node})
+    size += Base.summarysize(graph.dirty_nodes; exclude=Union{Node})
     return size += sizeof(diff)
 end
 
@@ -118,17 +110,10 @@ end
 
 Return the given vector as single String without quotation marks or brackets.
 """
-function unroll_symbol_vector(vec::Vector)
-    result = ""
-    for s in vec
-        if (result != "")
-            result *= ", "
-        end
-        result *= "$s"
-    end
-    return result
+function unroll_symbol_vector(vec::VEC) where {VEC<:Union{AbstractVector,Tuple}}
+    return Expr(:tuple, vec...)
 end
 
-function unroll_symbol_vector(vec::SVector)
-    return unroll_symbol_vector(Vector(vec))
+@inline function _call(f, args::Vararg)
+    return f(args...)
 end

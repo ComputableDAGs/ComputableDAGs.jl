@@ -34,10 +34,7 @@ export reset_graph!
 export get_operations
 
 # code generation related
-export execute
 export get_compute_function
-export gen_tape, execute_tape
-export unpack_identity
 
 # estimator
 export cost_type, graph_cost, operation_effect
@@ -50,8 +47,7 @@ export optimize_step!, optimize!
 export fixpoint_reached, optimize_to_fixpoint!
 
 # models
-export AbstractModel, AbstractProblemInstance
-export problem_instance, input_type, graph, input_expr
+export graph, input_type, input_expr
 
 # machine info
 export Machine
@@ -69,6 +65,7 @@ include("properties/type.jl")
 include("operation/type.jl")
 include("graph/type.jl")
 include("scheduler/type.jl")
+include("code_gen/type.jl")
 
 include("trie.jl")
 include("utils.jl")
@@ -127,7 +124,6 @@ include("devices/ext.jl")
 include("scheduler/interface.jl")
 include("scheduler/greedy.jl")
 
-include("code_gen/type.jl")
 include("code_gen/utils.jl")
 include("code_gen/tape_machine.jl")
 include("code_gen/function.jl")

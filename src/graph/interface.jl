@@ -7,7 +7,7 @@ See also: [`DAG`](@ref), [`pop_operation!`](@ref)
 """
 function push_operation!(graph::DAG, operation::Operation)
     # 1.: Add the operation to the DAG
-    push!(graph.operationsToApply, operation)
+    push!(graph.operations_to_apply, operation)
 
     return nothing
 end
@@ -21,10 +21,10 @@ See also: [`DAG`](@ref), [`push_operation!`](@ref)
 """
 function pop_operation!(graph::DAG)
     # 1.: Remove the operation from the appliedChain of the DAG
-    if !isempty(graph.operationsToApply)
-        pop!(graph.operationsToApply)
-    elseif !isempty(graph.appliedOperations)
-        appliedOp = pop!(graph.appliedOperations)
+    if !isempty(graph.operations_to_apply)
+        pop!(graph.operations_to_apply)
+    elseif !isempty(graph.applied_operations)
+        appliedOp = pop!(graph.applied_operations)
         revert_operation!(graph, appliedOp)
     else
         error("No more operations to pop!")
@@ -38,7 +38,8 @@ end
 
 Return `true` if [`pop_operation!`](@ref) is possible, `false` otherwise.
 """
-can_pop(graph::DAG) = !isempty(graph.operationsToApply) || !isempty(graph.appliedOperations)
+can_pop(graph::DAG) =
+    !isempty(graph.operations_to_apply) || !isempty(graph.applied_operations)
 
 """
     reset_graph!(graph::DAG)

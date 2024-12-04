@@ -4,7 +4,7 @@
 Return whether `operations` is empty, i.e. all of its fields are empty.
 """
 function Base.isempty(operations::PossibleOperations)
-    return isempty(operations.nodeReductions) && isempty(operations.nodeSplits)
+    return isempty(operations.node_reductions) && isempty(operations.node_splits)
 end
 
 """
@@ -14,8 +14,8 @@ Return a named tuple with the number of each of the operation types as a named t
 """
 function Base.length(operations::PossibleOperations)
     return (
-        nodeReductions=length(operations.nodeReductions),
-        nodeSplits=length(operations.nodeSplits),
+        node_reductions=length(operations.node_reductions),
+        node_splits=length(operations.node_splits),
     )
 end
 
@@ -25,7 +25,7 @@ end
 Delete the given node reduction from the possible operations.
 """
 function Base.delete!(operations::PossibleOperations, op::NodeReduction)
-    delete!(operations.nodeReductions, op)
+    delete!(operations.node_reductions, op)
     return operations
 end
 
@@ -35,7 +35,7 @@ end
 Delete the given node split from the possible operations.
 """
 function Base.delete!(operations::PossibleOperations, op::NodeSplit)
-    delete!(operations.nodeSplits, op)
+    delete!(operations.node_splits, op)
     return operations
 end
 

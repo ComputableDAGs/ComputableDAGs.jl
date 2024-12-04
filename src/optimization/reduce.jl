@@ -14,14 +14,14 @@ function optimize_step!(optimizer::ReductionOptimizer, graph::DAG)
         return false
     end
 
-    push_operation!(graph, first(operations.nodeReductions))
+    push_operation!(graph, first(operations.node_reductions))
 
     return true
 end
 
 function fixpoint_reached(optimizer::ReductionOptimizer, graph::DAG)
     operations = get_operations(graph)
-    return isempty(operations.nodeReductions)
+    return isempty(operations.node_reductions)
 end
 
 function optimize_to_fixpoint!(optimizer::ReductionOptimizer, graph::DAG)

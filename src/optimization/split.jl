@@ -14,14 +14,14 @@ function optimize_step!(optimizer::SplitOptimizer, graph::DAG)
         return false
     end
 
-    push_operation!(graph, first(operations.nodeSplits))
+    push_operation!(graph, first(operations.node_splits))
 
     return true
 end
 
 function fixpoint_reached(optimizer::SplitOptimizer, graph::DAG)
     operations = get_operations(graph)
-    return isempty(operations.nodeSplits)
+    return isempty(operations.node_splits)
 end
 
 function optimize_to_fixpoint!(optimizer::SplitOptimizer, graph::DAG)

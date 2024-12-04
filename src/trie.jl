@@ -46,24 +46,7 @@ Insert the given node into the trie. The depth is used to iterate through the tr
 """
 function insert_helper!(
     trie::NodeIdTrie{NodeType}, node::NodeType, depth::Int
-) where {TaskType<:AbstractDataTask,NodeType<:DataTaskNode{TaskType}}
-    if (length(children(node)) == depth)
-        push!(trie.value, node)
-        return nothing
-    end
-
-    depth = depth + 1
-    id = node.children[depth][1].id
-
-    if (!haskey(trie.children, id))
-        trie.children[id] = NodeIdTrie{NodeType}()
-    end
-    return insert_helper!(trie.children[id], node, depth)
-end
-# TODO: Remove this workaround once https://github.com/JuliaLang/julia/issues/54404 is fixed in julia 1.10+
-function insert_helper!(
-    trie::NodeIdTrie{NodeType}, node::NodeType, depth::Int
-) where {TaskType<:AbstractComputeTask,NodeType<:ComputeTaskNode{TaskType}}
+) where {NodeType<:Node}
     if (length(children(node)) == depth)
         push!(trie.value, node)
         return nothing
@@ -83,18 +66,7 @@ end
 
 Insert the given node into the trie. It's sorted by its type in the first layer, then by its children in the following layers.
 """
-function Base.insert!(
-    trie::NodeTrie, node::NodeType
-) where {TaskType<:AbstractDataTask,NodeType<:DataTaskNode{TaskType}}
-    if (!haskey(trie.children, NodeType))
-        trie.children[NodeType] = NodeIdTrie{NodeType}()
-    end
-    return insert_helper!(trie.children[NodeType], node, 0)
-end
-# TODO: Remove this workaround once https://github.com/JuliaLang/julia/issues/54404 is fixed in julia 1.10+
-function Base.insert!(
-    trie::NodeTrie, node::NodeType
-) where {TaskType<:AbstractComputeTask,NodeType<:ComputeTaskNode{TaskType}}
+function Base.insert!(trie::NodeTrie, node::NodeType) where {NodeType<:Node}
     if (!haskey(trie.children, NodeType))
         trie.children[NodeType] = NodeIdTrie{NodeType}()
     end

@@ -47,23 +47,6 @@ Interface function that must be implemented for every subtype of [`AbstractDevic
 function measure_device! end
 
 """
-    _gen_access_expr(device::AbstractDevice, symbol::Symbol)
-
-Interface function that must be implemented for every subtype of [`AbstractDevice`](@ref).
-Return an `Expr` or `QuoteNode` accessing the variable identified by [`symbol`].
-"""
-function _gen_access_expr end
-
-"""
-    _gen_local_init(fc::FunctionCall, device::AbstractDevice)
-
-Interface function that must be implemented for every subtype of [`AbstractDevice`](@ref).
-Return an `Expr` or `QuoteNode` that initializes the access expression returned by [`_gen_access_expr`](@ref) in the local scope.
-This expression may be empty. For local variables it should be `local <variable_name>::<Type>`.
-"""
-function _gen_local_init end
-
-"""
     kernel(gpu_type::Type{<:AbstractGPU}, graph::DAG, instance)
 
 For a GPU type, a [`DAG`](@ref), and a problem instance, return an `Expr` containing a function of signature `compute_<id>(input::<GPU>Vector, output::<GPU>Vector, n::Int64)`, which will return the result of the DAG computation of the input on the given output vector, intended for computation on GPUs. Currently, `CUDAGPU` and `ROCmGPU` are available if their respective package extensions are loaded.

@@ -31,17 +31,74 @@ end
 """
     gen_access_expr(fc::FunctionCall)
 
-Dispatch from the given [`FunctionCall`](@ref) to the interface function `_gen_access_expr`(@ref).
+Return the 
 """
-function gen_access_expr(fc::FunctionCall)
-    return _gen_access_expr(fc.device, fc.return_symbol)
+function gen_access_expr(fc::FunctionCall{VAL_T}) where {VAL_T}
+    if length(fc.return_types) != 1
+        # general case
+        vec = Expr[]
+        for ret_symbols in fc.return_symbols
+            push!(vec, unroll_symbol_vector(ret_symbols))
+        end
+        if length(vec) > 1
+            return unroll_symbol_vector(vec)
+        else
+            return vec[1]
+        end
+    end
+
+    # single return value per function
+    vec = Symbol[]
+    for ret_symbols in fc.return_symbols
+        push!(vec, ret_symbols[1])
+    end
+    if length(vec) > 1
+        return unroll_symbol_vector(vec)
+    else
+        return vec[1]
+    end
 end
 
 """
     gen_local_init(fc::FunctionCall)
 
-Dispatch from the given [`FunctionCall`](@ref) to the interface function `_gen_local_init`(@ref).
+Dispatch from the given [`FunctionCall`](@ref) to the lower-level function [`_gen_local_init`](@ref).
 """
 function gen_local_init(fc::FunctionCall)
-    return _gen_local_init(fc, fc.device)
+    return Expr(
+        :block,
+        _gen_local_init.(
+            Iterators.flatten(fc.return_symbols),
+            Iterators.cycle(fc.return_types, length(fc.return_symbols)),
+        )...,
+    )
+end
+
+"""
+    _gen_local_init(symbol::Symbol, type::Type)
+
+Return an `Expr` that initializes the symbol in the local scope.
+The result looks like `local <symbol>::<type>`.
+"""
+function _gen_local_init(symbol::Symbol, type::Type)
+    return Expr(:local, symbol, :(::), Symbol(type))
+end
+
+"""
+    wrap_in_let_statement(expr, symbols)
+
+For a given expression and a collection of symbols, generate a let statement that wraps the expression in a let statement with all the symbols, like
+`let <symbol[1]>=<symbol[1]>, ..., <symbol[end]>=<symbol[end]> <expr> end`
+"""
+@inline function wrap_in_let_statement(expr, symbols)
+    return Expr(:let, Expr(:block, _gen_let_statement.(symbols)...), expr)
+end
+
+"""
+    _gen_let_statement(symbol::Symbol)
+
+Return a let-`Expr` like `<symbol> = <symbol>`.
+"""
+function _gen_let_statement(symbol::Symbol)
+    return Expr(:(=), symbol, symbol)
 end
