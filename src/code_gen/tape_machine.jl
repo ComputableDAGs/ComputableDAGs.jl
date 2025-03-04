@@ -92,10 +92,17 @@ Generate the function body from the given [`Tape`](@ref).
 `closures_size`: The size of closures to generate (in lines of code). Closures introduce function barriers
     in the function body, preventing some optimizations by the compiler and therefore greatly reducing
     compile time. A value of 0 will disable the use of closures entirely.
+`concrete_input_type`: A type that will be used as the expected input type of the generated function. If
+    omitted, the `input_type` of the problem instance is used.
 """
-function gen_function_body(tape::Tape, context_module::Module; closures_size::Int)
+function gen_function_body(
+    tape::Tape,
+    context_module::Module;
+    closures_size::Int,
+    concrete_input_type::Type=Nothing,
+)
     # only need to annotate types later when using closures
-    types = infer_types!(tape, context_module)
+    types = infer_types!(tape, context_module; concrete_input_type=concrete_input_type)
 
     if closures_size > 1
         s = log(closures_size, length(tape.schedule))
