@@ -94,15 +94,18 @@ function result_types(
     fc::FunctionCall{VAL_T,F_T}, known_res_types::Dict{Symbol,Type}, context_module::Module
 ) where {VAL_T,F_T<:Function}
     arg_types = (_value_argument_types(fc)..., _argument_types(known_res_types, fc)...)
+    @debug "checking $(fc.func) with arg types $(arg_types)"
     types = Base.return_types(fc.func, arg_types)
 
     _validate_result_types(fc, types, arg_types)
 
     N_RET = length(fc.return_types)
     if (N_RET == 1)
+        @debug "found return type $(types[1])"
         return [types[1]]
     end
 
+    @debug "found return types $(types[1].parameters...)"
     return [types[1].parameters...]
 end
 

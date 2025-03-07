@@ -59,4 +59,13 @@ EDGE_NUMBERS = (3, 96, 747, 5304) #, 37203
         @test Base.return_types(f_closures, (typeof(input),))[1] == typeof(input[1])
         @test isapprox(f_closures(input), input[1] * input[2])
     end
+
+    @testset "Function generation with concrete input type" begin
+        f_closures = get_compute_function(
+            g, mm, cpu_st(), @__MODULE__; concrete_input_type=typeof(input)
+        )
+
+        @test Base.return_types(f_closures, (typeof(input),))[1] == typeof(input[1])
+        @test isapprox(f_closures(input), input[1] * input[2])
+    end
 end
