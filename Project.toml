@@ -29,7 +29,7 @@ NumaAllocators = "0.2"
 RuntimeGeneratedFunctions = "0.5"
 StaticArrays = "1"
 julia = "1.10"
-oneAPI = "1"
+oneAPI = "1, 2"
 
 [extras]
 SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
