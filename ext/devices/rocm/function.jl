@@ -12,7 +12,7 @@ function ComputableDAGs.kernel(
     function_id = ComputableDAGs.to_var_name(UUIDs.uuid1(ComputableDAGs.rng[1]))
     expr = Meta.parse(
         "function compute_$(function_id)(input_vector, output_vector, n::Int64)
-            id = (workgroupIdx().x - 1) * workgroupDim().x + workgroupIdx().x
+            id = (workgroupIdx().x - 1) * workgroupDim().x + workitemIdx().x
             if (id > n)
                 return
             end
