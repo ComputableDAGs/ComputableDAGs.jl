@@ -72,6 +72,7 @@ function optimize_to_fixpoint!(optimizer::GreedyOptimizer, graph::DAG)
     return nothing
 end
 
-function String(optimizer::GreedyOptimizer)
-    return "greedy_optimizer_$(optimizer.estimator)"
+function Base.print(io::IO, optimizer::GreedyOptimizer)
+    print(io, "greedy_optimizer_$(optimizer.estimator)")
+    return nothing
 end

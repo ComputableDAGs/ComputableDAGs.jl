@@ -81,6 +81,7 @@ function operation_effect(
     return (data=d, compute_effort=ce, compute_intensity=ce / d)::CDCost
 end
 
-function String(::GlobalMetricEstimator)
-    return "global_metric"
+function Base.print(io::IO, ::GlobalMetricEstimator)
+    print(io, "global_metric")
+    return nothing
 end

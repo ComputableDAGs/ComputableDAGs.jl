@@ -44,8 +44,10 @@ function optimize_step!(optimizer::RandomWalkOptimizer, graph::DAG)
             end
         end
     end
+    return nothing
 end
 
-function String(::RandomWalkOptimizer)
-    return "random_walker"
+function Base.print(io::IO, ::RandomWalkOptimizer)
+    print(io, "random_walker")
+    return nothing
 end
