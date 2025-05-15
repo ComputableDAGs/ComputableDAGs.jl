@@ -31,6 +31,7 @@ function optimize_to_fixpoint!(optimizer::SplitOptimizer, graph::DAG)
     return nothing
 end
 
-function String(::SplitOptimizer)
-    return "split_optimizer"
+function Base.print(io::IO, ::SplitOptimizer)
+    print(io, "split_optimizer")
+    return nothing
 end

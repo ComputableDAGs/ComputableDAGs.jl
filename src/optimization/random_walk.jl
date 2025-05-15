@@ -15,7 +15,7 @@ function optimize_step!(optimizer::RandomWalkOptimizer, graph::DAG)
     operations = get_operations(graph)
 
     if sum(length(operations)) == 0 &&
-        length(graph.applied_operations) + length(graph.operations_to_apply) == 0
+            length(graph.applied_operations) + length(graph.operations_to_apply) == 0
         # in case there are zero operations possible at all on the graph
         return false
     end
@@ -44,8 +44,10 @@ function optimize_step!(optimizer::RandomWalkOptimizer, graph::DAG)
             end
         end
     end
+    return
 end
 
-function String(::RandomWalkOptimizer)
-    return "random_walker"
+function Base.print(io::IO, ::RandomWalkOptimizer)
+    print(io, "random_walker")
+    return nothing
 end

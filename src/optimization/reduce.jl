@@ -31,6 +31,7 @@ function optimize_to_fixpoint!(optimizer::ReductionOptimizer, graph::DAG)
     return nothing
 end
 
-function String(::ReductionOptimizer)
-    return "reduction_optimizer"
+function Base.print(io::IO, ::ReductionOptimizer)
+    print(io, "reduction_optimizer")
+    return nothing
 end
