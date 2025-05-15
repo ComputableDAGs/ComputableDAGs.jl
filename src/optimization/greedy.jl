@@ -5,7 +5,7 @@ An implementation of the greedy optimization algorithm, simply choosing the best
 
 The fixpoint is reached when any leftover operation would increase the graph's total cost according to the given estimator.
 """
-struct GreedyOptimizer{EstimatorType <: AbstractEstimator} <: AbstractOptimizer
+struct GreedyOptimizer{EstimatorType<:AbstractEstimator} <: AbstractOptimizer
     estimator::EstimatorType
 end
 
@@ -28,7 +28,7 @@ function optimize_step!(optimizer::GreedyOptimizer, graph::DAG)
             return acc
         end,
         operations;
-        init = typemax(cost_type(optimizer.estimator)),
+        init=typemax(cost_type(optimizer.estimator)),
     )
 
     if lowestCost > zero(cost_type(optimizer.estimator))
@@ -56,7 +56,7 @@ function fixpoint_reached(optimizer::GreedyOptimizer, graph::DAG)
             return acc
         end,
         operations;
-        init = typemax(cost_type(optimizer.estimator)),
+        init=typemax(cost_type(optimizer.estimator)),
     )
 
     if lowestCost > zero(cost_type(optimizer.estimator))
