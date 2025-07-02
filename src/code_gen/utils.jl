@@ -28,6 +28,9 @@ function infer_types!(tape::Tape, context_module::Module; concrete_input_type::T
             Iterators.cycle(res_types, length(fc.return_symbols)),
         )
             known_result_types[s] = t
+            if (t == Union{})
+                @warn "found return type Union{} from input assignment function call:\n$(fc)"
+            end
         end
     end
 
@@ -39,6 +42,9 @@ function infer_types!(tape::Tape, context_module::Module; concrete_input_type::T
             Iterators.cycle(res_types, length(fc.return_symbols)),
         )
             known_result_types[s] = t
+            if (t == Union{})
+                @warn "found return type Union{} from function call:\n$(fc)\ninput argument types: $((_value_argument_types(fc)..., _argument_types(known_result_types, fc)...))"
+            end
         end
     end
 
