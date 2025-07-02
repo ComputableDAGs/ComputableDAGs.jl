@@ -1,6 +1,6 @@
 name = "ComputableDAGs"
 uuid = "62933717-1c9d-4a3f-b06f-7ab7f17ca32d"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Anton Reinhard <a.reinhard@hzdr.de>", "Uwe Hernandez Acosta"]
 
 [deps]
