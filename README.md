@@ -3,6 +3,7 @@
 [![Build Status](https://github.com/ComputableDAGs/ComputableDAGs.jl/actions/workflows/unit_tests.yml/badge.svg?branch=main)](https://github.com/ComputableDAGs/ComputableDAGs.jl/actions/workflows/unit_tests.yml/)
 [![Doc Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://ComputableDAGs.github.io/ComputableDAGs.jl/dev/)
 [![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
+[![DOI](https://rodare.hzdr.de/badge/848178532.svg)](https://rodare.hzdr.de/badge/latestdoi/848178532)
 
 Represent computations as Directed Acyclic Graphs (DAGs), analyze and optimize them, then compile to native code and run!
 
