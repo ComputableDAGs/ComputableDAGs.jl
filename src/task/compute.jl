@@ -139,3 +139,23 @@ function result_types(
 
     return [types[1].parameters...]
 end
+
+@inline function _assert_array_types(args)
+    @assert false "all arguments of a vectorized compute task must be arrays"
+end
+@inline _assert_array_types() = nothing
+@inline function _assert_array_types(arg::AbstractArray, args...)
+    return _assert_array_types(args)
+end
+
+function compute(::VectorizedComputeTask{T}, args...) where {T <: AbstractComputeTask}
+    _assert_array_types(args)
+
+    res = similar(args[1])
+    c = 1
+    @simd for args in Iterators.zip(args)
+        res[c] = compute(T(), args...)
+        c += 1
+    end
+    return res
+end

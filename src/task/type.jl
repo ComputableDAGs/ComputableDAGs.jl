@@ -27,3 +27,11 @@ Task representing a specific data transfer.
 struct DataTask <: AbstractDataTask
     data::Float64
 end
+
+"""
+    VectorizedComputeTask{TASK_T<:AbstractComputeTask} <: AbstractComputeTask
+
+Task representing a vectorized version of another compute task.
+"""
+struct VectorizedComputeTask{TASK_T<:AbstractComputeTask} <: AbstractComputeTask
+end

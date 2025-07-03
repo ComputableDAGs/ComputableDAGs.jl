@@ -18,13 +18,13 @@ is_exit_node(node::Node)::Bool = length(parents(node)) == 0
 Return the node's task.
 """
 function task(
-        node::DataTaskNode{TaskType}
-    )::TaskType where {TaskType <: Union{AbstractDataTask, AbstractComputeTask}}
+    node::DataTaskNode{TaskType}
+)::TaskType where {TaskType<:AbstractDataTask}
     return node.task
 end
 function task(
-        node::ComputeTaskNode{TaskType}
-    )::TaskType where {TaskType <: Union{AbstractDataTask, AbstractComputeTask}}
+    node::ComputeTaskNode{TaskType}
+)::TaskType where {TaskType<:AbstractComputeTask}
     return node.task
 end
 
