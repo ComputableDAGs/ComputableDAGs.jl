@@ -1,7 +1,7 @@
 name = "ComputableDAGs"
 uuid = "62933717-1c9d-4a3f-b06f-7ab7f17ca32d"
-version = "0.2.2"
 authors = ["Anton Reinhard <a.reinhard@hzdr.de>", "Uwe Hernandez Acosta"]
+version = "0.2.2"
 
 [deps]
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
@@ -22,7 +22,7 @@ CUDAExt = "CUDA"
 oneAPIExt = "oneAPI"
 
 [compat]
-AMDGPU = "1"
+AMDGPU = "2"
 CUDA = "5"
 DataStructures = "0.18"
 NumaAllocators = "0.2"
