@@ -24,7 +24,7 @@ oneAPIExt = "oneAPI"
 [compat]
 AMDGPU = "2"
 CUDA = "5"
-DataStructures = "0.18"
+DataStructures = "0.19"
 NumaAllocators = "0.2"
 RuntimeGeneratedFunctions = "0.5.14"
 StaticArrays = "1"

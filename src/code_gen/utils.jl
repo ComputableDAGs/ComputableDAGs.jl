@@ -9,8 +9,8 @@ end
 Infer the result type of each function call in the given tape. Returns a dictionary with the result type for each symbol and sets each function call's return_types.
 This function assumes that each [`FunctionCall`](@ref) has only one statically inferrable return type and will throw an exception otherwise.
 """
-function infer_types!(tape::Tape, context_module::Module; concrete_input_type::Type=Nothing)
-    known_result_types = Dict{Symbol,Type}()
+function infer_types!(tape::Tape, context_module::Module; concrete_input_type::Type = Nothing)
+    known_result_types = Dict{Symbol, Type}()
 
     if concrete_input_type == Nothing   # the type, not the value "nothing"
         # the only initially known type
@@ -24,9 +24,9 @@ function infer_types!(tape::Tape, context_module::Module; concrete_input_type::T
         res_types = result_types(fc, known_result_types, context_module)
         fc.return_types = res_types
         for (s, t) in Iterators.zip(
-            Iterators.flatten(fc.return_symbols),
-            Iterators.cycle(res_types, length(fc.return_symbols)),
-        )
+                Iterators.flatten(fc.return_symbols),
+                Iterators.flatten(Iterators.repeated(res_types, length(fc.return_symbols))),
+            )
             known_result_types[s] = t
             if (t == Union{})
                 @warn "found return type Union{} from input assignment function call:\n$(fc)"
@@ -38,9 +38,9 @@ function infer_types!(tape::Tape, context_module::Module; concrete_input_type::T
         res_types = result_types(fc, known_result_types, context_module)
         fc.return_types = res_types
         for (s, t) in Iterators.zip(
-            Iterators.flatten(fc.return_symbols),
-            Iterators.cycle(res_types, length(fc.return_symbols)),
-        )
+                Iterators.flatten(fc.return_symbols),
+                Iterators.flatten(Iterators.repeated(res_types, length(fc.return_symbols))),
+            )
             known_result_types[s] = t
             if (t == Union{})
                 @warn "found return type Union{} from function call:\n$(fc)\ninput argument types: $((_value_argument_types(fc)..., _argument_types(known_result_types, fc)...))"
@@ -49,11 +49,11 @@ function infer_types!(tape::Tape, context_module::Module; concrete_input_type::T
     end
 
     if any(
-        x -> x == Any,
-        getindex.(
-            Ref(known_result_types), Iterators.flatten(last(tape.schedule).return_symbols)
-        ),
-    )
+            x -> x == Any,
+            getindex.(
+                Ref(known_result_types), Iterators.flatten(last(tape.schedule).return_symbols)
+            ),
+        )
         @warn "the inferred return type of the function is 'Any', which will likely lead to problems\ntry to \n\t 1: provide a more specific function argument type in your 'input_type' (got: $(input_type(tape.instance)))\n\t 2: increase your compute functions' type stability" *
             (
             if concrete_input_type == Nothing
