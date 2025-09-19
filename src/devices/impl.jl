@@ -69,7 +69,9 @@ function gen_local_init(fc::FunctionCall)
         :block,
         _gen_local_init.(
             Iterators.flatten(fc.return_symbols),
-            Iterators.flatten(Iterators.repeated(fc.return_types, length(fc.return_symbols))),
+            Iterators.flatten(
+                Iterators.repeated(fc.return_types, length(fc.return_symbols))
+            ),
         )...,
     )
 end
