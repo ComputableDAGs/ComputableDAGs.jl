@@ -1,4 +1,3 @@
-
 """
     GreedyScheduler
 
@@ -22,7 +21,7 @@ function schedule_dag(::GreedyScheduler, graph::DAG, machine::Machine)
     # keep an accumulated cost of things scheduled to this device so far
     device_acc_cost = PriorityQueue{AbstractDevice,Float64}()
     for device in machine.devices
-        enqueue!(device_acc_cost, device => 0)
+        push!(device_acc_cost, device => 0)
     end
 
     local node
@@ -31,7 +30,7 @@ function schedule_dag(::GreedyScheduler, graph::DAG, machine::Machine)
 
         # assign the device with lowest accumulated cost to the node (if it's a compute node)
         if (isa(node, ComputeTaskNode))
-            lowest_device = peek(device_acc_cost)[1]
+            lowest_device = first(device_acc_cost)[1]
             node.device = lowest_device
             device_acc_cost[lowest_device] = compute_effort(task(node))
         end
