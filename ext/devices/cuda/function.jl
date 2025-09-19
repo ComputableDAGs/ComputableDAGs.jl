@@ -1,6 +1,6 @@
 function ComputableDAGs.kernel(
-    ::Type{CUDAGPU}, graph::DAG, instance, context_module::Module
-)
+        ::Type{CUDAGPU}, graph::DAG, instance, context_module::Module
+    )
     machine = cpu_st()
     tape = ComputableDAGs.gen_tape(graph, instance, machine, context_module)
 
@@ -12,7 +12,7 @@ function ComputableDAGs.kernel(
     expr = Meta.parse(
         "function compute_$(function_id)(input_vector, output_vector, n::Int64)
             id = (blockIdx().x - 1) * blockDim().x + threadIdx().x
-            if (id > n)  
+            if (id > n)
                 return
             end
             @inline input = input_vector[id]

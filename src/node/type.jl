@@ -19,7 +19,7 @@ abstract type Operation end
 
 """
     DataTaskNode <: Node
-    
+
 Any node that transfers data and does no computation.
 
 # Fields
@@ -31,12 +31,12 @@ Any node that transfers data and does no computation.
 `.node_split`:      Either this node's [`NodeSplit`](@ref) or `missing`, if none. There can only be at most one.\\
 `.name`:            The name of this node for entry nodes into the graph ([`is_entry_node`](@ref)) to reliably assign the inputs to the correct nodes when executing.\\
 """
-mutable struct DataTaskNode{TaskType<:AbstractDataTask} <: Node
+mutable struct DataTaskNode{TaskType <: AbstractDataTask} <: Node
     task::TaskType
 
     # use vectors as sets have way too much memory overhead
     parents::Vector{Node}
-    children::Vector{Tuple{Node,Int}}
+    children::Vector{Tuple{Node, Int}}
 
     # need a unique identifier unique to every *constructed* node
     # however, it can be copied when splitting a node
@@ -44,10 +44,10 @@ mutable struct DataTaskNode{TaskType<:AbstractDataTask} <: Node
 
     # the NodeReduction involving this node, if it exists
     # Can't use the NodeReduction type here because it's not yet defined
-    node_reduction::Union{Operation,Missing}
+    node_reduction::Union{Operation, Missing}
 
     # the NodeSplit involving this node, if it exists
-    node_split::Union{Operation,Missing}
+    node_split::Union{Operation, Missing}
 
     # for input nodes we need a name for the node to distinguish between them
     name::String
@@ -55,7 +55,7 @@ end
 
 """
     ComputeTaskNode <: Node
-    
+
 Any node that computes a result from inputs using an [`AbstractComputeTask`](@ref).
 
 # Fields
@@ -67,17 +67,17 @@ Any node that computes a result from inputs using an [`AbstractComputeTask`](@re
 `.node_split`:      Either this node's [`NodeSplit`](@ref) or `missing`, if none. There can only be at most one.\\
 `.device`:          The Device this node has been scheduled on by a [`Scheduler`](@ref).
 """
-mutable struct ComputeTaskNode{TaskType<:AbstractComputeTask} <: Node
+mutable struct ComputeTaskNode{TaskType <: AbstractComputeTask} <: Node
     task::TaskType
     parents::Vector{Node}
-    children::Vector{Tuple{Node,Int}}
+    children::Vector{Tuple{Node, Int}}
     id::Base.UUID
 
-    node_reduction::Union{Operation,Missing}
-    node_split::Union{Operation,Missing}
+    node_reduction::Union{Operation, Missing}
+    node_split::Union{Operation, Missing}
 
     # the device this node is assigned to execute on
-    device::Union{AbstractDevice,Missing}
+    device::Union{AbstractDevice, Missing}
 end
 
 """
@@ -91,7 +91,7 @@ The child is the prerequisite node of the parent.
 """
 struct Edge
     # edge points from child to parent
-    edge::Union{Tuple{DataTaskNode,ComputeTaskNode},Tuple{ComputeTaskNode,DataTaskNode}}
+    edge::Union{Tuple{DataTaskNode, ComputeTaskNode}, Tuple{ComputeTaskNode, DataTaskNode}}
     # the index of the child in parent
     index::Int
 end

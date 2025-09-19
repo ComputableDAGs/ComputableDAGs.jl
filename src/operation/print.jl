@@ -14,6 +14,7 @@ function Base.show(io::IO, ops::PossibleOperations)
     for ns in ops.node_splits
         println(io, "  - ", ns)
     end
+    return
 end
 
 """

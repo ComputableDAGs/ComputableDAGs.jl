@@ -1,4 +1,3 @@
-
 """
     AbstractEstimator
 
@@ -31,7 +30,7 @@ Get the estimated effect on the cost of the graph, such that `graph_cost(estimat
 
 !!! note
     There is a default implementation of this function, applying the operation, calling [`graph_cost`](@ref), then popping the operation again.
-    
+
     It can be much faster to overload this function for a specific estimator and directly compute the effects from the operation if possible.
 """
 function operation_effect(estimator::AbstractEstimator, graph::DAG, operation::Operation)

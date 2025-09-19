@@ -31,7 +31,7 @@ in a `Vector`.
     and later inferred and assigned by [`infer_types!`](@ref).
 - `device::AbstractDevice`: The device that this function call is scheduled on.
 """
-mutable struct FunctionCall{VAL_T<:Tuple,FUNC_T<:Union{Function,Expr}}
+mutable struct FunctionCall{VAL_T <: Tuple, FUNC_T <: Union{Function, Expr}}
     func::FUNC_T
     value_arguments::Vector{VAL_T}          # tuple of value arguments for the function call, will be prepended to the other arguments
     arguments::Vector{Vector{Symbol}}       # symbols of the inputs to the function call
@@ -40,13 +40,13 @@ mutable struct FunctionCall{VAL_T<:Tuple,FUNC_T<:Union{Function,Expr}}
     device::AbstractDevice
 end
 function FunctionCall(
-    func::Union{Function,Expr},
-    value_arguments::VAL_T,
-    arguments::Vector{Symbol},
-    return_symbol::Vector{Symbol},
-    return_types::Vector{<:Type},
-    device::AbstractDevice,
-) where {VAL_T<:Tuple}
+        func::Union{Function, Expr},
+        value_arguments::VAL_T,
+        arguments::Vector{Symbol},
+        return_symbol::Vector{Symbol},
+        return_types::Vector{<:Type},
+        device::AbstractDevice,
+    ) where {VAL_T <: Tuple}
     # convenience constructor for function calls that do not use vectorization, which is most of the use cases
     @assert length(return_types) == 0 || length(return_types) == length(return_symbol) "number of return types '$(length(return_types))' does not match the number of return symbols '$(length(return_symbol))'"
     @assert func isa Function || length(value_arguments) == 0 "no value arguments are allowed for a an Expr FunctionCall, but got '$value_arguments'"

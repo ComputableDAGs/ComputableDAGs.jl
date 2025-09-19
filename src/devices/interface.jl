@@ -67,8 +67,8 @@ The generated kernel does not use any internal parallelization, i.e., the DAG is
 
 ### Compute Requirements
 
-A GPU function has more restrictions on what can be computed than general functions running on the CPU. In Julia, there are mainly two important restrictions to consider: 
-    
+A GPU function has more restrictions on what can be computed than general functions running on the CPU. In Julia, there are mainly two important restrictions to consider:
+
 1. Used data types must be stack allocatable, i.e., `isbits(x)` must be `true` for arguments and local variables used in `ComputeTasks`.
 2. Function calls must not be dynamic. This means that type stability is required and the compiler must know in advance which method of a generic function to call. What this specifically entails may change with time and also differs between the different target GPU libraries. From experience, using the `always_inline = true` argument for `@cuda` calls can help with this.
 

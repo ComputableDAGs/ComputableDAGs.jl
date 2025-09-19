@@ -12,9 +12,9 @@ NODE_NUMBERS = (4, 70, 532, 3766) #, 26404
 EDGE_NUMBERS = (3, 96, 747, 5304) #, 37203
 
 @testset "Strassen Matrix Type $M_T Size $(TEST_SIZES[M_SIZE_I])" for (M_T, M_SIZE_I) in
-                                                                      Iterators.product(
-    TEST_TYPES, eachindex(TEST_SIZES)
-)
+    Iterators.product(
+        TEST_TYPES, eachindex(TEST_SIZES)
+    )
     M_SIZE = TEST_SIZES[M_SIZE_I]
     NODE_NUM_EXPECTED = NODE_NUMBERS[M_SIZE_I]
     EDGE_NUM_EXPECTED = EDGE_NUMBERS[M_SIZE_I]
@@ -25,7 +25,7 @@ EDGE_NUMBERS = (3, 96, 747, 5304) #, 37203
 
     @testset "Construction" begin
         @test mm.size == M_SIZE
-        @test input_type(mm) == Tuple{Matrix{M_T},Matrix{M_T}}
+        @test input_type(mm) == Tuple{Matrix{M_T}, Matrix{M_T}}
         @test input isa input_type(mm)
         @test_throws "unknown data node name C" input_expr(mm, "C", :input)
     end
@@ -54,7 +54,7 @@ EDGE_NUMBERS = (3, 96, 747, 5304) #, 37203
     end
 
     @testset "Execution with closures" begin
-        f_closures = get_compute_function(g, mm, cpu_st(), @__MODULE__; closures_size=100)
+        f_closures = get_compute_function(g, mm, cpu_st(), @__MODULE__; closures_size = 100)
 
         @test Base.return_types(f_closures, (typeof(input),))[1] == typeof(input[1])
         @test isapprox(f_closures(input), input[1] * input[2])
@@ -62,7 +62,7 @@ EDGE_NUMBERS = (3, 96, 747, 5304) #, 37203
 
     @testset "Function generation with concrete input type" begin
         f_closures = get_compute_function(
-            g, mm, cpu_st(), @__MODULE__; concrete_input_type=typeof(input)
+            g, mm, cpu_st(), @__MODULE__; concrete_input_type = typeof(input)
         )
 
         @test Base.return_types(f_closures, (typeof(input),))[1] == typeof(input[1])

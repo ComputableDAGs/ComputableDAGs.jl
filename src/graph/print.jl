@@ -27,7 +27,7 @@ function Base.show(io::IO, graph::DAG)
     println(io, "Graph:")
     print(io, "  Nodes: ")
 
-    nodeDict = Dict{Type,Int64}()
+    nodeDict = Dict{Type, Int64}()
     number_of_edges = 0
     for node in graph.nodes
         if haskey(nodeDict, typeof(task(node)))

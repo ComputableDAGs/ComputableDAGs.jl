@@ -18,13 +18,13 @@ is_exit_node(node::Node)::Bool = length(parents(node)) == 0
 Return the node's task.
 """
 function task(
-    node::DataTaskNode{TaskType}
-)::TaskType where {TaskType<:Union{AbstractDataTask,AbstractComputeTask}}
+        node::DataTaskNode{TaskType}
+    )::TaskType where {TaskType <: Union{AbstractDataTask, AbstractComputeTask}}
     return node.task
 end
 function task(
-    node::ComputeTaskNode{TaskType}
-)::TaskType where {TaskType<:Union{AbstractDataTask,AbstractComputeTask}}
+        node::ComputeTaskNode{TaskType}
+    )::TaskType where {TaskType <: Union{AbstractDataTask, AbstractComputeTask}}
     return node.task
 end
 
@@ -61,7 +61,7 @@ end
 """
     siblings(node::Node)
 
-Return a vector of all siblings of this node. 
+Return a vector of all siblings of this node.
 
 A node's siblings are all children of any of its parents. The result contains no duplicates and includes the node itself.
 """
@@ -78,12 +78,12 @@ end
 """
     partners(node::Node)
 
-Return a vector of all partners of this node. 
+Return a vector of all partners of this node.
 
 A node's partners are all parents of any of its children. The result contains no duplicates and includes the node itself.
 
 !!! note
-    This is very slow when there are multiple children with many parents. 
+    This is very slow when there are multiple children with many parents.
     This is less of a problem in [`siblings(node::Node)`](@ref) because (depending on the model) there are no nodes with a large number of children, or only a single one.
 """
 function partners(node::Node)::Set{Node}

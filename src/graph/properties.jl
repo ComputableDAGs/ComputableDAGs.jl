@@ -26,7 +26,7 @@ function get_exit_node(graph::DAG)
             return node
         end
     end
-    @assert false "The given graph has no exit node! It is either empty or not acyclic!"
+    return @assert false "The given graph has no exit node! It is either empty or not acyclic!"
 end
 
 """

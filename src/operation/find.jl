@@ -30,8 +30,8 @@ end
 Insert the node reductions into the graph and the nodes' caches. Employs multithreading for speedup.
 """
 function nr_insertion!(
-    operations::PossibleOperations, node_reductions::Vector{Vector{NodeReduction}}
-)
+        operations::PossibleOperations, node_reductions::Vector{Vector{NodeReduction}}
+    )
     total_len = 0
     for vec in node_reductions
         total_len += length(vec)
@@ -60,8 +60,8 @@ end
 Insert the node splits into the graph and the nodes' caches. Employs multithreading for speedup.
 """
 function ns_insertion!(
-    operations::PossibleOperations, node_splits::Vector{Vector{NodeSplit}}
-)
+        operations::PossibleOperations, node_splits::Vector{Vector{NodeSplit}}
+    )
     total_len = 0
     for vec in node_splits
         total_len += length(vec)

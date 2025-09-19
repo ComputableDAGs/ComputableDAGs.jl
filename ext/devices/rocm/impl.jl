@@ -10,7 +10,7 @@ end
 
 Return a Vector of [`ROCmGPU`](@ref)s available on the current machine. If `verbose` is true, print some additional information.
 """
-function ComputableDAGs.get_devices(::Type{ROCmGPU}; verbose::Bool=false)
+function ComputableDAGs.get_devices(::Type{ROCmGPU}; verbose::Bool = false)
     devices = Vector{ComputableDAGs.AbstractDevice}()
 
     if !AMDGPU.functional()

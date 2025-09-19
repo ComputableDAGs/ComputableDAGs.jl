@@ -3,9 +3,9 @@
 
 Helper struct for [`NodeTrie`](@ref). After the Trie's first level, every Trie level contains the vector of nodes that had children up to that level, and the TrieNode's children by UUID of the node's children.
 """
-mutable struct NodeIdTrie{NodeType<:Node}
+mutable struct NodeIdTrie{NodeType <: Node}
     value::Vector{NodeType}
-    children::Dict{UUID,NodeIdTrie{NodeType}}
+    children::Dict{UUID, NodeIdTrie{NodeType}}
 end
 
 """
@@ -18,7 +18,7 @@ First insertion level is the node's own task type and thus does not have a value
 See also: [`insert!`](@ref) and [`collect`](@ref)
 """
 mutable struct NodeTrie
-    children::Dict{DataType,NodeIdTrie}
+    children::Dict{DataType, NodeIdTrie}
 end
 
 """
@@ -27,7 +27,7 @@ end
 Constructor for an empty [`NodeTrie`](@ref).
 """
 function NodeTrie()
-    return NodeTrie(Dict{DataType,NodeIdTrie}())
+    return NodeTrie(Dict{DataType, NodeIdTrie}())
 end
 
 """
@@ -35,8 +35,8 @@ end
 
 Constructor for an empty [`NodeIdTrie`](@ref).
 """
-function NodeIdTrie{NodeType}() where {NodeType<:Node}
-    return NodeIdTrie(Vector{NodeType}(), Dict{UUID,NodeIdTrie{NodeType}}())
+function NodeIdTrie{NodeType}() where {NodeType <: Node}
+    return NodeIdTrie(Vector{NodeType}(), Dict{UUID, NodeIdTrie{NodeType}}())
 end
 
 """
@@ -45,8 +45,8 @@ end
 Insert the given node into the trie. The depth is used to iterate through the trie layers, while the function calls itself recursively until it ran through all children of the node.
 """
 function insert_helper!(
-    trie::NodeIdTrie{NodeType}, node::NodeType, depth::Int
-) where {NodeType<:Node}
+        trie::NodeIdTrie{NodeType}, node::NodeType, depth::Int
+    ) where {NodeType <: Node}
     if (length(children(node)) == depth)
         push!(trie.value, node)
         return nothing
@@ -66,7 +66,7 @@ end
 
 Insert the given node into the trie. It's sorted by its type in the first layer, then by its children in the following layers.
 """
-function Base.insert!(trie::NodeTrie, node::NodeType) where {NodeType<:Node}
+function Base.insert!(trie::NodeTrie, node::NodeType) where {NodeType <: Node}
     if (!haskey(trie.children, NodeType))
         trie.children[NodeType] = NodeIdTrie{NodeType}()
     end
