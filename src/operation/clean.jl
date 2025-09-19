@@ -69,8 +69,8 @@ end
 Sort this node's parent and child sets, then find reductions and splits involving it. Needs to be called after the node was changed in some way.
 """
 function clean_node!(
-    graph::DAG, node::Union{DataTaskNode{TaskType},ComputeTaskNode{TaskType}}
-) where {TaskType<:AbstractTask}
+        graph::DAG, node::Union{DataTaskNode{TaskType}, ComputeTaskNode{TaskType}}
+    ) where {TaskType <: AbstractTask}
     sort_node!(node)
 
     find_reductions!(graph, node)

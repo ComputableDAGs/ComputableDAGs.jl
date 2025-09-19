@@ -1,4 +1,4 @@
-function expr_from_fc(fc::FunctionCall{VAL_T,<:Function}) where {VAL_T}
+function expr_from_fc(fc::FunctionCall{VAL_T, <:Function}) where {VAL_T}
     if length(fc) == 1
         func_call = Expr(:call, fc.func, fc.value_arguments[1]..., fc.arguments[1]...)
     else
@@ -9,7 +9,7 @@ function expr_from_fc(fc::FunctionCall{VAL_T,<:Function}) where {VAL_T}
     return Expr(:(=), access_expr, func_call)
 end
 
-function expr_from_fc(fc::FunctionCall{VAL_T,Expr}) where {VAL_T}
+function expr_from_fc(fc::FunctionCall{VAL_T, Expr}) where {VAL_T}
     @assert length(fc) == 1 && isempty(fc.value_arguments[1]) "function call assigning an expression cannot be vectorized and cannot contain value arguments\n$fc"
 
     fc_expr = Expr(
@@ -60,8 +60,8 @@ end
 Return a `Vector{Expr}` doing the input assignments from the given `problem_input` onto the `input_symbols`.
 """
 function gen_input_assignment_code(
-    input_symbols::Dict{String,Vector{Symbol}}, instance, machine::Machine
-)
+        input_symbols::Dict{String, Vector{Symbol}}, instance, machine::Machine
+    )
     assign_inputs = Vector{FunctionCall}()
     for (name, symbols) in input_symbols
         for symbol in symbols
@@ -96,13 +96,13 @@ Generate the function body from the given [`Tape`](@ref).
     omitted, the `input_type` of the problem instance is used.
 """
 function gen_function_body(
-    tape::Tape,
-    context_module::Module;
-    closures_size::Int,
-    concrete_input_type::Type=Nothing,
-)
+        tape::Tape,
+        context_module::Module;
+        closures_size::Int,
+        concrete_input_type::Type = Nothing,
+    )
     # only need to annotate types later when using closures
-    types = infer_types!(tape, context_module; concrete_input_type=concrete_input_type)
+    types = infer_types!(tape, context_module; concrete_input_type = concrete_input_type)
 
     if closures_size > 1
         s = log(closures_size, length(tape.schedule))
@@ -113,17 +113,17 @@ function gen_function_body(
     @debug "generating function body with closure size $closures_size"
 
     return _gen_function_body(
-        tape.schedule, types, tape.machine, context_module; closures_size=closures_size
+        tape.schedule, types, tape.machine, context_module; closures_size = closures_size
     )
 end
 
 function _gen_function_body(
-    fc_vec::AbstractVector{FunctionCall},
-    type_dict::Dict{Symbol,Type},
-    machine::Machine,
-    context_module::Module;
-    closures_size=0,
-)
+        fc_vec::AbstractVector{FunctionCall},
+        type_dict::Dict{Symbol, Type},
+        machine::Machine,
+        context_module::Module;
+        closures_size = 0,
+    )
     @debug "generating function body from $(length(fc_vec)) function calls with closure size $closures_size"
     if closures_size <= 1 || closures_size >= length(fc_vec)
         return Expr(:block, expr_from_fc.(fc_vec)...)
@@ -149,7 +149,7 @@ function _gen_function_body(
     end
 
     return _gen_function_body(
-        closured_fc_vec, type_dict, machine, context_module; closures_size=closures_size
+        closured_fc_vec, type_dict, machine, context_module; closures_size = closures_size
     )
 end
 
@@ -167,12 +167,12 @@ function and the second for calling it.
 The undefined_argument_symbols is the set of all Symbols that need to be returned if available inside the code_block. They get updated inside this function.
 """
 function _closure_fc(
-    code_block::AbstractVector{FunctionCall},
-    types::Dict{Symbol,Type},
-    machine::Machine,
-    undefined_argument_symbols::Set{Symbol},
-    context_module::Module,
-)
+        code_block::AbstractVector{FunctionCall},
+        types::Dict{Symbol, Type},
+        machine::Machine,
+        undefined_argument_symbols::Set{Symbol},
+        context_module::Module,
+    )
     return_symbols = Symbol[]
     for s in
         Iterators.flatten(Iterators.flatten(getfield.(code_block, Ref(:return_symbols))))
@@ -232,18 +232,18 @@ end
 Generate the code for a given graph. The return value is a [`Tape`](@ref).
 """
 function gen_tape(
-    graph::DAG,
-    instance,
-    machine::Machine,
-    context_module::Module,
-    scheduler::AbstractScheduler=GreedyScheduler(),
-)
+        graph::DAG,
+        instance,
+        machine::Machine,
+        context_module::Module,
+        scheduler::AbstractScheduler = GreedyScheduler(),
+    )
     @debug "generating tape"
     schedule = schedule_dag(scheduler, graph, machine)
     function_body = lower(schedule, machine)
 
     # get input symbols
-    input_syms = Dict{String,Vector{Symbol}}()
+    input_syms = Dict{String, Vector{Symbol}}()
     for node in get_entry_nodes(graph)
         if !haskey(input_syms, node.name)
             input_syms[node.name] = Vector{Symbol}()

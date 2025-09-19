@@ -10,13 +10,13 @@
 Insert the node into the graph or alternatively construct a node from the given task and insert it.
 """
 function insert_node!(graph::DAG, node::Node)
-    return _insert_node!(graph, node; track=false, invalidate_cache=false)
+    return _insert_node!(graph, node; track = false, invalidate_cache = false)
 end
-function insert_node!(graph::DAG, task::AbstractDataTask, name::String="")
-    return _insert_node!(graph, make_node(task, name); track=false, invalidate_cache=false)
+function insert_node!(graph::DAG, task::AbstractDataTask, name::String = "")
+    return _insert_node!(graph, make_node(task, name); track = false, invalidate_cache = false)
 end
 function insert_node!(graph::DAG, task::AbstractComputeTask)
-    return _insert_node!(graph, make_node(task); track=false, invalidate_cache=false)
+    return _insert_node!(graph, make_node(task); track = false, invalidate_cache = false)
 end
 
 """
@@ -24,8 +24,8 @@ end
 
 Insert the edge between node1 (child) and node2 (parent) into the graph.
 """
-function insert_edge!(graph::DAG, node1::Node, node2::Node, index::Int=0)
-    return _insert_edge!(graph, node1, node2, index; track=false, invalidate_cache=false)
+function insert_edge!(graph::DAG, node1::Node, node2::Node, index::Int = 0)
+    return _insert_edge!(graph, node1, node2, index; track = false, invalidate_cache = false)
 end
 
 """
@@ -43,7 +43,7 @@ Insert the node into the graph.
 
 See also: [`_remove_node!`](@ref), [`_insert_edge!`](@ref), [`_remove_edge!`](@ref)
 """
-function _insert_node!(graph::DAG, node::Node; track=true, invalidate_cache=true)
+function _insert_node!(graph::DAG, node::Node; track = true, invalidate_cache = true)
     # 1: mute
     push!(graph.nodes, node)
 
@@ -62,14 +62,14 @@ function _insert_node!(graph::DAG, node::Node; track=true, invalidate_cache=true
 end
 
 function _insert_edge!(
-    ::DAG, ::DataTaskNode, ::DataTaskNode, ::Int=0; track=true, invalidate_cache=true
-)
+        ::DAG, ::DataTaskNode, ::DataTaskNode, ::Int = 0; track = true, invalidate_cache = true
+    )
     throw("trying to create an edge between two data nodes which is not allowed")
 end
 
 function _insert_edge!(
-    ::DAG, ::ComputeTaskNode, ::ComputeTaskNode, ::Int=0; track=true, invalidate_cache=true
-)
+        ::DAG, ::ComputeTaskNode, ::ComputeTaskNode, ::Int = 0; track = true, invalidate_cache = true
+    )
     throw("trying to create an edge between two compute nodes which is not allowed")
 end
 
@@ -88,8 +88,8 @@ Insert the edge between `node1` (child) and `node2` (parent) into the graph. An 
 See also: [`_insert_node!`](@ref), [`_remove_node!`](@ref), [`_remove_edge!`](@ref)
 """
 function _insert_edge!(
-    graph::DAG, node1::Node, node2::Node, index::Int=0; track=true, invalidate_cache=true
-)
+        graph::DAG, node1::Node, node2::Node, index::Int = 0; track = true, invalidate_cache = true
+    )
     #@assert (node2 ∉ parents(node1)) && (node1 ∉ children(node2)) "Edge to insert already exists"
 
     # 1: mute
@@ -128,7 +128,7 @@ Remove the node from the graph.
 
 See also: [`_insert_node!`](@ref), [`_insert_edge!`](@ref), [`_remove_edge!`](@ref)
 """
-function _remove_node!(graph::DAG, node::Node; track=true, invalidate_cache=true)
+function _remove_node!(graph::DAG, node::Node; track = true, invalidate_cache = true)
     #@assert node in graph.nodes "Trying to remove a node that's not in the graph"
 
     # 1: mute
@@ -162,8 +162,8 @@ Remove the edge between node1 (child) and node2 (parent) into the graph. Returns
 See also: [`_insert_node!`](@ref), [`_remove_node!`](@ref), [`_insert_edge!`](@ref)
 """
 function _remove_edge!(
-    graph::DAG, node1::Node, node2::Node; track=true, invalidate_cache=true
-)
+        graph::DAG, node1::Node, node2::Node; track = true, invalidate_cache = true
+    )
     # 1: mute
     pre_length1 = length(node1.parents)
     pre_length2 = length(node2.children)

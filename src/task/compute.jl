@@ -7,11 +7,11 @@ using StaticArrays
 For a node or a task together with necessary information, a [`FunctionCall`](@ref)s for the computation of the node or task.
 """
 function get_function_call(
-    t::AbstractComputeTask,
-    device::AbstractDevice,
-    in_symbols::NTuple{N,Symbol},
-    out_symbol::Symbol,
-) where {N}
+        t::AbstractComputeTask,
+        device::AbstractDevice,
+        in_symbols::NTuple{N, Symbol},
+        out_symbol::Symbol,
+    ) where {N}
     return FunctionCall(compute, (t,), [in_symbols...], [out_symbol], [Any], device)
 end
 
@@ -58,7 +58,7 @@ function get_init_function_call(node::DataTaskNode, device::AbstractDevice)
 end
 
 _value_argument_types(fc::FunctionCall) = typeof.(fc.value_arguments[1])
-function _argument_types(known_res_types::Dict{Symbol,Type}, fc::FunctionCall)
+function _argument_types(known_res_types::Dict{Symbol, Type}, fc::FunctionCall)
     return getindex.(Ref(known_res_types), fc.arguments[1])
 end
 
@@ -91,8 +91,8 @@ function _validate_result_types(fc::FunctionCall, types, arg_types)
 end
 
 function result_types(
-    fc::FunctionCall{VAL_T,F_T}, known_res_types::Dict{Symbol,Type}, context_module::Module
-) where {VAL_T,F_T<:Function}
+        fc::FunctionCall{VAL_T, F_T}, known_res_types::Dict{Symbol, Type}, context_module::Module
+    ) where {VAL_T, F_T <: Function}
     arg_types = (_value_argument_types(fc)..., _argument_types(known_res_types, fc)...)
     @debug "checking $(fc.func) with arg types $(arg_types)"
     types = Base.return_types(fc.func, arg_types)
@@ -110,8 +110,8 @@ function result_types(
 end
 
 function result_types(
-    fc::FunctionCall{VAL_T,Expr}, known_res_types::Dict{Symbol,Type}, context_module::Module
-) where {VAL_T}
+        fc::FunctionCall{VAL_T, Expr}, known_res_types::Dict{Symbol, Type}, context_module::Module
+    ) where {VAL_T}
     arg_types = _argument_types(known_res_types, fc)
     ret_expr = Expr(
         :call,

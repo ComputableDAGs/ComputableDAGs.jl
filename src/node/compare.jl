@@ -22,8 +22,8 @@ end
 Equality comparison between two [`ComputeTaskNode`](@ref)s.
 """
 function Base.:(==)(
-    n1::ComputeTaskNode{TaskType}, n2::ComputeTaskNode{TaskType}
-) where {TaskType<:AbstractComputeTask}
+        n1::ComputeTaskNode{TaskType}, n2::ComputeTaskNode{TaskType}
+    ) where {TaskType <: AbstractComputeTask}
     return n1.id == n2.id
 end
 
@@ -33,7 +33,7 @@ end
 Equality comparison between two [`DataTaskNode`](@ref)s.
 """
 function Base.:(==)(
-    n1::DataTaskNode{TaskType}, n2::DataTaskNode{TaskType}
-) where {TaskType<:AbstractDataTask}
+        n1::DataTaskNode{TaskType}, n2::DataTaskNode{TaskType}
+    ) where {TaskType <: AbstractDataTask}
     return n1.id == n2.id
 end

@@ -12,7 +12,7 @@ end
 
 MatrixMultiplication(size::Int) = MatrixMultiplication{DEFAULT_TYPE}(size)
 
-struct ComputeTask_Slice{X_SLICE,Y_SLICE} <: AbstractComputeTask end        # perform a matrix slicing operation, subindexing the matrix with the ranges X_SLICE and Y_SLICE
+struct ComputeTask_Slice{X_SLICE, Y_SLICE} <: AbstractComputeTask end        # perform a matrix slicing operation, subindexing the matrix with the ranges X_SLICE and Y_SLICE
 struct ComputeTask_Add <: AbstractComputeTask end          # perform matrix addition
 struct ComputeTask_Sub <: AbstractComputeTask end          # perform matrix subtraction
 struct ComputeTask_MultBase <: AbstractComputeTask end     # perform matrix multiplication on two matrices using naive algorithm
@@ -31,21 +31,21 @@ ComputableDAGs.compute_effort(::ComputeTask_MultBase) = 0
 ComputableDAGs.compute_effort(::ComputeTask_MultStrassen) = 0
 
 @inline ComputableDAGs.compute(
-    ::ComputeTask_Slice{UR_X,UR_Y}, A::AbstractMatrix
-) where {UR_X,UR_Y} = A[UR_X, UR_Y]
+    ::ComputeTask_Slice{UR_X, UR_Y}, A::AbstractMatrix
+) where {UR_X, UR_Y} = A[UR_X, UR_Y]
 @inline ComputableDAGs.compute(::ComputeTask_Add, A::AbstractMatrix, B::AbstractMatrix) =
     A + B
 @inline ComputableDAGs.compute(::ComputeTask_Sub, A::AbstractMatrix, B::AbstractMatrix) =
     A - B
 @inline function ComputableDAGs.compute(
-    ::ComputeTask_MultBase, A::MATRIX_T, B::MATRIX_T
-)::MATRIX_T where {MATRIX_T<:AbstractMatrix}
+        ::ComputeTask_MultBase, A::MATRIX_T, B::MATRIX_T
+    )::MATRIX_T where {MATRIX_T <: AbstractMatrix}
     return A * B
 end
 
 function ComputableDAGs.compute(
-    ::ComputeTask_MultStrassen, C11::MATRIX_T, C12::MATRIX_T, C21::MATRIX_T, C22::MATRIX_T
-) where {MATRIX_T<:AbstractMatrix}
+        ::ComputeTask_MultStrassen, C11::MATRIX_T, C12::MATRIX_T, C21::MATRIX_T, C22::MATRIX_T
+    ) where {MATRIX_T <: AbstractMatrix}
     return [
         C11 C12
         C21 C22
@@ -54,11 +54,11 @@ end
 
 # return data node with the result
 function _dag_build_helper!(
-    g::DAG,
-    mm::MatrixMultiplication{T},
-    A::DataTaskNode,    # Data node that contains matrix A
-    B::DataTaskNode,    # Data node that contains matrix B
-) where {T}
+        g::DAG,
+        mm::MatrixMultiplication{T},
+        A::DataTaskNode,    # Data node that contains matrix A
+        B::DataTaskNode,    # Data node that contains matrix B
+    ) where {T}
     mm_size = mm.size
     @assert iseven(mm_size) "matrix size is not even: $mm_size"
     mm_half_size = div(mm_size, 2)
@@ -81,13 +81,13 @@ function _dag_build_helper!(
     h2 = (mm_half_size + 1):mm_size
 
     # -- Subindexing of A and B to prepare A_11, A_12, and so on
-    A11_t = insert_node!(g, ComputeTask_Slice{h1,h1}())
+    A11_t = insert_node!(g, ComputeTask_Slice{h1, h1}())
     insert_edge!(g, A, A11_t)
-    A12_t = insert_node!(g, ComputeTask_Slice{h1,h2}())
+    A12_t = insert_node!(g, ComputeTask_Slice{h1, h2}())
     insert_edge!(g, A, A12_t)
-    A21_t = insert_node!(g, ComputeTask_Slice{h2,h1}())
+    A21_t = insert_node!(g, ComputeTask_Slice{h2, h1}())
     insert_edge!(g, A, A21_t)
-    A22_t = insert_node!(g, ComputeTask_Slice{h2,h2}())
+    A22_t = insert_node!(g, ComputeTask_Slice{h2, h2}())
     insert_edge!(g, A, A22_t)
 
     A11_d = insert_node!(g, DataTask(data_size_half))
@@ -99,13 +99,13 @@ function _dag_build_helper!(
     A22_d = insert_node!(g, DataTask(data_size_half))
     insert_edge!(g, A22_t, A22_d)
 
-    B11_t = insert_node!(g, ComputeTask_Slice{h1,h1}())
+    B11_t = insert_node!(g, ComputeTask_Slice{h1, h1}())
     insert_edge!(g, B, B11_t)
-    B12_t = insert_node!(g, ComputeTask_Slice{h1,h2}())
+    B12_t = insert_node!(g, ComputeTask_Slice{h1, h2}())
     insert_edge!(g, B, B12_t)
-    B21_t = insert_node!(g, ComputeTask_Slice{h2,h1}())
+    B21_t = insert_node!(g, ComputeTask_Slice{h2, h1}())
     insert_edge!(g, B, B21_t)
-    B22_t = insert_node!(g, ComputeTask_Slice{h2,h2}())
+    B22_t = insert_node!(g, ComputeTask_Slice{h2, h2}())
     insert_edge!(g, B, B22_t)
 
     B11_d = insert_node!(g, DataTask(data_size_half))
@@ -314,8 +314,8 @@ function ComputableDAGs.graph(mm::MatrixMultiplication{T}) where {T}
 end
 
 function ComputableDAGs.input_expr(
-    ::MatrixMultiplication, name::String, input_symbol::Symbol
-)
+        ::MatrixMultiplication, name::String, input_symbol::Symbol
+    )
     if name == "A"
         return Meta.parse("$input_symbol[1]")
     elseif name == "B"
@@ -326,7 +326,7 @@ function ComputableDAGs.input_expr(
 end
 
 function ComputableDAGs.input_type(mm::MatrixMultiplication{T}) where {T}
-    return Tuple{Matrix{T},Matrix{T}}
+    return Tuple{Matrix{T}, Matrix{T}}
 end
 
 export MatrixMultiplication

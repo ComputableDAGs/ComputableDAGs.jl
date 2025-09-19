@@ -39,7 +39,7 @@ A vector of nodes can be reduced if:
 
 See also: [`can_reduce`](@ref)
 """
-struct NodeReduction{NodeType<:Node} <: Operation
+struct NodeReduction{NodeType <: Node} <: Operation
     input::Vector{NodeType}
 end
 
@@ -48,7 +48,7 @@ end
 
 The applied version of the [`NodeReduction`](@ref).
 """
-struct AppliedNodeReduction{NodeType<:Node} <: AppliedOperation
+struct AppliedNodeReduction{NodeType <: Node} <: AppliedOperation
     operation::NodeReduction{NodeType}
     diff::Diff
 end
@@ -68,7 +68,7 @@ A node can be split if:
 
 See also: [`can_split`](@ref)
 """
-struct NodeSplit{NodeType<:Node} <: Operation
+struct NodeSplit{NodeType <: Node} <: Operation
     input::NodeType
 end
 
@@ -77,7 +77,7 @@ end
 
 The applied version of the [`NodeSplit`](@ref).
 """
-struct AppliedNodeSplit{NodeType<:Node} <: AppliedOperation
+struct AppliedNodeSplit{NodeType <: Node} <: AppliedOperation
     operation::NodeSplit{NodeType}
     diff::Diff
 end

@@ -11,7 +11,7 @@ mutable struct PossibleOperations
     node_splits::Set{NodeSplit}
 end
 
-""" 
+"""
     DAG
 
 The representation of the graph as a set of [`Node`](@ref)s.
@@ -21,7 +21,7 @@ To get the set of possible operations, use [`get_operations`](@ref).
 The members of the object should not be manually accessed, instead always use the provided interface functions.
 """
 mutable struct DAG
-    nodes::Set{Union{DataTaskNode,ComputeTaskNode}}
+    nodes::Set{Union{DataTaskNode, ComputeTaskNode}}
 
     # The operations currently applied to the set of nodes
     applied_operations::Stack{AppliedOperation}
@@ -33,7 +33,7 @@ mutable struct DAG
     possible_operations::PossibleOperations
 
     # The set of nodes whose possible operations need to be reevaluated
-    dirty_nodes::Set{Union{DataTaskNode,ComputeTaskNode}}
+    dirty_nodes::Set{Union{DataTaskNode, ComputeTaskNode}}
 
     # "snapshot" system: keep track of added/removed nodes/edges since last snapshot
     # these are muted in insert_node! etc.

@@ -26,7 +26,7 @@ end
 
 Return a Vector of [`NumaNode`](@ref)s available on the current machine. If `verbose` is true, print some additional information.
 """
-function get_devices(deviceType::Type{T}; verbose::Bool=false) where {T<:NumaNode}
+function get_devices(deviceType::Type{T}; verbose::Bool = false) where {T <: NumaNode}
     devices = Vector{AbstractDevice}()
     noNumaNodes = highest_numa_node()
 

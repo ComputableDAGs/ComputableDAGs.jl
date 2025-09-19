@@ -12,5 +12,5 @@ Representation of a [`DAG`](@ref)'s properties.
 """
 const GraphProperties = NamedTuple{
     (:data, :compute_effort, :compute_intensity, :number_of_nodes, :number_of_edges),
-    Tuple{Float64,Float64,Float64,Int,Int},
+    Tuple{Float64, Float64, Float64, Int, Int},
 }
