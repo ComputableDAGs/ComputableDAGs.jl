@@ -43,7 +43,7 @@ function get_compute_function(
     )
     assign_inputs = Expr(:block, expr_from_fc.(tape.input_assign_code)...)
 
-    function_id = to_var_name(UUIDs.uuid1(rng[1]))
+    function_id = to_var_name(UUIDs.uuid1(TaskLocalRNG()))
     res_sym = tape.output_symbol
     expr = Expr(
         :function, # function definition

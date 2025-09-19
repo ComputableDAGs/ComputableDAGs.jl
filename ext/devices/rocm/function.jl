@@ -9,7 +9,7 @@ function ComputableDAGs.kernel(
     # TODO use gen_function_body here
     code = Expr(:block, ComputableDAGs.expr_from_fc.(tape.schedule)...)
 
-    function_id = ComputableDAGs.to_var_name(UUIDs.uuid1(ComputableDAGs.rng[1]))
+    function_id = ComputableDAGs.to_var_name(UUIDs.uuid1(TaskLocalRNG()))
     expr = Meta.parse(
         "function compute_$(function_id)(input_vector, output_vector, n::Int64)
             id = (workgroupIdx().x - 1) * workgroupDim().x + workitemIdx().x

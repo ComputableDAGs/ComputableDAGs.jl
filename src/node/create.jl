@@ -3,7 +3,7 @@ function DataTaskNode(t::AbstractDataTask, name = "")
         t,
         Vector{Node}(),
         Vector{Tuple{Node, Int}}(),      # TODO this can only ever be a single child
-        UUIDs.uuid1(rng[threadid()]),
+        UUIDs.uuid1(TaskLocalRNG()),
         missing,
         missing,
         name,
@@ -13,8 +13,8 @@ function ComputeTaskNode(t::AbstractComputeTask)
     return ComputeTaskNode(
         t,                              # task
         Vector{Node}(),                 # parents
-        Vector{Tuple{Node, Int}}(),      # children
-        UUIDs.uuid1(rng[threadid()]),   # id
+        Vector{Tuple{Node, Int}}(),     # children
+        UUIDs.uuid1(TaskLocalRNG()),    # id
         missing,                        # node reduction
         missing,                        # node split
         missing,                        # device
