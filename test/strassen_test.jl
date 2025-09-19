@@ -68,4 +68,11 @@ EDGE_NUMBERS = (3, 96, 747, 5304) #, 37203
         @test Base.return_types(f_closures, (typeof(input),))[1] == typeof(input[1])
         @test isapprox(f_closures(input), input[1] * input[2])
     end
+
+    @testset "Execution with reduction optimization" begin
+        optimize_to_fixpoint!(ReductionOptimizer(), g)
+        f_optimized = get_compute_function(g, mm, cpu_st(), @__MODULE__)
+
+        @test isapprox(f_optimized(input), input[1] * input[2])
+    end
 end
