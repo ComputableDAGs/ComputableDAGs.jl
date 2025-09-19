@@ -25,7 +25,7 @@ A function returning a [`Machine`](@ref) that only has a single thread of one CP
 It is the simplest machine definition possible and produces a simple function when used with [`get_compute_function`](@ref).
 """
 function cpu_st()
-    return Machine([NumaNode(0, 1, -1.0, UUIDs.uuid1())], [-1.0;;])
+    return Machine([NumaNode(0, 1, -1.0, UUIDs.uuid1(TaskLocalRNG()))], [-1.0;;])
 end
 
 """
