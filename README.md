@@ -1,7 +1,7 @@
 # ComputableDAGs.jl
 
 [![tests](https://github.com/ComputableDAGs/ComputableDAGs.jl/actions/workflows/unit_tests.yml/badge.svg?branch=main)](https://github.com/ComputableDAGs/ComputableDAGs.jl/actions/workflows/unit_tests.yml/)
-[![codecov](https://codecov.io/gh/AntonReinhard/ComputableDAGs.jl/graph/badge.svg?token=2ISLU4GHTB)](https://codecov.io/gh/AntonReinhard/ComputableDAGs.jl)
+[![codecov](https://codecov.io/gh/ComputableDAGs/ComputableDAGs.jl/graph/badge.svg?token=2585ZA92QK)](https://codecov.io/gh/ComputableDAGs/ComputableDAGs.jl)
 [![docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://ComputableDAGs.github.io/ComputableDAGs.jl/dev/)
 [![code style: runic](https://img.shields.io/badge/code_style-%E1%9A%B1%E1%9A%A2%E1%9A%BE%E1%9B%81%E1%9A%B2-black)](https://github.com/fredrikekre/Runic.jl)
 [![doi](https://rodare.hzdr.de/badge/848178532.svg)](https://rodare.hzdr.de/badge/latestdoi/848178532)
