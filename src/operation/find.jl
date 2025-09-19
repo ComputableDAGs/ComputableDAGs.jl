@@ -163,7 +163,7 @@ function generate_operations(graph::DAG)
     ns_tasks = map(data_chunks) do nodes
         @spawn begin
             foundSplits = Vector{NodeSplit}()
-            for node in nodeArray
+            for node in nodes
                 if (can_split(node))
                     push!(foundSplits, NodeSplit(node))
                 end
