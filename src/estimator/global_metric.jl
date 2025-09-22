@@ -34,11 +34,11 @@ A simple estimator that adds up each node's set [`compute_effort`](@ref) and [`d
 """
 struct GlobalMetricEstimator <: AbstractEstimator end
 
-function cost_type(estimator::GlobalMetricEstimator)
+function cost_type(::GlobalMetricEstimator)
     return CDCost
 end
 
-function graph_cost(estimator::GlobalMetricEstimator, graph::DAG)
+function graph_cost(::GlobalMetricEstimator, graph::DAG)
     properties = get_properties(graph)
     return CDCost(
         properties.data,
@@ -47,7 +47,7 @@ function graph_cost(estimator::GlobalMetricEstimator, graph::DAG)
 end
 
 function operation_effect(
-        estimator::GlobalMetricEstimator, graph::DAG, operation::NodeReduction
+        ::GlobalMetricEstimator, graph::DAG, operation::NodeReduction
     )
     s = length(operation.input) - 1
     return CDCost(
@@ -57,7 +57,7 @@ function operation_effect(
 end
 
 function operation_effect(
-        estimator::GlobalMetricEstimator, graph::DAG, operation::NodeSplit
+        ::GlobalMetricEstimator, graph::DAG, operation::NodeSplit
     )
     s = length(parents(operation.input)) - 1
     d = s * data(task(operation.input))

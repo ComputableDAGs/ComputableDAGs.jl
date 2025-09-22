@@ -92,90 +92,68 @@ Generate all possible operations on the graph. Used initially when the graph is 
 Safely inserts all the found operations into the graph and its nodes.
 """
 function generate_operations(graph::DAG)
-    tasks_per_thread = 2
+    tasks_per_thread = 1
 
     # make sure the graph is fully generated through
     apply_all!(graph)
 
-    nodeArray = collect(graph.nodes)
-
-    # partition the data
-    chunk_size = max(1, length(nodeArray) ÷ (tasks_per_thread * nthreads()))
-    data_chunks = Iterators.partition(nodeArray, chunk_size)
+    node_array = collect(graph.nodes)
 
     # sort all nodes
-    @threads for node in nodeArray
+    @threads for node in node_array
         sort_node!(node)
     end
 
-    checkedNodes = Set{Node}()
-    checkedNodesLock = SpinLock()
-
     # --- find possible node reductions ---
-    nr_tasks = map(data_chunks) do nodes
-        @spawn begin
-            foundReductions = Vector{NodeReduction}()
-            for node in nodes
-                # we're looking for nodes with multiple parents, those parents can then potentially reduce with one another
-                if (length(node.parents) <= 1)
-                    continue
-                end
 
-                candidates = node.parents
+    found_reductions = Vector{NodeReduction}()
+    for node in node_array
+        # we're looking for nodes with multiple parents, those parents can then potentially reduce with one another
+        if (length(node.parents) <= 1)
+            continue
+        end
 
-                # sort into equivalence classes
-                trie = NodeTrie()
+        candidates = node.parents
 
-                for candidate in candidates
-                    # insert into trie
-                    insert!(trie, candidate)
-                end
+        # sort into equivalence classes
+        trie = NodeTrie()
 
-                node_reductions = collect(trie)
+        for candidate in candidates
+            # insert into trie
+            insert!(trie, candidate)
+        end
 
-                for nrVec in node_reductions
-                    # parent sets are ordered and any node can only be part of one node_reduction, so a NodeReduction is uniquely identifiable by its first element
-                    # this prevents duplicate node_reductions being generated
-                    lock(checkedNodesLock)
-                    if (nrVec[1] in checkedNodes)
-                        unlock(checkedNodesLock)
-                        continue
-                    else
-                        push!(checkedNodes, nrVec[1])
-                    end
-                    unlock(checkedNodesLock)
+        node_reductions = collect(trie)
 
-                    push!(foundReductions, NodeReduction(nrVec))
-                end
+        for nr_vec in node_reductions
+            # parent sets are ordered and any node can only be part of one node_reduction, so a NodeReduction is uniquely identifiable by its first element
+            # this prevents duplicate node_reductions being generated
+            lock(checked_nodes_lock)
+            if (nr_vec[1] in checked_nodes)
+                unlock(checked_nodes_lock)
+                continue
+            else
+                push!(checked_nodes, nr_vec[1])
             end
+            unlock(checked_nodes_lock)
 
-            return foundReductions
+            push!(found_reductions, NodeReduction(nr_vec))
         end
     end
-
-    generatedReductions = fetch.(nr_tasks)
 
     # launch thread for node reduction insertion
     # remove duplicates
-    nr_task = @spawn nr_insertion!(graph.possible_operations, generatedReductions)
+    nr_task = @spawn nr_insertion!(graph.possible_operations, [found_reductions])
 
-    # find possible node splits
-    ns_tasks = map(data_chunks) do nodes
-        @spawn begin
-            foundSplits = Vector{NodeSplit}()
-            for node in nodes
-                if (can_split(node))
-                    push!(foundSplits, NodeSplit(node))
-                end
-            end
-            return foundSplits
+    found_splits = Vector{NodeSplit}()
+    for node in node_array
+        if (can_split(node))
+            push!(found_splits, NodeSplit(node))
         end
     end
 
-    generatedSplits = fetch.(ns_tasks)
-
     # launch thread for node split insertion
-    ns_task = @spawn ns_insertion!(graph.possible_operations, generatedSplits)
+    ns_task = @spawn ns_insertion!(graph.possible_operations, [found_splits])
 
     empty!(graph.dirty_nodes)
 
