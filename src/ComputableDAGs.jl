@@ -39,6 +39,7 @@ export get_compute_function
 # estimator
 export cost_type, graph_cost, operation_effect
 export GlobalMetricEstimator, CDCost
+export compute_intensity
 
 # optimization
 export AbstractOptimizer, GreedyOptimizer, RandomWalkOptimizer

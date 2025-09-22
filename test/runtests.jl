@@ -4,6 +4,10 @@ using SafeTestsets
     include("unit_tests_utility.jl")
 end
 
+@safetestset "Estimation" begin
+    include("estimation.jl")
+end
+
 @safetestset "Strassen Matrix Multiplication Tests " begin
     include("strassen_test.jl")
 end
