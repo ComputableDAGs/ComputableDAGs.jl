@@ -33,7 +33,7 @@ function get_devices(deviceType::Type{T}; verbose::Bool = false) where {T <: Num
     verbose && @info "Found $(noNumaNodes + 1) NUMA nodes"
 
     for i in 0:noNumaNodes
-        push!(devices, NumaNode(i, 1, -1, UUIDs.uuid1(rng[1])))
+        push!(devices, NumaNode(i, 1, -1, UUIDs.uuid1(TaskLocalRNG())))
     end
 
     return devices

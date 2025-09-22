@@ -24,11 +24,12 @@ ComputableDAGs.children(::ComputeTask_Sub) = 2          # A, B
 ComputableDAGs.children(::ComputeTask_MultBase) = 2     # A, B
 ComputableDAGs.children(::ComputeTask_MultStrassen) = 7 # M1...M7
 
-ComputableDAGs.compute_effort(::ComputeTask_Slice) = 0
-ComputableDAGs.compute_effort(::ComputeTask_Add) = 0
-ComputableDAGs.compute_effort(::ComputeTask_Sub) = 0
-ComputableDAGs.compute_effort(::ComputeTask_MultBase) = 0
-ComputableDAGs.compute_effort(::ComputeTask_MultStrassen) = 0
+# TODO: use actual numbers here, these are just placeholders. they would have to scale with the sizes
+ComputableDAGs.compute_effort(::ComputeTask_Slice) = 10
+ComputableDAGs.compute_effort(::ComputeTask_Add) = 32
+ComputableDAGs.compute_effort(::ComputeTask_Sub) = 32
+ComputableDAGs.compute_effort(::ComputeTask_MultBase) = 512
+ComputableDAGs.compute_effort(::ComputeTask_MultStrassen) = 256
 
 @inline ComputableDAGs.compute(
     ::ComputeTask_Slice{UR_X, UR_Y}, A::AbstractMatrix

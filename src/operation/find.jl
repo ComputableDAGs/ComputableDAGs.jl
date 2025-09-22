@@ -1,4 +1,4 @@
-# functions that find operations on the inital graph
+# functions that find operations on the initial graph
 
 using Base.Threads
 
@@ -92,23 +92,22 @@ Generate all possible operations on the graph. Used initially when the graph is 
 Safely inserts all the found operations into the graph and its nodes.
 """
 function generate_operations(graph::DAG)
-    generatedReductions = [Vector{NodeReduction}() for _ in 1:nthreads()]
-    generatedSplits = [Vector{NodeSplit}() for _ in 1:nthreads()]
+    tasks_per_thread = 1
 
     # make sure the graph is fully generated through
     apply_all!(graph)
 
-    nodeArray = collect(graph.nodes)
+    node_array = collect(graph.nodes)
 
     # sort all nodes
-    @threads for node in nodeArray
+    @threads for node in node_array
         sort_node!(node)
     end
 
-    checkedNodes = Set{Node}()
-    checkedNodesLock = SpinLock()
     # --- find possible node reductions ---
-    @threads for node in nodeArray
+
+    found_reductions = Vector{NodeReduction}()
+    for node in node_array
         # we're looking for nodes with multiple parents, those parents can then potentially reduce with one another
         if (length(node.parents) <= 1)
             continue
@@ -126,35 +125,35 @@ function generate_operations(graph::DAG)
 
         node_reductions = collect(trie)
 
-        for nrVec in node_reductions
+        for nr_vec in node_reductions
             # parent sets are ordered and any node can only be part of one node_reduction, so a NodeReduction is uniquely identifiable by its first element
             # this prevents duplicate node_reductions being generated
-            lock(checkedNodesLock)
-            if (nrVec[1] in checkedNodes)
-                unlock(checkedNodesLock)
+            lock(checked_nodes_lock)
+            if (nr_vec[1] in checked_nodes)
+                unlock(checked_nodes_lock)
                 continue
             else
-                push!(checkedNodes, nrVec[1])
+                push!(checked_nodes, nr_vec[1])
             end
-            unlock(checkedNodesLock)
+            unlock(checked_nodes_lock)
 
-            push!(generatedReductions[threadid()], NodeReduction(nrVec))
+            push!(found_reductions, NodeReduction(nr_vec))
         end
     end
 
     # launch thread for node reduction insertion
     # remove duplicates
-    nr_task = @spawn nr_insertion!(graph.possible_operations, generatedReductions)
+    nr_task = @spawn nr_insertion!(graph.possible_operations, [found_reductions])
 
-    # find possible node splits
-    @threads for node in nodeArray
+    found_splits = Vector{NodeSplit}()
+    for node in node_array
         if (can_split(node))
-            push!(generatedSplits[threadid()], NodeSplit(node))
+            push!(found_splits, NodeSplit(node))
         end
     end
 
     # launch thread for node split insertion
-    ns_task = @spawn ns_insertion!(graph.possible_operations, generatedSplits)
+    ns_task = @spawn ns_insertion!(graph.possible_operations, [found_splits])
 
     empty!(graph.dirty_nodes)
 
