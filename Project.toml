@@ -1,7 +1,7 @@
 name = "ComputableDAGs"
 uuid = "62933717-1c9d-4a3f-b06f-7ab7f17ca32d"
 authors = ["Anton Reinhard <a.reinhard@hzdr.de>", "Uwe Hernandez Acosta"]
-version = "0.2.2"
+version = "0.2.3"
 
 [deps]
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
