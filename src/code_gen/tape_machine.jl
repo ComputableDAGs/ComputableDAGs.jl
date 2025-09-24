@@ -222,7 +222,7 @@ end
 
 """
     gen_tape(
-        graph::DAG,
+        dag::DAG,
         instance::Any,
         machine::Machine,
         context_module::Module,
@@ -232,19 +232,19 @@ end
 Generate the code for a given graph. The return value is a [`Tape`](@ref).
 """
 function gen_tape(
-        graph::DAG,
+        dag::DAG,
         instance,
         machine::Machine,
         context_module::Module,
         scheduler::AbstractScheduler = GreedyScheduler(),
     )
     @debug "generating tape"
-    schedule = schedule_dag(scheduler, graph, machine)
+    schedule = schedule_dag(scheduler, dag, machine)
     function_body = lower(schedule, machine)
 
     # get input symbols
     input_syms = Dict{String, Vector{Symbol}}()
-    for node in get_entry_nodes(graph)
+    for node in get_entry_nodes(dag)
         if !haskey(input_syms, node.name)
             input_syms[node.name] = Vector{Symbol}()
         end
@@ -253,7 +253,7 @@ function gen_tape(
     end
 
     # get outSymbol
-    outSym = Symbol(to_var_name(get_exit_node(graph).id))
+    outSym = Symbol(to_var_name(get_exit_node(dag).id))
 
     assign_inputs = gen_input_assignment_code(input_syms, instance, machine)
 

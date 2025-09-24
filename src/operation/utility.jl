@@ -44,7 +44,7 @@ end
 
 Return whether the given two nodes can be reduced. See [`NodeReduction`](@ref) for the requirements.
 """
-function can_reduce(n1::Node, n2::Node)
+function can_reduce(::Node, ::Node)
     return false
 end
 
@@ -53,8 +53,8 @@ function can_reduce(
     ) where {
         TaskType <: AbstractTask, NodeType <: Union{DataTaskNode{TaskType}, ComputeTaskNode{TaskType}},
     }
-    n1_length = length(children(n1))
-    n2_length = length(children(n2))
+    n1_length = length(n1.children)
+    n2_length = length(n2.children)
 
     if (n1_length != n2_length)
         return false
@@ -63,19 +63,19 @@ function can_reduce(
     # this seems to be the most common case so do this first
     # doing it manually is a lot faster than using the sets for a general solution
     if (n1_length == 2)
-        if (children(n1)[1] != children(n2)[1])
-            if (children(n1)[1] != children(n2)[2])
+        if (n1.children[1] != n2.children[1])
+            if (n1.children[1] != n2.children[2])
                 return false
             end
             # 1_1 == 2_2
-            if (children(n1)[2] != children(n2)[1])
+            if (n1.children[2] != n2.children[1])
                 return false
             end
             return true
         end
 
         # 1_1 == 2_1
-        if (children(n1)[2] != children(n2)[2])
+        if (n1.children[2] != n2.children[2])
             return false
         end
         return true
@@ -83,11 +83,11 @@ function can_reduce(
 
     # this is simple
     if (n1_length == 1)
-        return children(n1)[1] == children(n2)[1]
+        return n1.children[1] == n2.children[1]
     end
 
     # this takes a long time
-    return Set(children(n1)) == Set(children(n2))
+    return Set(n1.children) == Set(n2.children)
 end
 
 """
@@ -96,7 +96,7 @@ end
 Return whether the given node can be split. See [`NodeSplit`](@ref) for the requirements.
 """
 function can_split(n::Node)
-    return length(parents(n)) > 1
+    return length(n.parents) > 1
 end
 
 """

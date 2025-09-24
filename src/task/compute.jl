@@ -15,37 +15,36 @@ function get_function_call(
     return FunctionCall(compute, (t,), [in_symbols...], [out_symbol], [Any], device)
 end
 
-function get_function_call(node::ComputeTaskNode)
-    @assert length(children(node)) <= children(task(node)) "node $(node) has too many children for its task: node has $(length(node.children)) versus task has $(children(task(node)))\nnode's children: $(getfield.(node.children, :children))"
-    @assert !ismissing(node.device) "trying to get expression for an unscheduled ComputeTaskNode\nnode: $(node)"
+function get_function_call(node::ComputeTaskNode, device::AbstractDevice)
+    @assert length(node.children) <= children(task(node)) "node $(node) has too many children for its task: node has $(length(node.children)) versus task has $(children(task(node)))\nnode's children: $(getfield.(node.children, :children))"
 
     # make sure the node is sorted so the arguments keep their order
     sort_node!(node)
 
     return get_function_call(
         node.task,
-        node.device,
-        (Symbol.(to_var_name.(getfield.(getindex.(children(node), 1), :id)))...,),
+        device,
+        (Symbol.(to_var_name.(getindex.(node.children, 1)))...,),
         Symbol(to_var_name(node.id)),
     )
 end
 
-function get_function_call(node::DataTaskNode)
-    @assert length(children(node)) == 1 "trying to call get_function_call on a data task node that has $(length(node.children)) children instead of 1\nchildren: $(node.children)"
+function get_function_call(node::DataTaskNode, device::AbstractDevice)
+    @assert length(node.children) == 1 "trying to call get_function_call on a data task node that has $(length(node.children)) children instead of 1\nchildren: $(node.children)"
 
     # TODO: dispatch to device implementations generating the copy commands
     return FunctionCall(
         identity,
         (),
-        [Symbol(to_var_name(first(children(node))[1].id))],
+        [Symbol(to_var_name(first(node.children)[1]))],
         [Symbol(to_var_name(node.id))],
         [Any],
-        first(children(node))[1].device,
+        device,
     )
 end
 
 function get_init_function_call(node::DataTaskNode, device::AbstractDevice)
-    @assert isempty(children(node)) "trying to call get_init_function_call on a data task node that is not an entry node."
+    @assert isempty(node.children) "trying to call get_init_function_call on a data task node that is not an entry node."
 
     return FunctionCall(
         identity,
@@ -141,7 +140,7 @@ function result_types(
 end
 
 @inline function _assert_array_types(args)
-    @assert false "all arguments of a vectorized compute task must be arrays"
+    return @assert false "all arguments of a vectorized compute task must be arrays"
 end
 @inline _assert_array_types() = nothing
 @inline function _assert_array_types(arg::AbstractArray, args...)

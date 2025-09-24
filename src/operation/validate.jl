@@ -3,22 +3,22 @@
 # the functions throw their own errors though, to still have helpful error messages
 
 """
-    is_valid_node_reduction_input(graph::DAG, nodes::Vector{Node})
+    is_valid_node_reduction_input(dag::DAG, nodes::Vector{Node})
 
-Assert for a gven node reduction input whether the nodes can be reduced. For the requirements of a node reduction see [`NodeReduction`](@ref).
+Assert for a given node reduction input whether the nodes can be reduced. For the requirements of a node reduction see [`NodeReduction`](@ref).
 
 Intended for use with `@assert` or `@test`.
 """
-function is_valid_node_reduction_input(graph::DAG, nodes::Vector{Node})
+function is_valid_node_reduction_input(dag::DAG, nodes::Vector{Node})
     for n in nodes
-        if n ∉ graph
+        if n ∉ dag
             throw(
                 AssertionError(
                     "[Node Reduction] the given nodes are not part of the given graph"
                 ),
             )
         end
-        @assert is_valid(graph, n)
+        @assert is_valid(dag, n)
     end
 
     t = typeof(task(nodes[1]))
@@ -40,9 +40,9 @@ function is_valid_node_reduction_input(graph::DAG, nodes::Vector{Node})
         end
     end
 
-    n1_children = children(nodes[1])
+    n1_children = children(dag, nodes[1])
     for n in nodes
-        if Set(n1_children) != Set(children(n))
+        if Set(n1_children) != Set(children(dag, n))
             throw(
                 AssertionError(
                     "[Node Reduction] the given nodes do not have equal prerequisite nodes which is required for node reduction",
@@ -57,12 +57,12 @@ end
 """
     is_valid_node_split_input(graph::DAG, n1::Node)
 
-Assert for a gven node split input whether the node can be split. For the requirements of a node split see [`NodeSplit`](@ref).
+Assert for a given node split input whether the node can be split. For the requirements of a node split see [`NodeSplit`](@ref).
 
 Intended for use with `@assert` or `@test`.
 """
-function is_valid_node_split_input(graph::DAG, n1::Node)
-    if n1 ∉ graph
+function is_valid_node_split_input(dag::DAG, n1::Node)
+    if n1 ∉ dag
         throw(AssertionError("[Node Split] the given node is not part of the given graph"))
     end
 
@@ -74,31 +74,31 @@ function is_valid_node_split_input(graph::DAG, n1::Node)
         )
     end
 
-    @assert is_valid(graph, n1)
+    @assert is_valid(dag, n1)
 
     return true
 end
 
 """
-    is_valid(graph::DAG, nr::NodeReduction)
+    is_valid(dag::DAG, nr::NodeReduction)
 
 Assert for a given [`NodeReduction`](@ref) whether it is a valid operation in the graph.
 
 Intended for use with `@assert` or `@test`.
 """
-function is_valid(graph::DAG, nr::NodeReduction)
-    @assert is_valid_node_reduction_input(graph, nr.input)
+function is_valid(dag::DAG, nr::NodeReduction)
+    @assert is_valid_node_reduction_input(dag, getindex.(Ref(dag.nodes), nr.input))
     return true
 end
 
 """
-    is_valid(graph::DAG, nr::NodeSplit)
+    is_valid(dag::DAG, nr::NodeSplit)
 
 Assert for a given [`NodeSplit`](@ref) whether it is a valid operation in the graph.
 
 Intended for use with `@assert` or `@test`.
 """
-function is_valid(graph::DAG, ns::NodeSplit)
-    @assert is_valid_node_split_input(graph, ns.input)
+function is_valid(dag::DAG, ns::NodeSplit)
+    @assert is_valid_node_split_input(dag, dag.nodes[ns.input])
     return true
 end

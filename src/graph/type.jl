@@ -6,7 +6,7 @@ using DataStructures
 A struct storing all possible operations on a [`DAG`](@ref).
 To get the [`PossibleOperations`](@ref) on a [`DAG`](@ref), use [`get_operations`](@ref).
 """
-mutable struct PossibleOperations
+struct PossibleOperations
     node_reductions::Set{NodeReduction}
     node_splits::Set{NodeSplit}
 end
@@ -21,7 +21,7 @@ To get the set of possible operations, use [`get_operations`](@ref).
 The members of the object should not be manually accessed, instead always use the provided interface functions.
 """
 mutable struct DAG
-    nodes::Set{Union{DataTaskNode, ComputeTaskNode}}
+    nodes::Dict{UUID, Union{DataTaskNode, ComputeTaskNode}}
 
     # The operations currently applied to the set of nodes
     applied_operations::Stack{AppliedOperation}
@@ -32,8 +32,8 @@ mutable struct DAG
     # The possible operations at the current state of the DAG
     possible_operations::PossibleOperations
 
-    # The set of nodes whose possible operations need to be reevaluated
-    dirty_nodes::Set{Union{DataTaskNode, ComputeTaskNode}}
+    # The set of node ids whose possible operations need to be reevaluated
+    dirty_nodes::Set{UUID}
 
     # "snapshot" system: keep track of added/removed nodes/edges since last snapshot
     # these are muted in insert_node! etc.
@@ -59,7 +59,7 @@ Construct and return an empty [`DAG`](@ref).
 """
 function DAG()
     return DAG(
-        Set{Node}(),
+        Dict{UUID, Node}(),
         Stack{AppliedOperation}(),
         Deque{Operation}(),
         PossibleOperations(),

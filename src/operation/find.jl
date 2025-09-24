@@ -3,53 +3,37 @@
 using Base.Threads
 
 """
-    insert_operation!(nf::NodeReduction)
+    insert_operation!(dag::DAG, nr::NodeReduction)
 
-Insert the given node reduction into its input nodes' operation caches. This is thread-safe.
+Insert the given node reduction into the node's operation cache.
 """
-function insert_operation!(nr::NodeReduction)
-    for n in nr.input
-        n.node_reduction = nr
+function insert_operation!(dag::DAG, nr::NodeReduction)
+    for id in nr.inputs
+        dag.nodes[id] = node_with_op(dag.nodes[id], nr)
     end
     return nothing
 end
 
 """
-    insert_operation!(nf::NodeSplit)
+    insert_operation!(dag::DAG, ns::NodeSplit)
 
-Insert the given node split into its input node's operation cache. This is thread-safe.
+Insert the given node split into its input node's operation cache.
 """
-function insert_operation!(ns::NodeSplit)
-    ns.input.node_split = ns
+function insert_operation!(dag::DAG, ns::NodeSplit)
+    dag.nodes[ns.input] = node_with_op(dag.nodes[ns.input], ns)
     return nothing
 end
 
 """
-    nr_insertion!(operations::PossibleOperations, node_reductions::Vector{Vector{NodeReduction}})
+    nr_insertion!(dag::DAG, operations::PossibleOperations, node_reductions::Vector{Vector{NodeReduction}})
 
 Insert the node reductions into the graph and the nodes' caches. Employs multithreading for speedup.
 """
 function nr_insertion!(
-        operations::PossibleOperations, node_reductions::Vector{Vector{NodeReduction}}
+        dag::DAG, node_reductions::Vector{NodeReduction}
     )
-    total_len = 0
-    for vec in node_reductions
-        total_len += length(vec)
-    end
-    sizehint!(operations.node_reductions, total_len)
-
-    t = @task for vec in node_reductions
-        union!(operations.node_reductions, Set(vec))
-    end
-    schedule(t)
-
-    @threads for vec in node_reductions
-        for op in vec
-            insert_operation!(op)
-        end
-    end
-
-    wait(t)
+    union!(dag.possible_operations.node_reductions, Set(node_reductions))
+    insert_operation!.(Ref(dag), node_reductions)
 
     return nothing
 end
@@ -60,60 +44,42 @@ end
 Insert the node splits into the graph and the nodes' caches. Employs multithreading for speedup.
 """
 function ns_insertion!(
-        operations::PossibleOperations, node_splits::Vector{Vector{NodeSplit}}
+        dag::DAG, node_splits::Vector{NodeSplit}
     )
-    total_len = 0
-    for vec in node_splits
-        total_len += length(vec)
-    end
-    sizehint!(operations.node_splits, total_len)
-
-    t = @task for vec in node_splits
-        union!(operations.node_splits, Set(vec))
-    end
-    schedule(t)
-
-    @threads for vec in node_splits
-        for op in vec
-            insert_operation!(op)
-        end
-    end
-
-    wait(t)
+    union!(dag.possible_operations.node_splits, Set(node_splits))
+    insert_operation!.(Ref(dag), node_splits)
 
     return nothing
 end
 
 """
-    generate_operations(graph::DAG)
+    generate_operations(dag::DAG)
 
 Generate all possible operations on the graph. Used initially when the graph is freshly assembled or parsed. Uses multithreading for speedup.
 
 Safely inserts all the found operations into the graph and its nodes.
 """
-function generate_operations(graph::DAG)
-    tasks_per_thread = 1
-
+function generate_operations(dag::DAG)
     # make sure the graph is fully generated through
-    apply_all!(graph)
+    apply_all!(dag)
 
-    node_array = collect(graph.nodes)
+    node_array = collect(dag.nodes)
 
     # sort all nodes
-    @threads for node in node_array
+    @threads for (id, node) in node_array
         sort_node!(node)
     end
 
     # --- find possible node reductions ---
 
     found_reductions = Vector{NodeReduction}()
-    for node in node_array
+    for (id, node) in node_array
         # we're looking for nodes with multiple parents, those parents can then potentially reduce with one another
         if (length(node.parents) <= 1)
             continue
         end
 
-        candidates = node.parents
+        candidates = getindex.(Ref(dag.nodes), node.parents)
 
         # sort into equivalence classes
         trie = NodeTrie()
@@ -143,22 +109,19 @@ function generate_operations(graph::DAG)
 
     # launch thread for node reduction insertion
     # remove duplicates
-    nr_task = @spawn nr_insertion!(graph.possible_operations, [found_reductions])
+    nr_insertion!(dag, found_reductions)
 
     found_splits = Vector{NodeSplit}()
-    for node in node_array
+    for (id, node) in node_array
         if (can_split(node))
-            push!(found_splits, NodeSplit(node))
+            push!(found_splits, NodeSplit(id))
         end
     end
 
     # launch thread for node split insertion
-    ns_task = @spawn ns_insertion!(graph.possible_operations, [found_splits])
+    ns_insertion!(dag, found_splits)
 
-    empty!(graph.dirty_nodes)
-
-    wait(nr_task)
-    wait(ns_task)
+    empty!(dag.dirty_nodes)
 
     return nothing
 end

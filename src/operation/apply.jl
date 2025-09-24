@@ -93,17 +93,17 @@ Revert the given diff on the graph. Used to revert the individual [`AppliedOpera
 function revert_diff!(graph::DAG, diff::Diff)
     # add removed nodes, remove added nodes, same for edges
     # note the order
-    for edge in diff.addedEdges
+    for edge in diff.added_edges
         _remove_edge!(graph, edge.edge[1], edge.edge[2]; track = false)
     end
-    for node in diff.addedNodes
+    for node in diff.added_nodes
         _remove_node!(graph, node; track = false)
     end
 
-    for node in diff.removedNodes
+    for node in diff.removed_nodes
         _insert_node!(graph, node; track = false)
     end
-    for edge in diff.removedEdges
+    for edge in diff.removed_edges
         _insert_edge!(graph, edge.edge[1], edge.edge[2], edge.index; track = false)
     end
 
@@ -119,16 +119,16 @@ Reduce the given nodes together into one node, return the applied difference to 
 
 For details see [`NodeReduction`](@ref).
 """
-function node_reduction!(graph::DAG, nodes::Vector{Node})
-    @assert is_valid_node_reduction_input(graph, nodes)
+function node_reduction!(dag::DAG, nodes::Vector{Node})
+    @assert is_valid_node_reduction_input(dag, nodes)
 
     # clear snapshot
-    get_snapshot_diff(graph)
+    get_snapshot_diff(dag)
 
     n1 = nodes[1]
-    n1_children = copy(children(n1))
+    n1_children = children(dag, n1)
 
-    n1_parents = Set(parents(n1))
+    n1_parents = Set(parents(dag, n1))
 
     # set of the new parents of n1 together with the index of the child nodes
     new_parents = Set{Tuple{Node, Int}}()
@@ -141,68 +141,68 @@ function node_reduction!(graph::DAG, nodes::Vector{Node})
         n = nodes[i]
         for (child, index) in n1_children
             # no need to care about the indices here
-            _remove_edge!(graph, child, n)
+            _remove_edge!(dag, child, n)
         end
 
-        for parent in copy(parents(n))
-            removed_index = _remove_edge!(graph, n, parent)
+        for parent in copy(parents(dag, n))
+            removed_index = _remove_edge!(dag, n, parent)
 
             # collect all parents
             push!(new_parents, (parent, removed_index))
             new_parents_child_names[parent] = Symbol(to_var_name(n.id))
         end
 
-        _remove_node!(graph, n)
+        _remove_node!(dag, n)
     end
 
     for (parent, index) in new_parents
         # now add parents of all input nodes to n1 without duplicates
         if !(parent in n1_parents)
             # don't double insert edges
-            _insert_edge!(graph, n1, parent, index)
+            _insert_edge!(dag, n1, parent, index)
         end
     end
 
-    return get_snapshot_diff(graph)
+    return get_snapshot_diff(dag)
 end
 
 """
-    node_split!(graph::DAG, n1::Node)
+    node_split!(dag::DAG, n1::Node)
 
 Split the given node into one node per parent, return the applied difference to the graph.
 
 For details see [`NodeSplit`](@ref).
 """
 function node_split!(
-        graph::DAG, n1::Union{DataTaskNode{TaskType}, ComputeTaskNode{TaskType}}
+        dag::DAG, n1::Union{DataTaskNode{TaskType}, ComputeTaskNode{TaskType}}
     ) where {TaskType <: AbstractTask}
-    @assert is_valid_node_split_input(graph, n1)
+    @assert is_valid_node_split_input(dag, n1)
 
     # clear snapshot
-    get_snapshot_diff(graph)
+    get_snapshot_diff(dag)
 
-    n1_parents = copy(parents(n1))
+    n1_parents = parents(dag, n1)
     local parent_indices = Dict()
-    n1_children = copy(children(n1))
+    n1_children = children(dag, n1)
 
     for parent in n1_parents
-        parent_indices[parent] = _remove_edge!(graph, n1, parent)
+        parent_indices[parent] = _remove_edge!(dag, n1, parent)
     end
     for (child, index) in n1_children
-        @assert index == _remove_edge!(graph, child, n1)
+        @assert index == _remove_edge!(dag, child, n1)
     end
-    _remove_node!(graph, n1)
+    _remove_node!(dag, n1)
 
     for parent in n1_parents
         n_copy = copy(n1)
 
-        _insert_node!(graph, n_copy)
-        _insert_edge!(graph, n_copy, parent, parent_indices[parent])
+        _insert_node!(dag, n_copy)
+        _insert_edge!(dag, n_copy, parent, parent_indices[parent])
 
         for (child, index) in n1_children
-            _insert_edge!(graph, child, n_copy, index)
+            _insert_edge!(dag, child, n_copy, index)
         end
     end
 
-    return get_snapshot_diff(graph)
+    return get_snapshot_diff(dag)
 end

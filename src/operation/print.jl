@@ -23,10 +23,8 @@ end
 Print a string representation of the node reduction to io.
 """
 function Base.show(io::IO, op::NodeReduction)
-    print(io, "NR: ")
-    print(io, length(op.input))
-    print(io, "x")
-    return print(io, task(op.input[1]))
+    print(io, "Node Reduction x")
+    return print(io, length(op.input))
 end
 
 """
@@ -35,6 +33,5 @@ end
 Print a string representation of the node split to io.
 """
 function Base.show(io::IO, op::NodeSplit)
-    print(io, "NS: ")
-    return print(io, task(op.input))
+    return print(io, "Node Split")
 end

@@ -1,27 +1,27 @@
 """
-    get_properties(graph::DAG)
+    get_properties(dag::DAG)
 
 Return the graph's [`GraphProperties`](@ref).
 """
-function get_properties(graph::DAG)
+function get_properties(dag::DAG)
     # make sure the graph is fully generated
-    apply_all!(graph)
+    apply_all!(dag)
 
     # TODO: tests stop working without the if condition, which means there is probably a bug in the lazy evaluation and in the tests
-    if (graph.properties.compute_effort <= 0.0)
-        graph.properties = GraphProperties(graph)
+    if (dag.properties.compute_effort <= 0.0)
+        dag.properties = GraphProperties(dag)
     end
 
-    return graph.properties
+    return dag.properties
 end
 
 """
-    get_exit_node(graph::DAG)
+    get_exit_node(dag::DAG)
 
 Return the graph's exit node. This assumes the graph only has a single exit node. If the graph has multiple exit nodes, the one encountered first will be returned.
 """
-function get_exit_node(graph::DAG)
-    for node in graph.nodes
+function get_exit_node(dag::DAG)
+    for (id, node) in dag.nodes
         if (is_exit_node(node))
             return node
         end
@@ -30,14 +30,14 @@ function get_exit_node(graph::DAG)
 end
 
 """
-    get_entry_nodes(graph::DAG)
+    get_entry_nodes(dag::DAG)
 
 Return a vector of the graph's entry nodes.
 """
-function get_entry_nodes(graph::DAG)
-    apply_all!(graph)
+function get_entry_nodes(dag::DAG)
+    apply_all!(dag)
     result = Vector{Node}()
-    for node in graph.nodes
+    for (id, node) in dag.nodes
         if (is_entry_node(node))
             push!(result, node)
         end
@@ -46,10 +46,10 @@ function get_entry_nodes(graph::DAG)
 end
 
 """
-    operation_stack_length(graph::DAG)
+    operation_stack_length(dag::DAG)
 
 Return the number of operations applied to the graph.
 """
-function operation_stack_length(graph::DAG)
-    return length(graph.applied_operations) + length(graph.operations_to_apply)
+function operation_stack_length(dag::DAG)
+    return length(dag.applied_operations) + length(dag.operations_to_apply)
 end

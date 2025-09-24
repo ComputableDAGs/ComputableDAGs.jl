@@ -47,13 +47,13 @@ Insert the given node into the trie. The depth is used to iterate through the tr
 function insert_helper!(
         trie::NodeIdTrie{NodeType}, node::NodeType, depth::Int
     ) where {NodeType <: Node}
-    if (length(children(node)) == depth)
+    if (length(node.children) == depth)
         push!(trie.value, node)
         return nothing
     end
 
     depth = depth + 1
-    id = node.children[depth][1].id
+    id = node.children[depth][1]
 
     if (!haskey(trie.children, id))
         trie.children[id] = NodeIdTrie{NodeType}()

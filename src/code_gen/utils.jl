@@ -70,16 +70,16 @@ end
 """
     lower(schedule::Vector{Node}, machine::Machine)
 
-After [`schedule_dag`](@ref) has made a schedule of nodes, this function lowers the vector of [`Node`](@ref)s into a vector of [`FunctionCall`](@ref)s.
+After [`schedule_dag`](@ref) has made a schedule of nodes, this function lowers the vector of [`Node`](@ref)s and [`AbstractDevice`](@ref)s into a vector of [`FunctionCall`](@ref)s.
 """
-function lower(schedule::Vector{Node}, machine::Machine)
+function lower(schedule::Vector{Tuple{Node, AbstractDevice}}, machine::Machine)
     calls = Vector{FunctionCall}()
 
-    for node in schedule
-        if (node isa DataTaskNode && length(children(node)) == 0)
+    for (node, device) in schedule
+        if (node isa DataTaskNode && length(node.children) == 0)
             push!(calls, get_init_function_call(node, entry_device(machine)))
         else
-            push!(calls, get_function_call(node))
+            push!(calls, get_function_call(node, device))
         end
     end
 

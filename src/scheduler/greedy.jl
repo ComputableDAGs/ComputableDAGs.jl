@@ -5,18 +5,18 @@ A greedy implementation of a scheduler, creating a topological ordering of nodes
 """
 struct GreedyScheduler <: AbstractScheduler end
 
-function schedule_dag(::GreedyScheduler, graph::DAG, machine::Machine)
+function schedule_dag(::GreedyScheduler, dag::DAG, machine::Machine)
     node_dict = Dict{Node, Int}()   # dictionary of nodes with the number of not-yet-scheduled children
     node_stack = Stack{Node}()      # stack of currently schedulable nodes, i.e., nodes with all of their children already scheduled
     # the stack makes sure that closely related nodes will be scheduled one after another
 
     # use a priority equal to the number of unseen children -> 0 are nodes that can be added
-    for node in get_entry_nodes(graph)
+    for node in get_entry_nodes(dag)
         push!(node_stack, node)
     end
 
-    schedule = Node[]
-    sizehint!(schedule, length(graph.nodes))
+    schedule = Tuple{Node, AbstractDevice}[]
+    sizehint!(schedule, length(dag.nodes))
 
     # keep an accumulated cost of things scheduled to this device so far
     device_acc_cost = PriorityQueue{AbstractDevice, Float64}()
@@ -28,19 +28,20 @@ function schedule_dag(::GreedyScheduler, graph::DAG, machine::Machine)
     while !isempty(node_stack)
         node = pop!(node_stack)
 
-        # assign the device with lowest accumulated cost to the node (if it's a compute node)
-        if (isa(node, ComputeTaskNode))
-            lowest_device = first(device_acc_cost)[1]
-            node.device = lowest_device
-            device_acc_cost[lowest_device] = compute_effort(task(node))
-        end
+        # assign the device with lowest accumulated cost to the node
 
-        push!(schedule, node)
+        lowest_device = first(device_acc_cost)[1]
+
+        # TODO: doesn't really work yet for data nodes on multiple devices
+        push!(schedule, (node, lowest_device))
+
+        device_acc_cost[lowest_device] = compute_effort(task(node))
+
 
         # find all parent's priority, reduce by one if in the node_dict
         # if it reaches zero, push onto node_stack
-        for parent in parents(node)
-            parents_prio = get(node_dict, parent, length(children(parent))) - 1
+        for parent in parents(dag, node)
+            parents_prio = get(node_dict, parent, length(parent.children)) - 1
             if parents_prio == 0
                 delete!(node_dict, parent)
                 push!(node_stack, parent)

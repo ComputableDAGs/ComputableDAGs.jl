@@ -28,16 +28,16 @@ Any node that transfers data and does no computation.
 `.node_split`:      Either this node's [`NodeSplit`](@ref) or `missing`, if none. There can only be at most one.\\
 `.name`:            The name of this node for entry nodes into the graph ([`is_entry_node`](@ref)) to reliably assign the inputs to the correct nodes when executing.\\
 """
-mutable struct DataTaskNode{TaskType <: AbstractDataTask} <: Node
+struct DataTaskNode{TaskType <: AbstractDataTask} <: Node
     task::TaskType
 
     # use vectors as sets have way too much memory overhead
-    parents::Vector{Node}
-    children::Vector{Tuple{Node, Int}}
+    parents::Vector{UUID}
+    children::Vector{Tuple{UUID, Int}}
 
     # need a unique identifier unique to every *constructed* node
     # however, it can be copied when splitting a node
-    id::Base.UUID
+    id::UUID
 
     # the NodeReduction involving this node, if it exists
     # Can't use the NodeReduction type here because it's not yet defined
@@ -62,19 +62,15 @@ Any node that computes a result from inputs using an [`AbstractComputeTask`](@re
 `.id`:              The node's id. Improves the speed of comparisons and is used as a unique identifier.\\
 `.node_reduction`:  Either this node's [`NodeReduction`](@ref) or `missing`, if none. There can only be at most one.\\
 `.node_split`:      Either this node's [`NodeSplit`](@ref) or `missing`, if none. There can only be at most one.\\
-`.device`:          The Device this node has been scheduled on by a [`Scheduler`](@ref).
 """
-mutable struct ComputeTaskNode{TaskType <: AbstractComputeTask} <: Node
+struct ComputeTaskNode{TaskType <: AbstractComputeTask} <: Node
     task::TaskType
-    parents::Vector{Node}
-    children::Vector{Tuple{Node, Int}}
-    id::Base.UUID
+    parents::Vector{UUID}
+    children::Vector{Tuple{UUID, Int}}
+    id::UUID
 
     node_reduction::Union{Operation, Missing}
     node_split::Union{Operation, Missing}
-
-    # the device this node is assigned to execute on
-    device::Union{AbstractDevice, Missing}
 end
 
 """
