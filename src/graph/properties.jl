@@ -7,12 +7,7 @@ function get_properties(dag::DAG)
     # make sure the graph is fully generated
     apply_all!(dag)
 
-    # TODO: tests stop working without the if condition, which means there is probably a bug in the lazy evaluation and in the tests
-    if (dag.properties.compute_effort <= 0.0)
-        dag.properties = GraphProperties(dag)
-    end
-
-    return dag.properties
+    return GraphProperties(dag)
 end
 
 """

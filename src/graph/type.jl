@@ -20,7 +20,7 @@ The representation of the graph as a set of [`Node`](@ref)s.
 To get the set of possible operations, use [`get_operations`](@ref).
 The members of the object should not be manually accessed, instead always use the provided interface functions.
 """
-mutable struct DAG
+struct DAG
     nodes::Dict{UUID, Union{DataTaskNode, ComputeTaskNode}}
 
     # The operations currently applied to the set of nodes
@@ -38,9 +38,6 @@ mutable struct DAG
     # "snapshot" system: keep track of added/removed nodes/edges since last snapshot
     # these are muted in insert_node! etc.
     diff::Diff
-
-    # the cached properties of the DAG
-    properties::GraphProperties
 end
 
 """
@@ -64,7 +61,6 @@ function DAG()
         Deque{Operation}(),
         PossibleOperations(),
         Set{Node}(),
-        Diff(),
-        GraphProperties(),
+        Diff()
     )
 end
