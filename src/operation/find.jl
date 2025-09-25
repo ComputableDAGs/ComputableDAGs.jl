@@ -8,7 +8,7 @@ using Base.Threads
 Insert the given node reduction into the node's operation cache.
 """
 function insert_operation!(dag::DAG, nr::NodeReduction)
-    for id in nr.inputs
+    for id in nr.input
         dag.nodes[id] = node_with_op(dag.nodes[id], nr)
     end
     return nothing
@@ -71,7 +71,7 @@ function generate_operations(dag::DAG)
     end
 
     # --- find possible node reductions ---
-
+    checked_nodes = Set{UUID}()
     found_reductions = Vector{NodeReduction}()
     for (id, node) in node_array
         # we're looking for nodes with multiple parents, those parents can then potentially reduce with one another
@@ -94,16 +94,13 @@ function generate_operations(dag::DAG)
         for nr_vec in node_reductions
             # parent sets are ordered and any node can only be part of one node_reduction, so a NodeReduction is uniquely identifiable by its first element
             # this prevents duplicate node_reductions being generated
-            lock(checked_nodes_lock)
-            if (nr_vec[1] in checked_nodes)
-                unlock(checked_nodes_lock)
+            if (nr_vec[1].id in checked_nodes)
                 continue
             else
-                push!(checked_nodes, nr_vec[1])
+                push!(checked_nodes, nr_vec[1].id)
             end
-            unlock(checked_nodes_lock)
 
-            push!(found_reductions, NodeReduction(nr_vec))
+            push!(found_reductions, NodeReduction(getfield.(nr_vec, :id)))
         end
     end
 

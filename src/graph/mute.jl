@@ -44,6 +44,10 @@ Insert the node into the graph.
 See also: [`_remove_node!`](@ref), [`_insert_edge!`](@ref), [`_remove_edge!`](@ref)
 """
 function _insert_node!(dag::DAG, node::Node; track = true, invalidate_cache = true)
+    #@info "inserting node $(node.id)"
+
+    @assert !haskey(dag.nodes, node.id) "Node to insert already exists!"
+
     # 1: mute
     dag.nodes[node.id] = node
 
@@ -90,7 +94,9 @@ See also: [`_insert_node!`](@ref), [`_remove_node!`](@ref), [`_remove_edge!`](@r
 function _insert_edge!(
         dag::DAG, node1::Node, node2::Node, index::Int = 0; track = true, invalidate_cache = true
     )
-    #@assert (node2 ∉ parents(node1)) && (node1 ∉ children(node2)) "Edge to insert already exists"
+    #@info "inserting edge $(node1.id) to $(node2.id)"
+
+    @assert (node2 ∉ parents(dag, node1)) && (node1 ∉ children(dag, node2)) "Edge to insert already exists"
 
     # 1: mute
     # edge points from child to parent
@@ -129,10 +135,12 @@ Remove the node from the graph.
 See also: [`_insert_node!`](@ref), [`_insert_edge!`](@ref), [`_remove_edge!`](@ref)
 """
 function _remove_node!(dag::DAG, node::Node; track = true, invalidate_cache = true)
-    #@assert node in dag.nodes "Trying to remove a node that's not in the graph"
+    #@info "removing node $(node.id)"
+
+    @assert node.id in keys(dag.nodes) "Trying to remove a node that's not in the graph"
 
     # 1: mute
-    delete!(dag.nodes, node)
+    delete!(dag.nodes, node.id)
 
     # 2: keep track
     if (track)
@@ -164,12 +172,14 @@ See also: [`_insert_node!`](@ref), [`_remove_node!`](@ref), [`_insert_edge!`](@r
 function _remove_edge!(
         dag::DAG, node1::Node, node2::Node; track = true, invalidate_cache = true
     )
+    #@info "removing edge $(node1.id) to $(node2.id)"
+
     # 1: mute
     pre_length1 = length(node1.parents)
     pre_length2 = length(node2.children)
 
     for i in eachindex(node1.parents)
-        if (node1.parents[i] == node2)
+        if (node1.parents[i] == node2.id)
             splice!(node1.parents, i)
             break
         end
@@ -177,7 +187,7 @@ function _remove_edge!(
 
     removed_node_index = 0
     for i in eachindex(node2.children)
-        if (node2.children[i][1] == node1)
+        if (node2.children[i][1] == node1.id)
             removed_node_index = node2.children[i][2]
             splice!(node2.children, i)
             break
@@ -206,11 +216,12 @@ function _remove_edge!(
 
     invalidate_operation_caches!(dag, node1)
     invalidate_operation_caches!(dag, node2)
+
     if (node1 in dag)
-        push!(dag.dirty_nodes.id, node1)
+        push!(dag.dirty_nodes, node1.id)
     end
     if (node2 in dag)
-        push!(dag.dirty_nodes.id, node2)
+        push!(dag.dirty_nodes, node2.id)
     end
 
     return removed_node_index
@@ -219,12 +230,14 @@ end
 """
     get_snapshot_diff(dag::DAG)
 
-Return the graph's [`Diff`](@ref) since last time this function was called.
+Return the graph's [`Diff`](@ref) since last time this function was called. Then, clear the current diff.
 
 See also: [`revert_diff!`](@ref), [`AppliedOperation`](@ref) and [`revert_operation!`](@ref)
 """
 function get_snapshot_diff(dag::DAG)
-    return swapfield!(dag, :diff, Diff())
+    t = deepcopy(dag.diff)
+    empty!(dag.diff)
+    return t
 end
 
 """
@@ -237,8 +250,10 @@ This deletes the operation from the graph's possible operations and from the inv
 function invalidate_caches!(dag::DAG, operation::NodeReduction)
     delete!(dag.possible_operations, operation)
 
-    for node in operation.input
-        node.node_reduction = missing
+    for node_id in operation.input
+        if (haskey(dag.nodes, node_id))
+            dag.nodes[node_id] = node_without_operation(dag.nodes[node_id], NodeReduction)
+        end
     end
 
     return nothing
@@ -254,9 +269,10 @@ This deletes the operation from the graph's possible operations and from the inv
 function invalidate_caches!(dag::DAG, operation::NodeSplit)
     delete!(dag.possible_operations, operation)
 
-    # delete the operation from all caches of nodes involved in the operation
-    # for node split there is only one node
-    operation.input.node_split = missing
+    # delete the operation from all caches of nodes involved in the operation, if it exists
+    if (haskey(dag.nodes, operation.input))
+        dag.nodes[operation.input] = node_without_operation(dag.nodes[operation.input], NodeSplit)
+    end
 
     return nothing
 end

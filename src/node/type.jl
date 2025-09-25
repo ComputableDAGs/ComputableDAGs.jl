@@ -35,8 +35,7 @@ struct DataTaskNode{TaskType <: AbstractDataTask} <: Node
     parents::Vector{UUID}
     children::Vector{Tuple{UUID, Int}}
 
-    # need a unique identifier unique to every *constructed* node
-    # however, it can be copied when splitting a node
+    # need a unique identifier unique to every node
     id::UUID
 
     # the NodeReduction involving this node, if it exists
@@ -84,7 +83,7 @@ The child is the prerequisite node of the parent.
 """
 struct Edge
     # edge points from child to parent
-    edge::Union{Tuple{DataTaskNode, ComputeTaskNode}, Tuple{ComputeTaskNode, DataTaskNode}}
+    edge::Tuple{UUID, UUID}
     # the index of the child in parent
     index::Int
 end

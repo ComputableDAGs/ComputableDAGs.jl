@@ -7,7 +7,9 @@ function get_properties(dag::DAG)
     # make sure the graph is fully generated
     apply_all!(dag)
 
-    return GraphProperties(dag)
+    properties = GraphProperties(dag)
+
+    return properties
 end
 
 """

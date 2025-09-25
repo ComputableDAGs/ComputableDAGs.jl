@@ -73,6 +73,7 @@ include("utils.jl")
 
 include("diff/print.jl")
 include("diff/properties.jl")
+include("diff/mute.jl")
 
 include("graph/compare.jl")
 include("graph/interface.jl")

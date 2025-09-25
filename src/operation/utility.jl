@@ -115,7 +115,7 @@ Equality comparison between two node reductions. Two node reductions are conside
 """
 function Base.:(==)(op1::NodeReduction, op2::NodeReduction)
     # node reductions are equal exactly if their first input is the same
-    return op1.input[1].id == op2.input[1].id
+    return op1.input[1] == op2.input[1]
 end
 
 """

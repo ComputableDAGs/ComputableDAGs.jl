@@ -13,9 +13,9 @@ Check whether the edge is part of the graph.
 function Base.in(edge::Edge, dag::DAG)
     n1 = edge.edge[1]
     n2 = edge.edge[2]
-    if !(n1 in dag) || !(n2 in dag)
+    if !(n1 in keys(dag.nodes)) || !(n2 in keys(dag.nodes))
         return false
     end
 
-    return n1 in getindex.(children(dag, n2), 1)
+    return n1 in getindex.(children(dag, dag.nodes[n2]), 1)
 end

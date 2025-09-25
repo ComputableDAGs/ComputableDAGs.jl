@@ -9,7 +9,7 @@ Assert for a given node reduction input whether the nodes can be reduced. For th
 
 Intended for use with `@assert` or `@test`.
 """
-function is_valid_node_reduction_input(dag::DAG, nodes::Vector{Node})
+function is_valid_node_reduction_input(dag::DAG, nodes::Vector{NodeType}) where {NodeType <: Node}
     for n in nodes
         if n ∉ dag
             throw(
