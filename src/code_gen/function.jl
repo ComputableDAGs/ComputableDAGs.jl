@@ -50,7 +50,14 @@ function get_compute_function(
         Expr(
             :call, Symbol("compute_$function_id"), Expr(:(::), :input, input_type(instance))
         ), # function name and parameters
-        Expr(:block, assign_inputs, code, Expr(:return, res_sym)), # function body
+        Expr(
+            :block,
+            assign_inputs,
+            Expr(:noinline, true),
+            code,
+            Expr(:noinline, false),
+            Expr(:return, res_sym)
+        ), # function body
     )
 
     return RuntimeGeneratedFunction(@__MODULE__, context_module, expr)
