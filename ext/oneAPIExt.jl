@@ -2,6 +2,7 @@ module oneAPIExt
 
 using ComputableDAGs
 using UUIDs
+using Random
 using oneAPI
 
 function __init__()

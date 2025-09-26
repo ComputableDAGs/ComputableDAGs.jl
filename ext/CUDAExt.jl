@@ -2,6 +2,7 @@ module CUDAExt
 
 using ComputableDAGs
 using UUIDs
+using Random
 using CUDA
 
 function __init__()
