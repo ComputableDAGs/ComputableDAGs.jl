@@ -1,3 +1,9 @@
+const libflush = joinpath(@__DIR__, "reg_flush.so")  # Adjust path as needed
+
+@inline function flushpoint()
+    return ccall((:jl_flushpoint, libflush), Cvoid, ())
+end
+
 function Base.length(fc::FunctionCall)
     @assert length(fc.value_arguments) == length(fc.arguments) == length(fc.return_symbols) "function call length is undefined, got '$(length(fc.value_arguments))' tuples of value arguments, '$(length(fc.arguments))' tuples of arguments, and '$(length(return_symbols))' return symbols"
     return length(fc.value_arguments)

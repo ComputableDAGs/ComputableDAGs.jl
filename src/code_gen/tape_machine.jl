@@ -125,10 +125,27 @@ function _gen_function_body(
         closures_size = 0,
     )
     @debug "generating function body from $(length(fc_vec)) function calls with closure size $closures_size"
-    if closures_size <= 1 || closures_size >= length(fc_vec)
-        return Expr(:block, expr_from_fc.(fc_vec)...)
+
+    if closures_size == 0
+        closures_size = 1000000
+    end
+    exprs = Expr[]
+    sizehint!(exprs, length(fc_vec) + length(fc_vec) ÷ closures_size)
+
+    c = 0
+    for fc in fc_vec
+        c += 1
+        push!(exprs, expr_from_fc(fc))
+
+        if (c % closures_size == 0)
+            push!(exprs, Expr(:call, flushpoint))
+        end
     end
 
+
+    return Expr(:block, exprs...)
+
+    #=
     # iterate from end to beginning
     # this helps because we can collect all undefined arguments to the closures that have to be defined somewhere earlier
     undefined_argument_symbols = Set{Symbol}()
@@ -151,6 +168,7 @@ function _gen_function_body(
     return _gen_function_body(
         closured_fc_vec, type_dict, machine, context_module; closures_size = closures_size
     )
+    =#
 end
 
 """
