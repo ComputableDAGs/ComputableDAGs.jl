@@ -2,6 +2,7 @@ module AMDGPUExt
 
 using ComputableDAGs
 using UUIDs
+using Random
 using AMDGPU
 
 function __init__()
