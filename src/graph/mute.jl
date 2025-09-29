@@ -113,9 +113,6 @@ function _insert_edge!(
         return nothing
     end
 
-    invalidate_operation_caches!(dag, node1)
-    invalidate_operation_caches!(dag, node2)
-
     push!(dag.dirty_nodes, node1.id)
     push!(dag.dirty_nodes, node2.id)
 
@@ -148,13 +145,7 @@ function _remove_node!(dag::DAG, node::Node; track = true, invalidate_cache = tr
     end
 
     # 3: invalidate caches
-    if (!invalidate_cache)
-        return nothing
-    end
-
-    invalidate_operation_caches!(dag, node)
-    delete!(dag.dirty_nodes, node.id)
-
+    # nothing to do here, the node has to be kept in dirty nodes to delete operations involving it
     return nothing
 end
 
@@ -214,9 +205,6 @@ function _remove_edge!(
         return removed_node_index
     end
 
-    invalidate_operation_caches!(dag, node1)
-    invalidate_operation_caches!(dag, node2)
-
     if (node1 in dag)
         push!(dag.dirty_nodes, node1.id)
     end
@@ -238,71 +226,4 @@ function get_snapshot_diff(dag::DAG)
     t = deepcopy(dag.diff)
     empty!(dag.diff)
     return t
-end
-
-"""
-    invalidate_caches!(graph::DAG, operation::NodeReduction)
-
-Invalidate the operation caches for a given [`NodeReduction`](@ref).
-
-This deletes the operation from the graph's possible operations and from the involved nodes' own operation caches.
-"""
-function invalidate_caches!(dag::DAG, operation::NodeReduction)
-    delete!(dag.possible_operations, operation)
-
-    for node_id in operation.input
-        if (haskey(dag.nodes, node_id))
-            dag.nodes[node_id] = node_without_operation(dag.nodes[node_id], NodeReduction)
-        end
-    end
-
-    return nothing
-end
-
-"""
-    invalidate_caches!(graph::DAG, operation::NodeSplit)
-
-Invalidate the operation caches for a given [`NodeSplit`](@ref).
-
-This deletes the operation from the graph's possible operations and from the involved nodes' own operation caches.
-"""
-function invalidate_caches!(dag::DAG, operation::NodeSplit)
-    delete!(dag.possible_operations, operation)
-
-    # delete the operation from all caches of nodes involved in the operation, if it exists
-    if (haskey(dag.nodes, operation.input))
-        dag.nodes[operation.input] = node_without_operation(dag.nodes[operation.input], NodeSplit)
-    end
-
-    return nothing
-end
-
-"""
-    invalidate_operation_caches!(dag::DAG, node::ComputeTaskNode)
-
-Invalidate the operation caches of the given node through calls to the respective [`invalidate_caches!`](@ref) functions.
-"""
-function invalidate_operation_caches!(dag::DAG, node::ComputeTaskNode)
-    if !ismissing(node.node_reduction)
-        invalidate_caches!(dag, node.node_reduction)
-    end
-    if !ismissing(node.node_split)
-        invalidate_caches!(dag, node.node_split)
-    end
-    return nothing
-end
-
-"""
-    invalidate_operation_caches!(dag::DAG, node::DataTaskNode)
-
-Invalidate the operation caches of the given node through calls to the respective [`invalidate_caches!`](@ref) functions.
-"""
-function invalidate_operation_caches!(dag::DAG, node::DataTaskNode)
-    if !ismissing(node.node_reduction)
-        invalidate_caches!(dag, node.node_reduction)
-    end
-    if !ismissing(node.node_split)
-        invalidate_caches!(dag, node.node_split)
-    end
-    return nothing
 end

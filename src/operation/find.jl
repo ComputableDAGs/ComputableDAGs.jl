@@ -3,28 +3,6 @@
 using Base.Threads
 
 """
-    insert_operation!(dag::DAG, nr::NodeReduction)
-
-Insert the given node reduction into the node's operation cache.
-"""
-function insert_operation!(dag::DAG, nr::NodeReduction)
-    for id in nr.input
-        dag.nodes[id] = node_with_op(dag.nodes[id], nr)
-    end
-    return nothing
-end
-
-"""
-    insert_operation!(dag::DAG, ns::NodeSplit)
-
-Insert the given node split into its input node's operation cache.
-"""
-function insert_operation!(dag::DAG, ns::NodeSplit)
-    dag.nodes[ns.input] = node_with_op(dag.nodes[ns.input], ns)
-    return nothing
-end
-
-"""
     nr_insertion!(dag::DAG, operations::PossibleOperations, node_reductions::Vector{Vector{NodeReduction}})
 
 Insert the node reductions into the graph and the nodes' caches. Employs multithreading for speedup.
@@ -33,7 +11,6 @@ function nr_insertion!(
         dag::DAG, node_reductions::Vector{NodeReduction}
     )
     union!(dag.possible_operations.node_reductions, Set(node_reductions))
-    insert_operation!.(Ref(dag), node_reductions)
 
     return nothing
 end
@@ -47,7 +24,6 @@ function ns_insertion!(
         dag::DAG, node_splits::Vector{NodeSplit}
     )
     union!(dag.possible_operations.node_splits, Set(node_splits))
-    insert_operation!.(Ref(dag), node_splits)
 
     return nothing
 end

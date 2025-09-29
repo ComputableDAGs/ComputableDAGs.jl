@@ -2,12 +2,17 @@ module RandomArith
 
 using ComputableDAGs
 using Random
+using StatsBase
+
+export RandomArithmetic
 
 # generates a number of random basic arithmetic tasks, based on the given seed and number of nodes
 struct RandomArithmetic
     rng_seed::Int
     size::Int   # number of nodes to generate
 end
+
+const EPS = 1.0e-6
 
 # binary
 struct PLUS <: AbstractComputeTask end
@@ -51,22 +56,22 @@ ComputableDAGs.compute_effort(::FMA) = 1
 ComputableDAGs.compute(::PLUS, a, b) = a + b
 ComputableDAGs.compute(::MINUS, a, b) = a - b
 ComputableDAGs.compute(::MULT, a, b) = a * b
-ComputableDAGs.compute(::DIV, a, b) = a / b
+ComputableDAGs.compute(::DIV, a, b) = abs(b) < EPS ? a / EPS : a / b
 
 ComputableDAGs.compute(::NEGATE, a) = -a
-ComputableDAGs.compute(::SIN, a) = sin(a)
-ComputableDAGs.compute(::COS, a) = cos(a)
+ComputableDAGs.compute(::SIN, a) = isfinite(a) ? sin(a) : zero(Float64) # prevent domain errors
+ComputableDAGs.compute(::COS, a) = isfinite(a) ? cos(a) : one(Float64)
 ComputableDAGs.compute(::SQRT, a) = sign(a) * sqrt(abs(a))  # prevent domain error
 
 ComputableDAGs.compute(::FMA, a, b, c) = fma(a, b, c)
 
-function _add_node(g::DAG, rng)
+function _add_node(g::DAG, rng, c)
     input_nodes = ComputableDAGs.get_entry_nodes(g)
 
     n = rand(rng, 1:9)
 
     nodes = if (length(input_nodes) > 3)
-        rand(rng, input_nodes, rand(1:3))
+        sample(rng, input_nodes, rand(1:3); replace = false)
     else
         [rand(rng, input_nodes)]
     end
@@ -81,14 +86,14 @@ function _add_node(g::DAG, rng)
         else
             insert_node!(g, DIV())
         end
-        in1 = insert_node!(g, DataTask(sizeof(Float64)))
-        in2 = insert_node!(g, DataTask(sizeof(Float64)))
+        in1 = insert_node!(g, DataTask(sizeof(Float64)), "$(c += 1)")
+        in2 = insert_node!(g, DataTask(sizeof(Float64)), "$(c += 1)")
 
         for node in nodes
             insert_edge!(g, ct, node)
         end
-        insert_edge!(g, in1, ct)
-        insert_edge!(g, in2, ct)
+        insert_edge!(g, in1, ct, 1)
+        insert_edge!(g, in2, ct, 2)
     elseif (5 <= n <= 8) # negate, sin, cos, sqrt
         ct = if (n == 5)
             insert_node!(g, NEGATE())
@@ -99,7 +104,7 @@ function _add_node(g::DAG, rng)
         else
             insert_node!(g, SQRT())
         end
-        in = insert_node!(g, DataTask(sizeof(Float64)))
+        in = insert_node!(g, DataTask(sizeof(Float64)), "$(c += 1)")
 
         for node in nodes
             insert_edge!(g, ct, node)
@@ -107,16 +112,16 @@ function _add_node(g::DAG, rng)
         insert_edge!(g, in, ct)
     elseif (n == 9) # fma
         ct = insert_node!(g, FMA())
-        in1 = insert_node!(g, DataTask(sizeof(Float64)))
-        in2 = insert_node!(g, DataTask(sizeof(Float64)))
-        in3 = insert_node!(g, DataTask(sizeof(Float64)))
+        in1 = insert_node!(g, DataTask(sizeof(Float64)), "$(c += 1)")
+        in2 = insert_node!(g, DataTask(sizeof(Float64)), "$(c += 1)")
+        in3 = insert_node!(g, DataTask(sizeof(Float64)), "$(c += 1)")
 
         for node in nodes
             insert_edge!(g, ct, node)
         end
-        insert_edge!(g, in1, ct)
-        insert_edge!(g, in2, ct)
-        insert_edge!(g, in3, ct)
+        insert_edge!(g, in1, ct, 1)
+        insert_edge!(g, in2, ct, 2)
+        insert_edge!(g, in3, ct, 3)
     end
 
     return nothing
@@ -130,16 +135,9 @@ function ComputableDAGs.graph(r::RandomArithmetic)
     # this will be the result node
     insert_node!(g, DataTask(sizeof(Float64)))
 
-    for _ in 1:r.size
-        _add_node(g, rng)
-    end
-
-    input_nodes = ComputableDAGs.get_entry_nodes(g)
-
     c = 0
-    for node in input_nodes
-        c += 1
-        node.name = "$c"
+    for _ in 1:r.size
+        _add_node(g, rng, c += 1)
     end
 
     return g

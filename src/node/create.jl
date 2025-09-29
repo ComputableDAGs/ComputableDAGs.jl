@@ -4,8 +4,6 @@ function DataTaskNode(t::AbstractDataTask, name = "")
         Vector{UUID}(),
         Vector{Tuple{UUID, Int}}(),      # TODO this can only ever be a single child
         uuid1(TaskLocalRNG()),
-        missing,
-        missing,
         name,
     )
 end
@@ -15,33 +13,11 @@ function ComputeTaskNode(t::AbstractComputeTask)
         Vector{UUID}(),                 # parents
         Vector{Tuple{UUID, Int}}(),     # children
         uuid1(TaskLocalRNG()),          # id
-        missing,                        # node reduction
-        missing,                        # node split
     )
 end
 
-"""
-    node_with_op(node::Node, operation::Operation)
-
-Return a copy of the given node with the given operation set. Necessary to keep the Node struct immutable.
-"""
-node_with_op(node::ComputeTaskNode, ns::NodeSplit) = ComputeTaskNode(node.task, node.parents, node.children, node.id, node.node_reduction, ns)
-node_with_op(node::ComputeTaskNode, nr::NodeReduction) = ComputeTaskNode(node.task, node.parents, node.children, node.id, nr, node.node_split)
-node_with_op(node::DataTaskNode, ns::NodeSplit) = DataTaskNode(node.task, node.parents, node.children, node.id, node.node_reduction, ns, node.name)
-node_with_op(node::DataTaskNode, nr::NodeReduction) = DataTaskNode(node.task, node.parents, node.children, node.id, nr, node.node_split, node.name)
-
-"""
-    node_without_operation(node::Node, op_type::Type{Operation})
-
-Return a copy of the given node without any of the given operation type set.
-"""
-node_without_operation(node::ComputeTaskNode, ::Type{NodeSplit}) = ComputeTaskNode(node.task, node.parents, node.children, node.id, node.node_reduction, missing)
-node_without_operation(node::ComputeTaskNode, ::Type{NodeReduction}) = ComputeTaskNode(node.task, node.parents, node.children, node.id, missing, node.node_split)
-node_without_operation(node::DataTaskNode, ::Type{NodeSplit}) = DataTaskNode(node.task, node.parents, node.children, node.id, node.node_reduction, missing, node.name)
-node_without_operation(node::DataTaskNode, ::Type{NodeReduction}) = DataTaskNode(node.task, node.parents, node.children, node.id, missing, node.node_split, node.name)
-
-Base.copy(n::ComputeTaskNode) = ComputeTaskNode(copy(task(n)), UUID[], Tuple{UUID, Int}[], uuid1(TaskLocalRNG()), missing, missing)
-Base.copy(n::DataTaskNode) = DataTaskNode(copy(task(n)), UUID[], Tuple{UUID, Int}[], uuid1(TaskLocalRNG()), missing, missing, n.name)
+Base.copy(n::ComputeTaskNode) = ComputeTaskNode(copy(task(n)), UUID[], Tuple{UUID, Int}[], uuid1(TaskLocalRNG()))
+Base.copy(n::DataTaskNode) = DataTaskNode(copy(task(n)), UUID[], Tuple{UUID, Int}[], uuid1(TaskLocalRNG()), n.name)
 
 """
     make_node(t::AbstractTask)

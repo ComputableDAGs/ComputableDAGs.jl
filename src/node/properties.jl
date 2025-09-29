@@ -83,7 +83,7 @@ A node's partners are all parents of any of its children. The result contains no
 function partners(dag::DAG, node::Node)
     result = Set{Node}()
     push!(result, node)
-    for (child, _) in children(dag, node)
+    for child in children(dag, node)
         union!(result, parents(dag, child))
     end
 
@@ -97,7 +97,7 @@ Alternative version to [`partners(node::Node)`](@ref), avoiding allocation of a 
 """
 function partners(dag::DAG, node::Node, set::Set{Node})
     push!(set, node)
-    for (child, _) in children(dag, node)
+    for child in children(dag, node)
         union!(set, parents(dag, child))
     end
     return nothing

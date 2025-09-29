@@ -51,13 +51,18 @@ end
 function can_reduce(
         n1::NodeType, n2::NodeType
     ) where {
-        TaskType <: AbstractTask, NodeType <: Union{DataTaskNode{TaskType}, ComputeTaskNode{TaskType}},
+        NodeType <: Node,
     }
     n1_length = length(n1.children)
     n2_length = length(n2.children)
 
     if (n1_length != n2_length)
         return false
+    end
+    if n1 isa DataTaskNode
+        if (n1.name != n2.name)
+            return false
+        end
     end
 
     # this seems to be the most common case so do this first
