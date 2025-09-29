@@ -27,11 +27,10 @@ function infer_types!(tape::Tape, context_module::Module; concrete_input_type::T
     end
 
     for fc in tape.input_assign_code
-        res_types = result_types(fc, known_result_types, context_module)
-        fc.return_types = res_types
+        result_types(fc, known_result_types, context_module)
         for (s, t) in Iterators.zip(
                 Iterators.flatten(fc.return_symbols),
-                Iterators.flatten(Iterators.repeated(res_types, length(fc.return_symbols))),
+                Iterators.flatten(Iterators.repeated(fc.return_types, length(fc.return_symbols))),
             )
             known_result_types[s] = t
             if (t == Union{})
@@ -41,11 +40,10 @@ function infer_types!(tape::Tape, context_module::Module; concrete_input_type::T
     end
 
     for fc in tape.schedule
-        res_types = result_types(fc, known_result_types, context_module)
-        fc.return_types = res_types
+        result_types(fc, known_result_types, context_module)
         for (s, t) in Iterators.zip(
                 Iterators.flatten(fc.return_symbols),
-                Iterators.flatten(Iterators.repeated(res_types, length(fc.return_symbols))),
+                Iterators.flatten(Iterators.repeated(fc.return_types, length(fc.return_symbols))),
             )
             known_result_types[s] = t
             if (t == Union{})

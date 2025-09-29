@@ -31,7 +31,7 @@ in a `Vector`.
     and later inferred and assigned by [`infer_types!`](@ref).
 - `device::AbstractDevice`: The device that this function call is scheduled on.
 """
-mutable struct FunctionCall{VAL_T <: Tuple, FUNC_T <: Union{Function, Expr}}
+struct FunctionCall{VAL_T <: Tuple, FUNC_T <: Union{Function, Expr}}
     func::FUNC_T
     value_arguments::Vector{VAL_T}          # tuple of value arguments for the function call, will be prepended to the other arguments
     arguments::Vector{Vector{Symbol}}       # symbols of the inputs to the function call

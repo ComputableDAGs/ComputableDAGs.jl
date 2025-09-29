@@ -101,11 +101,16 @@ function result_types(
     N_RET = length(fc.return_types)
     if (N_RET == 1)
         @debug "found return type $(types[1])"
-        return [types[1]]
+        empty!(fc.return_types)
+        push!(fc.return_types, types[1])
+        return nothing
     end
 
     @debug "found return types $(types[1].parameters...)"
-    return [types[1].parameters...]
+
+    empty!(fc.return_types)
+    append!(fc.return_types, types[1].parameters)
+    return nothing
 end
 
 function result_types(
@@ -132,11 +137,13 @@ function result_types(
     _validate_result_types(fc, types, arg_types)
 
     N_RET = length(fc.return_types)
+    empty!(fc.return_types)
     if (N_RET == 1)
-        return [types[1]]
+        push!(fc.return_types, types[1])
+    else
+        append!(fc.return_types, types[1].parameters)
     end
-
-    return [types[1].parameters...]
+    return nothing
 end
 
 @inline function _assert_array_types(args)
