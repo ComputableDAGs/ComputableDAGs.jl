@@ -36,7 +36,7 @@ struct FunctionCall{VAL_T <: Tuple, FUNC_T <: Union{Function, Expr}}
     value_arguments::Vector{VAL_T}          # tuple of value arguments for the function call, will be prepended to the other arguments
     arguments::Vector{Vector{Symbol}}       # symbols of the inputs to the function call
     return_symbols::Vector{Vector{Symbol}}  # the return symbols
-    return_types::Vector{<:Type}            # the return type of the function call(s); there can only be one return type since we require type stability
+    return_types::Vector{Type}              # the return type of the function call(s); there can only be one return type since we require type stability
     device::AbstractDevice
 end
 function FunctionCall(
@@ -44,7 +44,7 @@ function FunctionCall(
         value_arguments::VAL_T,
         arguments::Vector{Symbol},
         return_symbol::Vector{Symbol},
-        return_types::Vector{<:Type},
+        return_types::Vector{Type},
         device::AbstractDevice,
     ) where {VAL_T <: Tuple}
     # convenience constructor for function calls that do not use vectorization, which is most of the use cases

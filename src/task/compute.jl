@@ -12,7 +12,7 @@ function get_function_call(
         in_symbols::NTuple{N, Symbol},
         out_symbol::Symbol,
     ) where {N}
-    return FunctionCall(compute, (t,), [in_symbols...], [out_symbol], [Any], device)
+    return FunctionCall(compute, (t,), [in_symbols...], [out_symbol], Type[Any], device)
 end
 
 function get_function_call(node::ComputeTaskNode, device::AbstractDevice)
@@ -38,7 +38,7 @@ function get_function_call(node::DataTaskNode, device::AbstractDevice)
         (),
         [Symbol(to_var_name(first(node.children)[1]))],
         [Symbol(to_var_name(node.id))],
-        [Any],
+        Type[Any],
         device,
     )
 end
@@ -51,7 +51,7 @@ function get_init_function_call(node::DataTaskNode, device::AbstractDevice)
         (),
         [Symbol("$(to_var_name(node.id))_in")],
         [Symbol(to_var_name(node.id))],
-        [Any],
+        Type[Any],
         device,
     )
 end
