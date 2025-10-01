@@ -15,55 +15,19 @@ end
 const EPS = 1.0e-6
 
 # binary
-struct PLUS <: AbstractComputeTask end
-struct MINUS <: AbstractComputeTask end
-struct MULT <: AbstractComputeTask end
-struct DIV <: AbstractComputeTask end
+@compute_task PLUS 1 2 (+)
+@compute_task MINUS 1 2 (-)
+@compute_task MULT 1 2 (*)
+@compute_task DIV 2 2 (a, b) -> abs(b) < EPS ? a / EPS : a / b
 
 # unary
-struct NEGATE <: AbstractComputeTask end
-struct SIN <: AbstractComputeTask end
-struct COS <: AbstractComputeTask end
-struct SQRT <: AbstractComputeTask end
+@compute_task NEGATE 1 1 (-)
+@compute_task SIN 3 1 a -> isfinite(a) ? sin(a) : zero(Float64) # prevent domain errors
+@compute_task COS 3 1 a -> isfinite(a) ? cos(a) : one(Float64)
+@compute_task SQRT 2 1 a -> sign(a) * sqrt(abs(a))  # prevent domain error
 
 # ternary
-struct FMA <: AbstractComputeTask end
-
-ComputableDAGs.children(::PLUS) = 2
-ComputableDAGs.children(::MINUS) = 2
-ComputableDAGs.children(::MULT) = 2
-ComputableDAGs.children(::DIV) = 2
-
-ComputableDAGs.children(::NEGATE) = 1
-ComputableDAGs.children(::SIN) = 1
-ComputableDAGs.children(::COS) = 1
-ComputableDAGs.children(::SQRT) = 1
-
-ComputableDAGs.children(::FMA) = 3
-
-ComputableDAGs.compute_effort(::PLUS) = 1
-ComputableDAGs.compute_effort(::MINUS) = 1
-ComputableDAGs.compute_effort(::MULT) = 1
-ComputableDAGs.compute_effort(::DIV) = 2
-
-ComputableDAGs.compute_effort(::NEGATE) = 1
-ComputableDAGs.compute_effort(::SIN) = 3
-ComputableDAGs.compute_effort(::COS) = 3
-ComputableDAGs.compute_effort(::SQRT) = 2
-
-ComputableDAGs.compute_effort(::FMA) = 1
-
-ComputableDAGs.compute(::PLUS, a, b) = a + b
-ComputableDAGs.compute(::MINUS, a, b) = a - b
-ComputableDAGs.compute(::MULT, a, b) = a * b
-ComputableDAGs.compute(::DIV, a, b) = abs(b) < EPS ? a / EPS : a / b
-
-ComputableDAGs.compute(::NEGATE, a) = -a
-ComputableDAGs.compute(::SIN, a) = isfinite(a) ? sin(a) : zero(Float64) # prevent domain errors
-ComputableDAGs.compute(::COS, a) = isfinite(a) ? cos(a) : one(Float64)
-ComputableDAGs.compute(::SQRT, a) = sign(a) * sqrt(abs(a))  # prevent domain error
-
-ComputableDAGs.compute(::FMA, a, b, c) = fma(a, b, c)
+@compute_task FMA 1 3 fma
 
 function _add_node(g::DAG, rng, c)
     input_nodes = ComputableDAGs.get_entry_nodes(g)
