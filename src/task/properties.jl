@@ -41,13 +41,6 @@ Copy the data task and return it.
 Base.copy(t::DataTask) = DataTask(t.data)
 
 """
-    children(::DataTask)
-
-Return the number of children of a data task (always 1).
-"""
-children(::DataTask) = 1
-
-"""
     data(t::AbstractComputeTask)
 
 Return the data of a compute task, always zero, regardless of the specific task.

@@ -16,8 +16,6 @@ function get_function_call(
 end
 
 function get_function_call(node::ComputeTaskNode, device::AbstractDevice)
-    @assert length(node.children) <= children(task(node)) "node $(node) has too many children for its task: node has $(length(node.children)) versus task has $(children(task(node)))\nnode's children: $(getfield.(node.children, :children))"
-
     # make sure the node is sorted so the arguments keep their order
     sort_node!(node)
 

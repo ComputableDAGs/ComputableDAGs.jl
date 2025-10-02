@@ -15,19 +15,19 @@ end
 const EPS = 1.0e-6
 
 # binary
-@compute_task PLUS 1 2 (+)
-@compute_task MINUS 1 2 (-)
-@compute_task MULT 1 2 (*)
-@compute_task DIV 2 2 (a, b) -> abs(b) < EPS ? a / EPS : a / b
+@compute_task PLUS 1 (+)
+@compute_task MINUS 1 (-)
+@compute_task MULT 1 (*)
+@compute_task DIV 2 (a, b) -> abs(b) < EPS ? a / EPS : a / b
 
 # unary
-@compute_task NEGATE 1 1 (-)
-@compute_task SIN 3 1 a -> isfinite(a) ? sin(a) : zero(Float64) # prevent domain errors
-@compute_task COS 3 1 a -> isfinite(a) ? cos(a) : one(Float64)
-@compute_task SQRT 2 1 a -> sign(a) * sqrt(abs(a))  # prevent domain error
+@compute_task NEGATE 1 (-)
+@compute_task SIN 3 a -> isfinite(a) ? sin(a) : zero(Float64) # prevent domain errors
+@compute_task COS 3 a -> isfinite(a) ? cos(a) : one(Float64)
+@compute_task SQRT 2 a -> sign(a) * sqrt(abs(a))  # prevent domain error
 
 # ternary
-@compute_task FMA 1 3 fma
+@compute_task FMA 1 fma
 
 function _add_node(g::DAG, rng, c)
     input_nodes = ComputableDAGs.get_entry_nodes(g)

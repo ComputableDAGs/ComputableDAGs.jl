@@ -13,14 +13,14 @@ end
 MatrixMultiplication(size::Int) = MatrixMultiplication{DEFAULT_TYPE}(size)
 
 # TODO: use actual numbers here for the compute efforts, these are just placeholders. they would have to scale with the sizes
-@compute_task Slice{X_SLICE, Y_SLICE} 10 1
-@compute_task Add 32 2 (+)
-@compute_task Subtract 32 2 (-)
-@compute_task MultBase 512 2 (*)
-@compute_task MultStrassen 256 4 (C11, C12, C21, C22) -> [C11 C12; C21 C22]
+@compute_task Slice{X_SLICE, Y_SLICE} 10
+@compute_task Add 32 (+)
+@compute_task Subtract 32 (-)
+@compute_task MultBase 512 (*)
+@compute_task MultStrassen 256 (C11, C12, C21, C22) -> [C11 C12; C21 C22]
 
 # relies on the type parameters, so long form compute function definition outside of the @compute_task macro
-@inline ComputableDAGs.compute(
+@noinline ComputableDAGs.compute(
     ::Slice{UR_X, UR_Y}, A::AbstractMatrix
 ) where {UR_X, UR_Y} = A[UR_X, UR_Y]
 
