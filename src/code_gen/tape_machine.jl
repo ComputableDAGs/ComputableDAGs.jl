@@ -1,5 +1,3 @@
-const FLUSHPOINT_DISTANCE = 1000
-
 function expr_from_fc(fc::FunctionCall{VAL_T, <:Function}) where {VAL_T}
     if length(fc) == 1
         func_call = Expr(:call, fc.func, fc.value_arguments[1]..., fc.arguments[1]...)
@@ -129,20 +127,7 @@ function _gen_function_body(
     @debug "generating function body from $(length(fc_vec)) function calls with closure size $closures_size"
 
     if closures_size <= 1 || closures_size >= length(fc_vec)
-        exprs = Expr[]
-        sizehint!(exprs, length(fc_vec) + length(fc_vec) ÷ FLUSHPOINT_DISTANCE)
-
-        c = 0
-        for fc in fc_vec
-            c += 1
-            push!(exprs, expr_from_fc(fc))
-
-            if (c % FLUSHPOINT_DISTANCE == 0)
-                push!(exprs, Expr(:call, flushpoint))
-            end
-        end
-
-        return Expr(:block, exprs...)
+        return Expr(:block, expr_from_fc.(fc_vec)...)
     end
 
     # iterate from end to beginning
@@ -219,7 +204,9 @@ function _closure_fc(
 
     fc_expr = Expr(                               # actual function body of the closure
         :block,
+        Expr(:noinline, true),
         expr_from_fc.(code_block)...,             # no return statement necessary, will be done via capture and local init
+        Expr(:noinline, false),
     )
 
     fc = FunctionCall(
@@ -268,11 +255,11 @@ function gen_tape(
         push!(input_syms[node.name], Symbol("$(to_var_name(node.id))_in"))
     end
 
-    # get outSymbol
-    outSym = Symbol(to_var_name(get_exit_node(dag).id))
+    # get out_symbol
+    out_sym = Symbol(to_var_name(get_exit_node(dag).id))
 
     assign_inputs = gen_input_assignment_code(input_syms, instance, machine)
 
     INPUT_T = input_type(instance)
-    return Tape{INPUT_T}(assign_inputs, function_body, outSym, instance, machine)
+    return Tape{INPUT_T}(assign_inputs, function_body, out_sym, instance, machine)
 end
