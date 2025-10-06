@@ -37,7 +37,7 @@ end
 !!! note
     Only valid within a [`@assemble_dag`](@ref) block.
 
-Takes an `AbstractComputeTask` and arguments in the form of [`ComputeTaskNode`](@ref)s, creating a node in the dag currently being assembled (see [`assemble_dag`](@ref)). The resulting node is returned to be used in subsequent [`add_call`](@ref)s.
+Takes an `AbstractComputeTask` and arguments in the form of [`ComputeTaskNode`](@ref)s, creating a node in the dag currently being assembled (see [`@assemble_dag`](@ref)). The resulting node is returned to be used in subsequent [`@add_call`](@ref)s.
 
 ## Arguments
 - `task`: The actual ComputeTask object to use.
@@ -103,7 +103,7 @@ end
     @compute_task task effort [function]
 
 Defines a compute task to be later added in compute nodes to a DAG, for example using [`@add_call`](@ref).
-Necessary arguments are the task name and its expected compute effort. Optionally, a function can be provided, making up the task's 
+Necessary arguments are the task name and its expected compute effort. Optionally, a function can be provided, making up the task's
 [`compute`](@ref) function. For example, to add a task type that simply adds two child nodes together:
 ```julia
 @compute_task Add 1 (+)

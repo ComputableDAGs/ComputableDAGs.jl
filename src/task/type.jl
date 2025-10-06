@@ -33,5 +33,5 @@ end
 
 Task representing a vectorized version of another compute task.
 """
-struct VectorizedComputeTask{TASK_T<:AbstractComputeTask} <: AbstractComputeTask
+struct VectorizedComputeTask{TASK_T <: AbstractComputeTask} <: AbstractComputeTask
 end
