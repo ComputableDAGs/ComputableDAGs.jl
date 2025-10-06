@@ -92,7 +92,7 @@ function _add_node(g::DAG, rng, c)
 end
 
 function ComputableDAGs.graph(r::RandomArithmetic)
-    rng = MersenneTwister(r.rng_seed)
+    rng = Xoshiro(r.rng_seed)
 
     g = DAG()
 

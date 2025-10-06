@@ -32,6 +32,9 @@ end
     VectorizedComputeTask{TASK_T<:AbstractComputeTask} <: AbstractComputeTask
 
 Task representing a vectorized version of another compute task.
+
+!!! warn
+    The feature of node vectorization is not fully implemented and will not work yet.
 """
 struct VectorizedComputeTask{TASK_T <: AbstractComputeTask} <: AbstractComputeTask
 end

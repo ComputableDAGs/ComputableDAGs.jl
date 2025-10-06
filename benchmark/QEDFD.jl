@@ -7,7 +7,7 @@ using QEDcore
 using QEDbase
 RuntimeGeneratedFunctions.init(@__MODULE__)
 
-RNG = MersenneTwister(1)
+RNG = Xoshiro(1)
 MODEL = PerturbativeQED()
 PROC = ScatteringProcess(
     (Electron(), Photon()),

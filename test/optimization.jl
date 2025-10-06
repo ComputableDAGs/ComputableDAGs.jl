@@ -7,8 +7,10 @@ RuntimeGeneratedFunctions.init(@__MODULE__)
 include("random_arithmetic/impl.jl")
 using .RandomArith
 
+RNG = Xoshiro(1)
+
 @testset "Equal results after optimization" for optimizer in [
-        ReductionOptimizer(), RandomWalkOptimizer(MersenneTwister(0)),
+        ReductionOptimizer(), RandomWalkOptimizer(Xoshiro(2)),
     ]
     @testset "Random Arithmetic graph N=$N" for N in [10, 100, 1000]
         instance = RandomArithmetic(0, N)
@@ -25,7 +27,7 @@ using .RandomArith
             dag, instance, cpu_st(), @__MODULE__
         )
 
-        input = [rand(Float64, 3 * N) for _ in 1:100]
+        input = [rand(RNG, Float64, 3 * N) for _ in 1:100]
 
         @test isapprox(compute_function.(input), reduced_compute_function.(input))
     end
