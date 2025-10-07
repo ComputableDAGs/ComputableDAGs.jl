@@ -3,7 +3,7 @@
 
 Helper struct for [`NodeTrie`](@ref). After the Trie's first level, every Trie level contains the vector of nodes that had children up to that level, and the TrieNode's children by UUID of the node's children.
 """
-mutable struct NodeIdTrie{NodeType <: Node}
+struct NodeIdTrie{NodeType <: Node}
     value::Vector{NodeType}
     children::Dict{UUID, NodeIdTrie{NodeType}}
 end
@@ -13,12 +13,12 @@ end
 
 Trie data structure for node reduction, inserts nodes by children.
 Assumes that given nodes have ordered vectors of children (see [`sort_node!`](@ref)).
-First insertion level is the node's own task type and thus does not have a value (every node has a task type).
+First insertion level is the node's own task type + name and thus does not have a value (every node has a task type).
 
 See also: [`insert!`](@ref) and [`collect`](@ref)
 """
-mutable struct NodeTrie
-    children::Dict{DataType, NodeIdTrie}
+struct NodeTrie
+    children::Dict{Tuple{DataType, String}, NodeIdTrie}
 end
 
 """
@@ -47,13 +47,13 @@ Insert the given node into the trie. The depth is used to iterate through the tr
 function insert_helper!(
         trie::NodeIdTrie{NodeType}, node::NodeType, depth::Int
     ) where {NodeType <: Node}
-    if (length(children(node)) == depth)
+    if (length(node.children) == depth)
         push!(trie.value, node)
         return nothing
     end
 
     depth = depth + 1
-    id = node.children[depth][1].id
+    id = node.children[depth][1]
 
     if (!haskey(trie.children, id))
         trie.children[id] = NodeIdTrie{NodeType}()
@@ -67,10 +67,13 @@ end
 Insert the given node into the trie. It's sorted by its type in the first layer, then by its children in the following layers.
 """
 function Base.insert!(trie::NodeTrie, node::NodeType) where {NodeType <: Node}
+    str = NodeType <: ComputeTaskNode ? "" : node.name
+
     if (!haskey(trie.children, NodeType))
-        trie.children[NodeType] = NodeIdTrie{NodeType}()
+        trie.children[(NodeType, str)] = NodeIdTrie{NodeType}()
     end
-    return insert_helper!(trie.children[NodeType], node, 0)
+
+    return insert_helper!(trie.children[(NodeType, str)], node, 0)
 end
 
 """

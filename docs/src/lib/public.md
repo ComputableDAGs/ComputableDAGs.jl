@@ -4,12 +4,6 @@ Documentation for `ComputableDAGs.jl`'s public interface.
 
 See the Internals section of the manual for documentation of everything else.
 
-```@autodocs
-Modules = [ComputableDAGs]
-Pages   = ["ComputableDAGs.jl"]
-Order   = [:module]
-```
-
 ## Contents
 
 ```@contents
@@ -21,4 +15,18 @@ Depth = 2
 
 ```@index
 Pages = ["public.md"]
+```
+
+## Module
+```@autodocs
+Modules = [ComputableDAGs]
+Pages   = ["ComputableDAGs.jl"]
+Order   = [:module]
+```
+
+## Macros
+```@autodocs
+Modules = [ComputableDAGs]
+Pages   = ["usability/macros.jl"]
+Order   = [:macro]
 ```

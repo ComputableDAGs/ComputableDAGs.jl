@@ -1,6 +1,6 @@
 """
     get_compute_function(
-        graph::DAG,
+        dag::DAG,
         instance,
         machine::Machine,
         context_module::Module
@@ -26,14 +26,14 @@ in your top level.
     type in the generated function header.
 """
 function get_compute_function(
-        graph::DAG,
+        dag::DAG,
         instance,
         machine::Machine,
         context_module::Module;
         closures_size::Int = 0,
         concrete_input_type::Type = Nothing,
     )
-    tape = gen_tape(graph, instance, machine, context_module)
+    tape = gen_tape(dag, instance, machine, context_module)
 
     code = gen_function_body(
         tape,
@@ -50,7 +50,14 @@ function get_compute_function(
         Expr(
             :call, Symbol("compute_$function_id"), Expr(:(::), :input, input_type(instance))
         ), # function name and parameters
-        Expr(:block, assign_inputs, code, Expr(:return, res_sym)), # function body
+        Expr(
+            :block,
+            assign_inputs,
+            Expr(:noinline, true),
+            code,
+            Expr(:noinline, false),
+            Expr(:return, res_sym)
+        ), # function body
     )
 
     return RuntimeGeneratedFunction(@__MODULE__, context_module, expr)

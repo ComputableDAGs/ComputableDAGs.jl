@@ -20,20 +20,20 @@ end
 @inline function Base.iterate(
         possible_operations::PossibleOperations, state
     )::Union{Nothing, _POIteratorStateType}
-    newStateSym = state[1]
-    newStateIt = iterate(getfield(possible_operations, newStateSym), state[2])
-    if !isnothing(newStateIt)
-        return (result = newStateIt[1], state = (newStateSym, newStateIt[2]))
+    new_state_sym = state[1]
+    new_state_it = iterate(getfield(possible_operations, new_state_sym), state[2])
+    if !isnothing(new_state_it)
+        return (result = new_state_it[1], state = (new_state_sym, new_state_it[2]))
     end
 
     # cycle to next field
-    index = findfirst(x -> x == newStateSym, _POSSIBLE_OPERATIONS_FIELDS) + 1
+    index = findfirst(x -> x == new_state_sym, _POSSIBLE_OPERATIONS_FIELDS) + 1
 
     while index <= length(_POSSIBLE_OPERATIONS_FIELDS)
-        newStateSym = _POSSIBLE_OPERATIONS_FIELDS[index]
-        newStateIt = iterate(getfield(possible_operations, newStateSym))
-        if !isnothing(newStateIt)
-            return (result = newStateIt[1], state = (newStateSym, newStateIt[2]))
+        new_state_sym = _POSSIBLE_OPERATIONS_FIELDS[index]
+        new_state_it = iterate(getfield(possible_operations, new_state_sym))
+        if !isnothing(new_state_it)
+            return (result = new_state_it[1], state = (new_state_sym, new_state_it[2]))
         end
         index += 1
     end

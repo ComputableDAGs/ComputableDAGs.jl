@@ -7,53 +7,48 @@ This function is very performance intensive and should only be used when testing
 
 See also this function's specific versions for the concrete Node types [`is_valid(graph::DAG, node::ComputeTaskNode)`](@ref) and [`is_valid(graph::DAG, node::DataTaskNode)`](@ref).
 """
-function is_valid_node(graph::DAG, node::Node)
-    @assert node in graph "Node is not part of the given graph!"
+function is_valid_node(dag::DAG, node::Node)
+    @assert node in dag "Node is not part of the given graph!"
 
-    for parent in node.parents
+    for parent_id in node.parents
+        parent = dag.nodes[parent_id]
         @assert typeof(parent) != typeof(node) "Node's type is the same as its parent's!"
-        @assert parent in graph "Node's parent is not in the same graph!"
-        @assert is_child(node, parent) "Node is not a child of its parent!"
+        @assert haskey(dag.nodes, parent_id) "Node's parent is not in the same graph!"
+        @assert is_child(dag, node, parent) "Node is not a child of its parent!"
     end
 
-    for (child, index) in node.children
+    for (child_id, index) in node.children
+        child = dag.nodes[child_id]
         @assert typeof(child) != typeof(node) "Node's type is the same as its child's!"
-        @assert child in graph "Node's child is not in the same graph!"
-        @assert node in child.parents "Node is not a parent of its child!"
+        @assert haskey(dag.nodes, child_id) "Node's child is not in the same graph!"
+        @assert is_parent(dag, node, child) "Node is not a parent of its child!"
     end
-
-    #=if !ismissing(node.node_reduction)
-        @assert is_valid(graph, node.node_reduction)
-    end
-    if !ismissing(node.node_split)
-        @assert is_valid(graph, node.node_split)
-    end=#
 
     return true
 end
 
 """
-    is_valid(graph::DAG, node::ComputeTaskNode)
+    is_valid(dag::DAG, node::ComputeTaskNode)
 
 Verify that the given compute node is valid in the graph. Call with `@assert` or `@test` when testing or debugging.
 
 This also calls [`is_valid_node(graph::DAG, node::Node)`](@ref).
 """
-function is_valid(graph::DAG, node::ComputeTaskNode)
-    @assert is_valid_node(graph, node)
+function is_valid(dag::DAG, node::ComputeTaskNode)
+    @assert is_valid_node(dag, node)
 
     return true
 end
 
 """
-    is_valid(graph::DAG, node::DataTaskNode)
+    is_valid(dag::DAG, node::DataTaskNode)
 
 Verify that the given compute node is valid in the graph. Call with `@assert` or `@test` when testing or debugging.
 
 This also calls [`is_valid_node(graph::DAG, node::Node)`](@ref).
 """
-function is_valid(graph::DAG, node::DataTaskNode)
-    @assert is_valid_node(graph, node)
+function is_valid(dag::DAG, node::DataTaskNode)
+    @assert is_valid_node(dag, node)
 
     return true
 end

@@ -21,11 +21,10 @@ function infer_types!(tape::Tape, context_module::Module; concrete_input_type::T
     end
 
     for fc in tape.input_assign_code
-        res_types = result_types(fc, known_result_types, context_module)
-        fc.return_types = res_types
+        result_types(fc, known_result_types, context_module)
         for (s, t) in Iterators.zip(
                 Iterators.flatten(fc.return_symbols),
-                Iterators.flatten(Iterators.repeated(res_types, length(fc.return_symbols))),
+                Iterators.flatten(Iterators.repeated(fc.return_types, length(fc.return_symbols))),
             )
             known_result_types[s] = t
             if (t == Union{})
@@ -35,11 +34,10 @@ function infer_types!(tape::Tape, context_module::Module; concrete_input_type::T
     end
 
     for fc in tape.schedule
-        res_types = result_types(fc, known_result_types, context_module)
-        fc.return_types = res_types
+        result_types(fc, known_result_types, context_module)
         for (s, t) in Iterators.zip(
                 Iterators.flatten(fc.return_symbols),
-                Iterators.flatten(Iterators.repeated(res_types, length(fc.return_symbols))),
+                Iterators.flatten(Iterators.repeated(fc.return_types, length(fc.return_symbols))),
             )
             known_result_types[s] = t
             if (t == Union{})
@@ -70,16 +68,16 @@ end
 """
     lower(schedule::Vector{Node}, machine::Machine)
 
-After [`schedule_dag`](@ref) has made a schedule of nodes, this function lowers the vector of [`Node`](@ref)s into a vector of [`FunctionCall`](@ref)s.
+After [`schedule_dag`](@ref) has made a schedule of nodes, this function lowers the vector of [`Node`](@ref)s and [`AbstractDevice`](@ref)s into a vector of [`FunctionCall`](@ref)s.
 """
-function lower(schedule::Vector{Node}, machine::Machine)
+function lower(schedule::Vector{Tuple{Node, AbstractDevice}}, machine::Machine)
     calls = Vector{FunctionCall}()
 
-    for node in schedule
-        if (node isa DataTaskNode && length(children(node)) == 0)
+    for (node, device) in schedule
+        if (node isa DataTaskNode && length(node.children) == 0)
             push!(calls, get_init_function_call(node, entry_device(machine)))
         else
-            push!(calls, get_function_call(node))
+            push!(calls, get_function_call(node, device))
         end
     end
 

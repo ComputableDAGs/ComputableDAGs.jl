@@ -39,8 +39,8 @@ A vector of nodes can be reduced if:
 
 See also: [`can_reduce`](@ref)
 """
-struct NodeReduction{NodeType <: Node} <: Operation
-    input::Vector{NodeType}
+struct NodeReduction <: Operation
+    input::Vector{UUID}
 end
 
 """
@@ -48,8 +48,8 @@ end
 
 The applied version of the [`NodeReduction`](@ref).
 """
-struct AppliedNodeReduction{NodeType <: Node} <: AppliedOperation
-    operation::NodeReduction{NodeType}
+struct AppliedNodeReduction <: AppliedOperation
+    operation::NodeReduction
     diff::Diff
 end
 
@@ -68,8 +68,8 @@ A node can be split if:
 
 See also: [`can_split`](@ref)
 """
-struct NodeSplit{NodeType <: Node} <: Operation
-    input::NodeType
+struct NodeSplit <: Operation
+    input::UUID
 end
 
 """
@@ -77,7 +77,7 @@ end
 
 The applied version of the [`NodeSplit`](@ref).
 """
-struct AppliedNodeSplit{NodeType <: Node} <: AppliedOperation
-    operation::NodeSplit{NodeType}
+struct AppliedNodeSplit <: AppliedOperation
+    operation::NodeSplit
     diff::Diff
 end

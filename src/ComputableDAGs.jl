@@ -58,6 +58,9 @@ export get_machine_info, cpu_st
 # GPU Extensions
 export kernel, CUDAGPU, ROCmGPU, oneAPIGPU
 
+# usability macros
+export @assemble_dag, @add_call, @add_entry, @compute_task
+
 include("devices/interface.jl")
 include("task/type.jl")
 include("node/type.jl")
@@ -73,6 +76,7 @@ include("utils.jl")
 
 include("diff/print.jl")
 include("diff/properties.jl")
+include("diff/mute.jl")
 
 include("graph/compare.jl")
 include("graph/interface.jl")
@@ -128,5 +132,8 @@ include("scheduler/greedy.jl")
 include("code_gen/utils.jl")
 include("code_gen/tape_machine.jl")
 include("code_gen/function.jl")
+
+include("usability/globals.jl")
+include("usability/macros.jl")
 
 end # module ComputableDAGs

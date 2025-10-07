@@ -1,29 +1,23 @@
 function DataTaskNode(t::AbstractDataTask, name = "")
     return DataTaskNode(
         t,
-        Vector{Node}(),
-        Vector{Tuple{Node, Int}}(),      # TODO this can only ever be a single child
-        UUIDs.uuid1(TaskLocalRNG()),
-        missing,
-        missing,
+        Vector{UUID}(),
+        Vector{Tuple{UUID, Int}}(),      # TODO this can only ever be a single child
+        uuid1(TaskLocalRNG()),
         name,
     )
 end
 function ComputeTaskNode(t::AbstractComputeTask)
     return ComputeTaskNode(
         t,                              # task
-        Vector{Node}(),                 # parents
-        Vector{Tuple{Node, Int}}(),     # children
-        UUIDs.uuid1(TaskLocalRNG()),    # id
-        missing,                        # node reduction
-        missing,                        # node split
-        missing,                        # device
+        Vector{UUID}(),                 # parents
+        Vector{Tuple{UUID, Int}}(),     # children
+        uuid1(TaskLocalRNG()),          # id
     )
 end
 
-Base.copy(m::Missing) = missing
-Base.copy(n::ComputeTaskNode) = ComputeTaskNode(copy(task(n)))
-Base.copy(n::DataTaskNode) = DataTaskNode(copy(task(n)), n.name)
+Base.copy(n::ComputeTaskNode) = ComputeTaskNode(copy(task(n)), UUID[], Tuple{UUID, Int}[], uuid1(TaskLocalRNG()))
+Base.copy(n::DataTaskNode) = DataTaskNode(copy(task(n)), UUID[], Tuple{UUID, Int}[], uuid1(TaskLocalRNG()), n.name)
 
 """
     make_node(t::AbstractTask)
@@ -69,7 +63,7 @@ Construct and return a new [`Edge`](@ref) pointing from `n1` (child) to `n2` (pa
 The index parameter is 0 by default and is passed to the parent node as argument index for its child.
 """
 function make_edge(n1::ComputeTaskNode, n2::DataTaskNode, index::Int = 0)
-    return Edge((n1, n2), index)
+    return Edge((n1.id, n2.id), index)
 end
 
 """
@@ -80,5 +74,5 @@ Construct and return a new [`Edge`](@ref) pointing from `n1` (child) to `n2` (pa
 The index parameter is 0 by default and is passed to the parent node as argument index for its child.
 """
 function make_edge(n1::DataTaskNode, n2::ComputeTaskNode, index::Int = 0)
-    return Edge((n1, n2), index)
+    return Edge((n1.id, n2.id), index)
 end

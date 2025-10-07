@@ -1,31 +1,31 @@
 """
-    push_operation!(graph::DAG, operation::Operation)
+    push_operation!(dag::DAG, operation::Operation)
 
 Apply a new operation to the graph.
 
 See also: [`DAG`](@ref), [`pop_operation!`](@ref)
 """
-function push_operation!(graph::DAG, operation::Operation)
+function push_operation!(dag::DAG, operation::Operation)
     # 1.: Add the operation to the DAG
-    push!(graph.operations_to_apply, operation)
+    push!(dag.operations_to_apply, operation)
 
     return nothing
 end
 
 """
-    pop_operation!(graph::DAG)
+    pop_operation!(dag::DAG)
 
 Revert the latest applied operation on the graph.
 
 See also: [`DAG`](@ref), [`push_operation!`](@ref)
 """
-function pop_operation!(graph::DAG)
+function pop_operation!(dag::DAG)
     # 1.: Remove the operation from the appliedChain of the DAG
-    if !isempty(graph.operations_to_apply)
-        pop!(graph.operations_to_apply)
-    elseif !isempty(graph.applied_operations)
-        appliedOp = pop!(graph.applied_operations)
-        revert_operation!(graph, appliedOp)
+    if !isempty(dag.operations_to_apply)
+        pop!(dag.operations_to_apply)
+    elseif !isempty(dag.applied_operations)
+        appliedOp = pop!(dag.applied_operations)
+        revert_operation!(dag, appliedOp)
     else
         error("No more operations to pop!")
     end
@@ -34,21 +34,21 @@ function pop_operation!(graph::DAG)
 end
 
 """
-    can_pop(graph::DAG)
+    can_pop(dag::DAG)
 
 Return `true` if [`pop_operation!`](@ref) is possible, `false` otherwise.
 """
-can_pop(graph::DAG) =
-    !isempty(graph.operations_to_apply) || !isempty(graph.applied_operations)
+can_pop(dag::DAG) =
+    !isempty(dag.operations_to_apply) || !isempty(dag.applied_operations)
 
 """
-    reset_graph!(graph::DAG)
+    reset_graph!(dag::DAG)
 
 Reset the graph to its initial state with no operations applied.
 """
-function reset_graph!(graph::DAG)
-    while (can_pop(graph))
-        pop_operation!(graph)
+function reset_graph!(dag::DAG)
+    while (can_pop(dag))
+        pop_operation!(dag)
     end
 
     return nothing

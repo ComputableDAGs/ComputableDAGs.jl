@@ -38,8 +38,8 @@ function cost_type(::GlobalMetricEstimator)
     return CDCost
 end
 
-function graph_cost(::GlobalMetricEstimator, graph::DAG)
-    properties = get_properties(graph)
+function graph_cost(::GlobalMetricEstimator, dag::DAG)
+    properties = get_properties(dag)
     return CDCost(
         properties.data,
         properties.compute_effort
@@ -47,21 +47,32 @@ function graph_cost(::GlobalMetricEstimator, graph::DAG)
 end
 
 function operation_effect(
-        ::GlobalMetricEstimator, graph::DAG, operation::NodeReduction
+        ::GlobalMetricEstimator, dag::DAG, operation::NodeReduction
     )
+    input_node = dag.nodes[operation.input[1]]
     s = length(operation.input) - 1
+
+    # sum of the data of all children will be multiplied by s
+    temp_d = sum(data.(task.(children(dag, input_node))))
+
     return CDCost(
-        s * -data(task(operation.input[1])),
-        s * -compute_effort(task(operation.input[1])),
+        s * -temp_d,
+        s * -compute_effort(task(input_node)),
     )
 end
 
 function operation_effect(
-        ::GlobalMetricEstimator, graph::DAG, operation::NodeSplit
+        ::GlobalMetricEstimator, dag::DAG, operation::NodeSplit
     )
-    s = length(parents(operation.input)) - 1
-    d = s * data(task(operation.input))
-    ce = s * compute_effort(task(operation.input))
+    input_node = dag.nodes[operation.input]
+
+    s = length(input_node.parents) - 1
+
+    # sum of the data of all children will be multiplied by s
+    temp_d = sum(data.(task.(children(dag, input_node))))
+
+    d = s * temp_d
+    ce = s * compute_effort(task(input_node))
     return CDCost(d, ce)
 end
 

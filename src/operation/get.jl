@@ -3,19 +3,31 @@
 using Base.Threads
 
 """
-    get_operations(graph::DAG)
+    get_operations(dag::DAG)
 
 Return the [`PossibleOperations`](@ref) of the graph at the current state.
 """
-function get_operations(graph::DAG)
-    apply_all!(graph)
+function get_operations(dag::DAG)
+    apply_all!(dag)
 
-    if isempty(graph.possible_operations)
-        generate_operations(graph)
+    if isempty(dag.possible_operations)
+        generate_operations(dag)
     end
 
-    clean_node!.(Ref(graph), graph.dirty_nodes)
-    empty!(graph.dirty_nodes)
+    # remove node reductions/splits, where at least one of the inputs is a dirty node
+    filter!(
+        nr -> begin
+            return !any(id -> id in dag.dirty_nodes, nr.input)
+        end, dag.possible_operations.node_reductions
+    )
+    filter!(
+        ns -> begin
+            return !(ns.input in dag.dirty_nodes)
+        end, dag.possible_operations.node_splits
+    )
 
-    return graph.possible_operations
+    clean_node!.(Ref(dag), dag.dirty_nodes)
+    empty!(dag.dirty_nodes)
+
+    return dag.possible_operations
 end
