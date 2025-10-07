@@ -4,11 +4,28 @@ project_path = Base.Filesystem.joinpath(Base.Filesystem.dirname(Base.source_path
 Pkg.develop(; path = project_path)
 
 using Documenter
+using Literate
 using ComputableDAGs
+
+# setup examples using Literate.jl
+literate_paths = [
+    (
+        Base.Filesystem.joinpath(project_path, "docs/src/examples/fibonacci.jl"),
+        Base.Filesystem.joinpath(project_path, "docs/src/examples/"),
+    ),
+]
+
+for (file, output_dir) in literate_paths
+    Literate.markdown(file, output_dir; documenter = true)
+    Literate.notebook(file, output_dir)
+end
 
 pages = [
     "index.md",
     "Manual" => "manual.md",
+    "Examples" => [
+        "Fibonacci" => "examples/fibonacci.md",
+    ],
     "Library" => [
         "Public" => "lib/public.md",
         "Graph" => "lib/internals/graph.md",
