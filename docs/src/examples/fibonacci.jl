@@ -58,8 +58,8 @@ function ComputableDAGs.graph(fib::Fibonacci)
     end
 end
 
-# In short, `@assemble_dag begin ... end` creates a scope in which `@add_entry` can add entry nodes and `@add_call` can add compute nodes. The whole expression then returns the DAG created in the scope.
-# [`@add_entry`](@ref) takes two arguments: a node name, which is later passed to the `input_expr` implementation we defined above, and the expected data size of the output. This doesn't have to be in bytes, but it should be proportional across all data sizes in the DAG.
+# In short, `@assemble_dag begin ... end` creates a scope in which [`@add_entry`](@ref) can add entry nodes and [`@add_call`](@ref) can add compute nodes. The whole expression then returns the DAG created in the scope.
+# [`@add_entry`](@ref) takes two arguments: a node name, which is later passed to the [`input_expr`](@ref) implementation we defined above, and the expected data size of the output. This doesn't have to be in bytes, but it should be proportional across all data sizes in the DAG.
 # [`@add_call`](@ref) takes the compute task that the compute node should execute. In our case, this is the `Add` task defined earlier. Note that this has to be an instance of the task object, not just the type name. The second argument is the expected output data size, as with the entry nodes. Finally, a list of all the input nodes to the compute task follows.
 
 # ### Trying it out
