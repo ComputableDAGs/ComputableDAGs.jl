@@ -19,7 +19,7 @@ To create a DAG, some steps are necessary:
 
 Once a CDAG has been created, it can be analyzed and optimized. For this, the concepts of [`Operation`](@ref)s, [`AbstractEstimator`](@ref ComputableDAGs.AbstractEstimator), and [`AbstractOptimizer`](@ref)s exist in this package. Operations can be pushed onto a CDAG, which applies it to the structure. Applied operations change the CDAG's structure, but not its computation. An estimator can estimate the required time (or some other metric, depending on its implementation) of a CDAG. These metrics may change by applying operations. Finally, these estimations and operations can be used together to optimize the CDAG.
 
-If the intention is to use this package mostly as an overhead-free Dagger.jl replacement, this step may be skipped entirely.
+If the intention is to use this package mostly as an overhead-free Dagger.jl alternative, this step may be skipped entirely.
 
 ## 3. Executing the CDAG
 
