@@ -1,11 +1,9 @@
 using ComputableDAGs
-using RuntimeGeneratedFunctions
 using Random
 using QEDFeynmanDiagrams
 using QEDprocesses
 using QEDcore
 using QEDbase
-RuntimeGeneratedFunctions.init(@__MODULE__)
 
 RNG = Xoshiro(1)
 MODEL = PerturbativeQED()
