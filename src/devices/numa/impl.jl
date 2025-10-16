@@ -6,7 +6,7 @@ using NumaAllocators
 Representation of a specific CPU that code can run on. Implements the [`AbstractDevice`](@ref) interface.
 """
 mutable struct NumaNode <: AbstractCPU
-    numaId::UInt16
+    numa_id::UInt16
     threads::UInt16
     FLOPS::Float64
     id::UUID
@@ -15,7 +15,7 @@ end
 push!(DEVICE_TYPES, NumaNode)
 
 function measure_device!(device::NumaNode; verbose::Bool)
-    verbose && @info "Measuring Numa Node $(device.numaId)"
+    verbose && @info "Measuring Numa Node $(device.numa_id)"
 
     # TODO implement
     return nothing
@@ -28,11 +28,11 @@ Return a Vector of [`NumaNode`](@ref)s available on the current machine. If `ver
 """
 function get_devices(deviceType::Type{T}; verbose::Bool = false) where {T <: NumaNode}
     devices = Vector{AbstractDevice}()
-    noNumaNodes = highest_numa_node()
+    no_numa_nodes = highest_numa_node()
 
-    verbose && @info "Found $(noNumaNodes + 1) NUMA nodes"
+    verbose && @info "Found $(no_numa_nodes + 1) NUMA nodes"
 
-    for i in 0:noNumaNodes
+    for i in 0:no_numa_nodes
         push!(devices, NumaNode(i, 1, -1, UUIDs.uuid1(TaskLocalRNG())))
     end
 

@@ -12,9 +12,9 @@ struct RandomWalkOptimizer <: AbstractOptimizer
 end
 
 function optimize_step!(optimizer::RandomWalkOptimizer, graph::DAG)
-    operations = get_operations(graph)
+    ops = operations(graph)
 
-    if sum(length(operations)) == 0 &&
+    if sum(length(ops)) == 0 &&
             length(graph.applied_operations) + length(graph.operations_to_apply) == 0
         # in case there are zero operations possible at all on the graph
         return false
@@ -29,11 +29,11 @@ function optimize_step!(optimizer::RandomWalkOptimizer, graph::DAG)
 
             # choose one of split/reduce
             option = rand(r, 1:2)
-            if option == 1 && !isempty(operations.node_reductions)
-                push_operation!(graph, rand(r, collect(operations.node_reductions)))
+            if option == 1 && !isempty(ops.node_reductions)
+                push_operation!(graph, rand(r, collect(ops.node_reductions)))
                 return true
-            elseif option == 2 && !isempty(operations.node_splits)
-                push_operation!(graph, rand(r, collect(operations.node_splits)))
+            elseif option == 2 && !isempty(ops.node_splits)
+                push_operation!(graph, rand(r, collect(ops.node_splits)))
                 return true
             end
         else

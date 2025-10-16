@@ -9,19 +9,19 @@ struct ReductionOptimizer <: AbstractOptimizer end
 
 function optimize_step!(optimizer::ReductionOptimizer, graph::DAG)
     # generate all options
-    operations = get_operations(graph)
+    ops = operations(graph)
     if fixpoint_reached(optimizer, graph)
         return false
     end
 
-    push_operation!(graph, first(operations.node_reductions))
+    push_operation!(graph, first(ops.node_reductions))
 
     return true
 end
 
 function fixpoint_reached(optimizer::ReductionOptimizer, graph::DAG)
-    operations = get_operations(graph)
-    return isempty(operations.node_reductions)
+    ops = operations(graph)
+    return isempty(ops.node_reductions)
 end
 
 function optimize_to_fixpoint!(optimizer::ReductionOptimizer, graph::DAG)
