@@ -1,9 +1,6 @@
 using ComputableDAGs
 using Random
 
-using RuntimeGeneratedFunctions
-RuntimeGeneratedFunctions.init(@__MODULE__)
-
 include("random_arithmetic/impl.jl")
 using .RandomArith
 
