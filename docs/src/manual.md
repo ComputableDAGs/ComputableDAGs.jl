@@ -13,7 +13,8 @@ To create a DAG, some steps are necessary:
 1. A problem defining struct needs to be defined. This does not have to inherit from any type and is completely free in its definition. It can contain information about the parameters of the problem, for example the matrix size in the Strassen matrix multiplication example.
 2. The types of compute steps need to be defined. They are represented by [`AbstractComputeTask`](@ref)s and can be defined easily using the [`@compute_task`](@ref) macro.
 3. The input nodes of the CDAG must have a way of reading their value from the input to the actually callable function later. For this, these input nodes are required to have a name and an [`input_expr`](@ref) must be defined to map from this input to the value of the node. To remove overhead from handling the strings at execution time, this is done by returning an expression that is later evaluated in the function.
-4. Implement the [`ComputableDAGs.graph`](@ref) interface function, creating and returning the CDAG. The macros [`@assemble_dag`](@ref), [`@add_entry`](@ref), and [`@add_call`](@ref) can be used for this.
+4. [`ComputableDAGs.input_type`](@ref) needs to be implemented for the problem instance defined earlier, returning the expected type that the generated function will later be called with.
+5. Implement the [`ComputableDAGs.graph`](@ref) interface function, creating and returning the CDAG. The macros [`@assemble_dag`](@ref), [`@add_entry`](@ref), and [`@add_call`](@ref) can be used for this.
 
 ## 2. Working with the CDAG
 
