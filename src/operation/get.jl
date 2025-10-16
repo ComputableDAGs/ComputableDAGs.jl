@@ -3,11 +3,11 @@
 using Base.Threads
 
 """
-    get_operations(dag::DAG)
+    operations(dag::DAG)
 
 Return the [`PossibleOperations`](@ref) of the graph at the current state.
 """
-function get_operations(dag::DAG)
+function operations(dag::DAG)
     apply_all!(dag)
 
     if isempty(dag.possible_operations)

@@ -1,5 +1,5 @@
 """
-    get_compute_function(
+    compute_function(
         dag::DAG,
         instance,
         machine::Machine,
@@ -7,13 +7,7 @@
     )
 
 Return a function of signature `compute_<id>(input::input_type(instance))`, which will return the result of the DAG computation on the given input.
-The final argument `context_module` should always be `@__MODULE__` to be able to use functions defined in the caller's environment. For this to work,
-you need
-```Julia
-using RuntimeGeneratedFunctions
-RuntimeGeneratedFunctions.init(@__MODULE__)
-```
-in your top level.
+The final argument `context_module` should always be `@__MODULE__` to be able to use functions defined in the caller's environment.
 
 ## Keyword Arguments
 
@@ -25,7 +19,7 @@ in your top level.
     omitted, the `input_type` of the problem instance is used. Note that the `input_type` of the instance will still be used as the annotated
     type in the generated function header.
 """
-function get_compute_function(
+function compute_function(
         dag::DAG,
         instance,
         machine::Machine,
@@ -33,6 +27,12 @@ function get_compute_function(
         closures_size::Int = 0,
         concrete_input_type::Type = Nothing,
     )
+    global INITIALIZED_MODULES
+    if !(context_module in INITIALIZED_MODULES)
+        RuntimeGeneratedFunctions.init(context_module)
+        push!(INITIALIZED_MODULES, context_module)
+    end
+
     tape = gen_tape(dag, instance, machine, context_module)
 
     code = gen_function_body(
@@ -60,5 +60,5 @@ function get_compute_function(
         ), # function body
     )
 
-    return RuntimeGeneratedFunction(@__MODULE__, context_module, expr)
+    return invokelatest(RuntimeGeneratedFunction, @__MODULE__, context_module, expr)
 end

@@ -4,7 +4,7 @@ using DataStructures
     PossibleOperations
 
 A struct storing all possible operations on a [`DAG`](@ref).
-To get the [`PossibleOperations`](@ref) on a [`DAG`](@ref), use [`get_operations`](@ref).
+To get the [`PossibleOperations`](@ref) on a [`DAG`](@ref), use [`operations`](@ref).
 """
 struct PossibleOperations
     node_reductions::Set{NodeReduction}
@@ -17,7 +17,7 @@ end
 The representation of the graph as a set of [`Node`](@ref)s.
 
 [`Operation`](@ref)s can be applied on it using [`push_operation!`](@ref) and reverted using [`pop_operation!`](@ref) like a stack.
-To get the set of possible operations, use [`get_operations`](@ref).
+To get the set of possible operations, use [`operations`](@ref).
 The members of the object should not be manually accessed, instead always use the provided interface functions.
 """
 struct DAG

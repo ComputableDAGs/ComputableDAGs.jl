@@ -29,3 +29,7 @@ Manifest.toml
 .julia
 **/.ipynb_checkpoints/
 *.bkp
+
+# Ignore files created by literate:
+docs/src/examples/*.md
+docs/src/examples/*.ipynb

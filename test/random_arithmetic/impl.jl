@@ -4,6 +4,8 @@ using ComputableDAGs
 using Random
 using StatsBase
 
+using ComputableDAGs: DataTask
+
 export RandomArithmetic
 
 # generates a number of random basic arithmetic tasks, based on the given seed and number of nodes

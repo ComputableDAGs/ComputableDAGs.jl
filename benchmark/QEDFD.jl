@@ -1,11 +1,9 @@
 using ComputableDAGs
-using RuntimeGeneratedFunctions
 using Random
 using QEDFeynmanDiagrams
 using QEDprocesses
 using QEDcore
 using QEDbase
-RuntimeGeneratedFunctions.init(@__MODULE__)
 
 RNG = Xoshiro(1)
 MODEL = PerturbativeQED()
@@ -22,7 +20,7 @@ PSP = PhaseSpacePoint(PROC, MODEL, INPSL, tuple(rand(SFourMomentum, number_incom
 @show g
 
 @info "Building the function"
-@time f = get_compute_function(g, PROC, cpu_st(), @__MODULE__; closures_size = 100, concrete_input_type = typeof(PSP));
+@time f = compute_function(g, PROC, cpu_st(), @__MODULE__; closures_size = 100, concrete_input_type = typeof(PSP));
 
 #=@info "Writing llvm code"
 @time open("llvm.out", write = true) do file

@@ -1,7 +1,7 @@
 using ComputableDAGs
-using RuntimeGeneratedFunctions
-RuntimeGeneratedFunctions.init(@__MODULE__)
 using StaticArrays
+
+using ComputableDAGs: is_valid, input_expr, input_type
 
 include("strassen/impl.jl")
 using .MatrixMultiplicationImpl
@@ -42,7 +42,7 @@ EDGE_NUMBERS = (3, 96, 747, 5304) #, 37203
         @test EDGE_NUM_EXPECTED == props.number_of_edges
     end
 
-    f = get_compute_function(g, mm, cpu_st(), @__MODULE__)
+    f = compute_function(g, mm, cpu_st(), @__MODULE__)
 
     if (M_SIZE > 256)
         continue
@@ -54,14 +54,14 @@ EDGE_NUMBERS = (3, 96, 747, 5304) #, 37203
     end
 
     @testset "Execution with closures" begin
-        f_closures = get_compute_function(g, mm, cpu_st(), @__MODULE__; closures_size = 100)
+        f_closures = compute_function(g, mm, cpu_st(), @__MODULE__; closures_size = 100)
 
         @test Base.return_types(f_closures, (typeof(input),))[1] == typeof(input[1])
         @test isapprox(f_closures(input), input[1] * input[2])
     end
 
     @testset "Function generation with concrete input type" begin
-        f_closures = get_compute_function(
+        f_closures = compute_function(
             g, mm, cpu_st(), @__MODULE__; concrete_input_type = typeof(input)
         )
 
@@ -71,7 +71,7 @@ EDGE_NUMBERS = (3, 96, 747, 5304) #, 37203
 
     @testset "Execution with reduction optimization" begin
         optimize_to_fixpoint!(ReductionOptimizer(), g)
-        f_optimized = get_compute_function(g, mm, cpu_st(), @__MODULE__)
+        f_optimized = compute_function(g, mm, cpu_st(), @__MODULE__)
 
         @test isapprox(f_optimized(input), input[1] * input[2])
     end

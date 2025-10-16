@@ -17,17 +17,29 @@ There are some hard requirements for this to be possible to a specific computati
 - All data dependencies within the graph must be known in advance.
 - The overall computation must be separable into smaller parts with less than total interdependency.
 
-Some more soft requirements exist for the project to be *useful*:
+Some more soft requirements exist for parts of the project to be *useful*:
 - For optimizations to be effective, the functions should have a predictable compute effort that can be known in advance.
 - The individual tasks should not be too *small* (ideally at least a few dozen FLOPs) because the compiler is smarter at optimizing very small functions than we can be.
 - The individual tasks should not be too *large* so the graph has a large enough number of nodes to allow for a larger optimization space.
 - Tasks should [not have side-effects](https://en.wikipedia.org/wiki/Side_effect_(computer_science)) because the order and number of times a function is executed can not be relied upon.
 
+That being said, the package can still be useful even without using optimizations at all, simply as a way to schedule and distribute given work on a machine.
+
+### Comparison to Dagger.jl
+
+[Dagger.jl](https://juliaparallel.org/Dagger.jl/) is a popular way of using scheduling work distributed on a machine, with complex dependencies in the form of a DAG. This makes it similar to the goals of this package. However, Dagger.jl schedules immediately as a piece of work is given. This has some effects:
+- It *does* allow the DAG to be dynamically built, it does not have to be known in advance, like with ComputableDAGs.jl
+- It adds some overhead at execution time for scheduling the tasks. This becomes worse the more work the scheduler has to do, for example when many cores exist, and when the tasks themselves are small and finish quickly.
+- It *does not* allow for optimizations ahead of execution, for example to prevent duplicate work.
+- It *does not* allow scheduling with the entire structure of the DAG already known.
+
+Which package is better suited for a task certainly depends on the use-case.
+
 ### Overview of the Project Structure
 
 ![Parts of the Project](structure.png)
 
-The project consists of several parts that are designed to be mostly orthogonal interfaces, extendable with new implementations without having to change other parts of the code. For example implementations, refer to the [manual](manual.md), the tests, or other projects in the [ComputableDAGs project](https://github.com/ComputableDAGs).
+The project consists of several parts that are designed to be mostly orthogonal interfaces, extendable with new implementations without having to change other parts of the code. For instructions on how to use the package and example implementations, refer to the [manual](manual.md), the [examples](examples/fibonacci.md), or the tests.
 
 The [*Graph*](lib/internals/graph.md) is the central part. It consists of [*Nodes*](lib/internals/node.md) and *Edges*. Nodes represent a [*Task*](lib/internals/task.md), which is either a computation or a data transfer. Edges purely represent the dependencies between the nodes.
 
