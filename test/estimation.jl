@@ -25,7 +25,7 @@ using .MatrixMultiplicationImpl
     end
 
     @testset "Estimating" begin
-        using ComputableDAGs: DataTask, DataTaskNode
+        using ComputableDAGs: DataTask, DataTaskNode, cost_type, graph_cost
 
         estimator = GlobalMetricEstimator()
 
@@ -43,9 +43,9 @@ using .MatrixMultiplicationImpl
         @test c == CDCost(176128.0, 4496.0)
         @test isapprox(compute_intensity(c), 0.02552688953488372)
 
-        operations = get_operations(g)
-        @test length(operations).node_reductions == 0
-        @test length(operations).node_splits == 15
+        ops = operations(g)
+        @test length(ops).node_reductions == 0
+        @test length(ops).node_splits == 15
 
         # TODO: add real operation effect tests
     end

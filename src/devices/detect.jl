@@ -13,10 +13,10 @@ function get_machine_info(; verbose::Bool = Base.is_interactive)
         end
     end
 
-    noDevices = length(devices)
-    @assert noDevices > 0 "No devices were found, but at least one NUMA node should always be available!"
+    no_devices = length(devices)
+    @assert no_devices > 0 "No devices were found, but at least one NUMA node should always be available!"
 
-    transferRates = Matrix{Float64}(undef, noDevices, noDevices)
-    fill!(transferRates, -1)
-    return Machine(devices, transferRates)
+    transfer_rates = Matrix{Float64}(undef, no_devices, no_devices)
+    fill!(transfer_rates, -1)
+    return Machine(devices, transfer_rates)
 end

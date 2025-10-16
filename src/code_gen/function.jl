@@ -1,5 +1,5 @@
 """
-    get_compute_function(
+    compute_function(
         dag::DAG,
         instance,
         machine::Machine,
@@ -19,7 +19,7 @@ The final argument `context_module` should always be `@__MODULE__` to be able to
     omitted, the `input_type` of the problem instance is used. Note that the `input_type` of the instance will still be used as the annotated
     type in the generated function header.
 """
-function get_compute_function(
+function compute_function(
         dag::DAG,
         instance,
         machine::Machine,

@@ -13,19 +13,19 @@ RNG = Xoshiro(1)
         instance = RandomArithmetic(0, N)
         dag = graph(instance)
 
-        compute_function = get_compute_function(dag, instance, cpu_st(), @__MODULE__)
+        f = compute_function(dag, instance, cpu_st(), @__MODULE__)
 
         if (typeof(optimizer) <: RandomWalkOptimizer)
             optimize!(optimizer, dag, 100)
         elseif (typeof(optimizer) <: ReductionOptimizer)
             optimize_to_fixpoint!(optimizer, dag)
         end
-        reduced_compute_function = get_compute_function(
+        reduced_f = compute_function(
             dag, instance, cpu_st(), @__MODULE__
         )
 
         input = [rand(RNG, Float64, 3 * N) for _ in 1:100]
 
-        @test isapprox(compute_function.(input), reduced_compute_function.(input))
+        @test isapprox(f.(input), reduced_f.(input))
     end
 end

@@ -59,7 +59,7 @@ A simple example call for a CUDA kernel might look like the following:
 ```
 
 !!! note
-    Unlike the standard [`get_compute_function`](@ref) to generate a callable function which returns a `RuntimeGeneratedFunction`, this returns an `Expr` that needs to be `eval`'d. This is a current limitation of `RuntimeGeneratedFunctions.jl` which currently cannot wrap GPU kernels. This might change in the future.
+    Unlike the standard [`compute_function`](@ref) to generate a callable function which returns a `RuntimeGeneratedFunction`, this returns an `Expr` that needs to be `eval`'d. This is a current limitation of `RuntimeGeneratedFunctions.jl` which currently cannot wrap GPU kernels. This might change in the future.
 
 ### Size limitation
 

@@ -11,8 +11,8 @@ end
 
 function optimize_step!(optimizer::GreedyOptimizer, graph::DAG)
     # generate all options
-    operations = get_operations(graph)
-    if isempty(operations)
+    ops = operations(graph)
+    if isempty(ops)
         return false
     end
 
@@ -27,7 +27,7 @@ function optimize_step!(optimizer::GreedyOptimizer, graph::DAG)
             end
             return acc
         end,
-        operations;
+        ops;
         init = typemax(cost_type(optimizer.estimator)),
     )
 
@@ -42,8 +42,8 @@ end
 
 function fixpoint_reached(optimizer::GreedyOptimizer, graph::DAG)
     # generate all options
-    operations = get_operations(graph)
-    if isempty(operations)
+    ops = operations(graph)
+    if isempty(ops)
         return true
     end
 
@@ -55,7 +55,7 @@ function fixpoint_reached(optimizer::GreedyOptimizer, graph::DAG)
             end
             return acc
         end,
-        operations;
+        ops;
         init = typemax(cost_type(optimizer.estimator)),
     )
 
