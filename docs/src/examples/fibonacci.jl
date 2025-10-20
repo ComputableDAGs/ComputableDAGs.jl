@@ -16,7 +16,7 @@ end
 
 # ### Task definitions
 
-# For Fibonacci, we only need one type of task: An addition of two numbers to yield the next number. Compute tasks can be defined using the [`@compute_task`](@ref) macro. We provide the name, the compute effort, and the function to call.
+# For Fibonacci, we only need one type of compute task: An addition of two numbers to yield the next number. Compute tasks can be defined using the [`@compute_task`](@ref) macro. We provide the name, the compute effort, and the function to call.
 
 @compute_task Add 1 (+)
 
