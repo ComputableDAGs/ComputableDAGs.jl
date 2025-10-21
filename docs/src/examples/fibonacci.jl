@@ -62,6 +62,13 @@ end
 # [`@add_entry`](@ref) takes two arguments: a node name, which is later passed to the [`input_expr`](@ref) implementation we defined above, and the expected data size of the output. This doesn't have to be in bytes, but it should be proportional across all data sizes in the DAG.
 # [`@add_call`](@ref) takes the compute task that the compute node should execute. In our case, this is the `Add` task defined earlier. Note that this has to be an instance of the task object, not just the type name. The second argument is the expected output data size, as with the entry nodes. Finally, a list of all the input nodes to the compute task follows.
 
+# The actual logic follows that of the Fibonacci sequence:
+# ```math
+# a_i = a_{i-1} + a_{i-2}
+# ```
+
+# To achieve this, in each iteration of the for-loop, `n3` is created as a new node representing the addition of `n1` and `n2`. Then, the variables are swapped such that `n1` represents the next $a_{i-2}$ and `n2` is the next $a_{i-1}$.
+
 # ### Trying it out
 
 # This is all we have to do to define the problem. Now we can use ComputableDAGs.jl to generate a callable function from this definition:
@@ -81,3 +88,7 @@ f10 = get_compute_function(dag, fib, cpu_st(), @__MODULE__);
 using Test
 @test f10((0, 1)) == 34
 @test f10((5, 10)) == 445
+
+#md # ## Jupyter notebook
+
+#md # You can download this file as a jupyter notebook [here](fibonacci.ipynb).
