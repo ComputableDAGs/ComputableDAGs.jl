@@ -24,7 +24,7 @@ end
 
 # For this model, we will need two different input nodes, `fib(0)` and `fib(1)`, to base the rest of the DAG on. Input nodes are distinguished by name.
 
-# To extract the correct numbers from the CDAG input, we have to provide an expression that does so by implementing [`input_expr`](@ref), given the entry node's name. We'll use `"fib(0)"` and `"fib(1)"` as names.
+# To extract the correct numbers from the CDAG input, we have to provide an expression that does so by implementing [`ComputableDAGs.input_expr`](@ref), given the entry node's name. We'll use `"fib(0)"` and `"fib(1)"` as names.
 
 function ComputableDAGs.input_expr(::Fibonacci, name::String, input_symbol::Symbol)
     return if (name == "fib(0)")
@@ -42,7 +42,7 @@ ComputableDAGs.input_type(::Fibonacci) = Tuple{Int, Int}
 
 # ### Building the DAG
 
-# To be able to compute a DAG we first have to build it. This is done by implementing [`graph`](@ref) for our problem instance and returning a DAG. We can use several macros to make this simple: [`@assemble_dag`](@ref), [`@add_call`](@ref), [`@add_entry`](@ref).
+# To be able to compute a DAG we first have to build it. This is done by implementing [`ComputableDAGs.graph`](@ref) for our problem instance and returning a DAG. We can use several macros to make this simple: [`@assemble_dag`](@ref), [`@add_call`](@ref), [`@add_entry`](@ref).
 
 function ComputableDAGs.graph(fib::Fibonacci)
     @assert fib.n >= 2
@@ -59,7 +59,7 @@ function ComputableDAGs.graph(fib::Fibonacci)
 end
 
 # In short, `@assemble_dag begin ... end` creates a scope in which [`@add_entry`](@ref) can add entry nodes and [`@add_call`](@ref) can add compute nodes. The whole expression then returns the DAG created in the scope.
-# [`@add_entry`](@ref) takes two arguments: a node name, which is later passed to the [`input_expr`](@ref) implementation we defined above, and the expected data size of the output. This doesn't have to be in bytes, but it should be proportional across all data sizes in the DAG.
+# [`@add_entry`](@ref) takes two arguments: a node name, which is later passed to the [`input_expr`](@ref ComputableDAGs.input_expr) implementation we defined above, and the expected data size of the output. This doesn't have to be in bytes, but it should be proportional across all data sizes in the DAG.
 # [`@add_call`](@ref) takes the compute task that the compute node should execute. In our case, this is the `Add` task defined earlier. Note that this has to be an instance of the task object, not just the type name. The second argument is the expected output data size, as with the entry nodes. Finally, a list of all the input nodes to the compute task follows.
 
 # The actual logic follows that of the Fibonacci sequence:
@@ -75,7 +75,7 @@ end
 
 fib = Fibonacci(10)
 dag = graph(fib)
-f10 = get_compute_function(dag, fib, cpu_st(), @__MODULE__);
+f10 = compute_function(dag, fib, cpu_st(), @__MODULE__);
 
 # This function is now callable immediately:
 
