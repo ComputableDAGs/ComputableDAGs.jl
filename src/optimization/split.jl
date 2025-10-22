@@ -9,19 +9,19 @@ struct SplitOptimizer <: AbstractOptimizer end
 
 function optimize_step!(optimizer::SplitOptimizer, graph::DAG)
     # generate all options
-    operations = get_operations(graph)
+    ops = operations(graph)
     if fixpoint_reached(optimizer, graph)
         return false
     end
 
-    push_operation!(graph, first(operations.node_splits))
+    push_operation!(graph, first(ops.node_splits))
 
     return true
 end
 
 function fixpoint_reached(optimizer::SplitOptimizer, graph::DAG)
-    operations = get_operations(graph)
-    return isempty(operations.node_splits)
+    ops = operations(graph)
+    return isempty(ops.node_splits)
 end
 
 function optimize_to_fixpoint!(optimizer::SplitOptimizer, graph::DAG)

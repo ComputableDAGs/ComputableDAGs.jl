@@ -9,50 +9,36 @@ using RuntimeGeneratedFunctions
 RuntimeGeneratedFunctions.init(@__MODULE__)
 
 # graph types
-export DAG, Node, Edge
-export ComputeTaskNode, DataTaskNode
-export AbstractTask, AbstractComputeTask, AbstractDataTask
-export DataTask
-export PossibleOperations
+export DAG, Node, Edge, DataTaskNode
 export GraphProperties
 
 # graph functions
-export make_node, make_edge
 export insert_node!, insert_edge!
 export is_entry_node, is_exit_node
-export parents, children, partners, siblings
-export compute, data, compute_effort, task
+export compute, data, compute_effort
 export get_properties, get_exit_node
-export operation_stack_length
-export is_valid, is_scheduled
 
 # graph operation related
-export Operation, AppliedOperation
-export NodeReduction, NodeSplit
-export push_operation!, pop_operation!, can_pop
 export reset_graph!
-export get_operations
+export operations
 
 # code generation related
-export get_compute_function
+export compute_function
 
 # estimator
-export cost_type, graph_cost, operation_effect
-export GlobalMetricEstimator, CDCost
+export GlobalMetricEstimator
 export compute_intensity
 
 # optimization
-export AbstractOptimizer, GreedyOptimizer, RandomWalkOptimizer
+export GreedyOptimizer, RandomWalkOptimizer
 export ReductionOptimizer, SplitOptimizer
 export optimize_step!, optimize!
 export fixpoint_reached, optimize_to_fixpoint!
 
 # models
-export graph, input_type, input_expr
+export graph
 
 # machine info
-export Machine
-export NumaNode
 export get_machine_info, cpu_st
 
 # GPU Extensions
