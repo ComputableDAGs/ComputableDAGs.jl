@@ -75,12 +75,6 @@ end
 
 fib = Fibonacci(10)
 dag = graph(fib)
-
-# Because ComputableDAGs.jl is using RuntimeGeneratedFunctions to avoid world age problems, we need to explicitly use and initialize this package before we can generate and call functions:
-
-using RuntimeGeneratedFunctions
-RuntimeGeneratedFunctions.init(@__MODULE__)
-
 f10 = get_compute_function(dag, fib, cpu_st(), @__MODULE__);
 
 # This function is now callable immediately:

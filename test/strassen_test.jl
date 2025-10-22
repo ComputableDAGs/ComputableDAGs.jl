@@ -1,6 +1,4 @@
 using ComputableDAGs
-using RuntimeGeneratedFunctions
-RuntimeGeneratedFunctions.init(@__MODULE__)
 using StaticArrays
 
 include("strassen/impl.jl")
