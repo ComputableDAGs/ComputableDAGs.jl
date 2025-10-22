@@ -1,11 +1,11 @@
 function ComputableDAGs.kernel(
-        ::Type{ROCmGPU}, graph::DAG, instance, context_module::Module
+        ::Type{oneAPIGPU}, graph::DAG, instance, context_module::Module
     )
     machine = cpu_st()
     tape = ComputableDAGs.gen_tape(graph, instance, machine, context_module)
 
     assign_inputs = Expr(:block, ComputableDAGs.expr_from_fc.(tape.input_assign_code)...)
-    # TODO use gen_function_body here
+    # TODO: use gen_function_body here
     code = Expr(:block, ComputableDAGs.expr_from_fc.(tape.schedule)...)
 
     function_id = ComputableDAGs.to_var_name(UUIDs.uuid1(TaskLocalRNG()))

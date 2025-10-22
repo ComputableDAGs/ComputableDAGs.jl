@@ -16,32 +16,24 @@ function expr_from_fc(fc::FunctionCall{VAL_T, Expr}) where {VAL_T}
         :block,
         gen_local_init(fc),
         fc.func,    # anonymous function code block
-        Expr(       # return the symbols
-            :return,
-            (
-                if length(fc.return_symbols[1]) == 1
-                    fc.return_symbols[1][1]
-                else
-                    Expr(:tuple, fc.return_symbols[1]...)
-                end
-            ),
+        (   # implicit return (to make KA.jl happy...)
+            if length(fc.return_symbols[1]) == 1
+                fc.return_symbols[1][1]
+            else
+                Expr(:tuple, fc.return_symbols[1]...)
+            end
         ),
     )
 
     func_call = Expr(
         :call,                      # call
-        #wrap_in_let_statement(  # wrap in let statement to prevent boxing of local variables
         Expr(
             :->,                    # anonymous function
             Expr(
                 :tuple,             # anonymous function arguments
-                #fc.arguments[1]...,
             ),
             fc_expr,            # anonymous function code block
         ),
-        #fc.arguments[1],
-        #),
-        #fc.arguments[1]...,         # runtime arguments passed to the anonymous function call
     )
 
     access_expr = gen_access_expr(fc)
@@ -57,7 +49,7 @@ end
         context_module::Module
     )
 
-Return a `Vector{Expr}` doing the input assignments from the given `problem_input` onto the `input_symbols`.
+Return a `Vector{FunctionCall}` doing the input assignments from the given `problem_input` onto the `input_symbols`.
 """
 function gen_input_assignment_code(
         input_symbols::Dict{String, Vector{Symbol}}, instance, machine::Machine

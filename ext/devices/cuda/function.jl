@@ -16,7 +16,6 @@ function ComputableDAGs.kernel(
             $(assign_inputs)
             $code
             @inline output_vector[id] = $(tape.output_symbol)
-            return nothing
         end"
     )
 
