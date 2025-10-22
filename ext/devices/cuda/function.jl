@@ -10,11 +10,8 @@ function ComputableDAGs.kernel(
 
     function_id = ComputableDAGs.to_var_name(UUIDs.uuid1(TaskLocalRNG()))
     expr = Meta.parse(
-        "function compute_$(function_id)(input_vector, output_vector, n::Int64)
-            id = (blockIdx().x - 1) * blockDim().x + threadIdx().x
-            if (id > n)
-                return
-            end
+        "@kernel function compute_$(function_id)(input_vector, output_vector)
+            id = @index(Global)
             @inline input = input_vector[id]
             $(assign_inputs)
             $code
