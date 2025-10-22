@@ -128,7 +128,7 @@ macro compute_task(comp_task, compute_effort, compute_function)
     return quote
         struct $(comp_task) <: AbstractComputeTask end
         ComputableDAGs.compute_effort(::$(esc(name))) = $(esc(compute_effort))
-        @noinline ComputableDAGs.compute(::$(esc(name)), varargs...) = ($(esc(compute_function)))(varargs...)
+        ComputableDAGs.compute(::$(esc(name)), varargs...) = ($(esc(compute_function)))(varargs...)
         $(esc(name))
     end
 end

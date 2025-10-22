@@ -47,19 +47,19 @@ Interface function that must be implemented for every subtype of [`AbstractDevic
 function measure_device! end
 
 """
-    kernel(gpu_type::Type{<:AbstractGPU}, graph::DAG, instance)
+    kernel(graph::DAG, instance, context_module::Module)
 
-For a GPU type, a [`DAG`](@ref), and a problem instance, return an `Expr` containing a function of signature `compute_<id>(input::<GPU>Vector, output::<GPU>Vector, n::Int64)`, which will return the result of the DAG computation of the input on the given output vector, intended for computation on GPUs. Currently, `CUDAGPU` and `ROCmGPU` are available if their respective package extensions are loaded.
+For a [`DAG`](@ref), and a problem instance, return an `Expr` containing a KernelAbstractions function of signature `compute_<id>(input::<GPU>Vector, output::<GPU>Vector; ndranges::Int64)`, which will return the result of the DAG computation of the input on the given output vector on each index (like a broadcast). This function is available as an extension when KernelAbstractions is loaded.
 
-The generated kernel function accepts its thread ID in only the x-dimension, and only as thread ID, not as block ID. The input and output should therefore be 1-dimensional vectors. For detailed information on GPU programming and the Julia packages, please refer to their respective documentations.
-
-A simple example call for a CUDA kernel might look like the following:
+A simple example call for a kernel generated from this might look like the following:
 ```Julia
-@cuda threads = (32,) always_inline = true cuda_kernel!(cu_inputs, outputs, length(cu_inputs))
+cuda_kernel(get_backend(inputs), 256)(inputs, outputs; ndrange=length(inputs))
 ```
 
+The internal index used is `@index(Global)` as provided by KernelAbstractions. For more details, please refer to the documentation of KernelAbstractions.jl.
+
 !!! note
-    Unlike the standard [`compute_function`](@ref) to generate a callable function which returns a `RuntimeGeneratedFunction`, this returns an `Expr` that needs to be `eval`'d. This is a current limitation of `RuntimeGeneratedFunctions.jl` which currently cannot wrap GPU kernels. This might change in the future.
+    Unlike the standard [`compute_function`](@ref) to generate a callable function which returns a `RuntimeGeneratedFunction`, this returns an `Expr` that needs to be `eval`'d. This is a current limitation of `RuntimeGeneratedFunctions.jl` which cannot wrap GPU kernels. This might change in the future. This also means that world age problems can appear when the world age does not increase between the `eval` and a call to the function.
 
 ### Size limitation
 
@@ -70,7 +70,7 @@ The generated kernel does not use any internal parallelization, i.e., the DAG is
 A GPU function has more restrictions on what can be computed than general functions running on the CPU. In Julia, there are mainly two important restrictions to consider:
 
 1. Used data types must be stack allocatable, i.e., `isbits(x)` must be `true` for arguments and local variables used in `ComputeTasks`.
-2. Function calls must not be dynamic. This means that type stability is required and the compiler must know in advance which method of a generic function to call. What this specifically entails may change with time and also differs between the different target GPU libraries. From experience, using the `always_inline = true` argument for `@cuda` calls can help with this.
+2. Function calls must not be dynamic. This means that type stability is required and the compiler must know in advance which method of a generic function to call. What this specifically entails may change with time and also differs between the different target GPU libraries. From experience, inlining as much as possible can help with this.
 
 !!! warning
     This feature is currently experimental. There are still some unresolved issues with the generated kernels.

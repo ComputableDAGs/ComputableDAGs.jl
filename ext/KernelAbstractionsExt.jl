@@ -1,6 +1,10 @@
-function ComputableDAGs.kernel(
-        ::Type{CUDAGPU}, graph::DAG, instance, context_module::Module
-    )
+module KernelAbstractionsExt
+
+using ComputableDAGs
+using UUIDs
+using Random
+
+function ComputableDAGs.kernel(graph::DAG, instance, context_module::Module)
     machine = cpu_st()
     tape = ComputableDAGs.gen_tape(graph, instance, machine, context_module)
 
@@ -10,18 +14,16 @@ function ComputableDAGs.kernel(
 
     function_id = ComputableDAGs.to_var_name(UUIDs.uuid1(TaskLocalRNG()))
     expr = Meta.parse(
-        "function compute_$(function_id)(input_vector, output_vector, n::Int64)
-            id = (blockIdx().x - 1) * blockDim().x + threadIdx().x
-            if (id > n)
-                return
-            end
+        "@kernel function compute_$(function_id)(input_vector, output_vector)
+            id = @index(Global)
             @inline input = input_vector[id]
             $(assign_inputs)
             $code
             @inline output_vector[id] = $(tape.output_symbol)
-            return nothing
         end"
     )
 
     return expr
+end
+
 end
