@@ -126,7 +126,7 @@ macro compute_task(comp_task, compute_effort, compute_function)
         error("failed parsing compute task $comp_task")
     end
     return quote
-        struct $(comp_task) <: AbstractComputeTask end
+        struct $(comp_task) <: ComputableDAGs.AbstractComputeTask end
         ComputableDAGs.compute_effort(::$(esc(name))) = $(esc(compute_effort))
         ComputableDAGs.compute(::$(esc(name)), varargs...) = ($(esc(compute_function)))(varargs...)
         $(esc(name))
@@ -142,7 +142,7 @@ macro compute_task(comp_task, compute_effort)
         error("failed parsing compute task $comp_task")
     end
     return quote
-        struct $(comp_task) <: AbstractComputeTask end
+        struct $(comp_task) <: ComputableDAGs.AbstractComputeTask end
         ComputableDAGs.compute_effort(::$(esc(name))) = $(esc(compute_effort))
         $(esc(name))
     end

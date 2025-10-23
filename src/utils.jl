@@ -1,18 +1,4 @@
 """
-    INITIALIZED_MODULES
-
-Vector of modules to keep track which have been initialized with RuntimeGeneratedFunctions.jl.
-"""
-INITIALIZED_MODULES = Module[]
-
-"""
-    noop()
-
-Function with no arguments, returns nothing, does nothing. Useful for noop [`FunctionCall`](@ref)s.
-"""
-@inline noop() = nothing
-
-"""
     bytes_to_human_readable(bytes)
 
 Return a human readable string representation of the given number.
@@ -65,8 +51,4 @@ Return the given vector as single String without quotation marks or brackets.
 """
 function unroll_symbol_vector(vec::VEC) where {VEC <: Union{AbstractVector, Tuple}}
     return Expr(:tuple, vec...)
-end
-
-@inline function _call(f, args::Vararg)
-    return f(args...)
 end

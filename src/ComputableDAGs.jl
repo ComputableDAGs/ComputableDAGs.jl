@@ -121,5 +121,6 @@ include("code_gen/function.jl")
 
 include("usability/globals.jl")
 include("usability/macros.jl")
+include("usability/init.jl")
 
 end # module ComputableDAGs

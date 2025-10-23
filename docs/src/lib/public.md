@@ -24,6 +24,12 @@ Pages   = ["ComputableDAGs.jl"]
 Order   = [:module]
 ```
 
+```@autodocs
+Modules = [ComputableDAGs]
+Pages   = ["usability/init.jl"]
+Order   = [:function]
+```
+
 ## Macros
 ```@autodocs
 Modules = [ComputableDAGs]
