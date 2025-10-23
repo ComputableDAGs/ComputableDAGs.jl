@@ -2,11 +2,14 @@
 
 # In this example, we want to calculate the n-th Fibonacci number using a DAG representation. The input is a tuple of two numbers, the definition of `fib(0)` and `fib(1)`, to make it not just a constant Fibonacci evaluation.
 
+# First, ComputableDAGs needs to be loaded and initialized. This is because of RuntimeGeneratedFunctions, and needs to be done once at the top-level of your project.
+
+using ComputableDAGs
+ComputableDAGs.init(@__MODULE__)
+
 # ### Model Definition
 
 # To define a model for your problem type, simply define a new struct. No specific type inheritance is necessary. An object of this will later represent a specific problem instance.
-
-using ComputableDAGs
 
 struct Fibonacci
     n::Int
