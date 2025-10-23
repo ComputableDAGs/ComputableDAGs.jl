@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - dev
     tags: "*"
   pull_request:
 
@@ -15,13 +16,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: julia-actions/setup-julia@v1
+      - uses: julia-actions/setup-julia@v2
         with:
-          version: "1.10"
+          version: '1.10'
+      - name: Add Julia cache
+        uses: julia-actions/cache@v2
       - name: Install dependencies
         run: |
           julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+
       - name: Build and deploy
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # If authenticating with GitHub Actions token
-        run: julia --project=docs/ docs/make.jl
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: julia --code-coverage=@src --project=docs/ docs/make.jl
+
+      - name: Process code coverage
+        uses: julia-actions/julia-processcoverage@v1
+
+      - name: Upload code coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./lcov.inf
+          flags: unittests
+          token: ${{ secrets.CODECOV_TOKEN }}
