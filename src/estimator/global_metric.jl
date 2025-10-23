@@ -39,10 +39,10 @@ function cost_type(::GlobalMetricEstimator)
 end
 
 function graph_cost(::GlobalMetricEstimator, dag::DAG)
-    properties = get_properties(dag)
+    p = properties(dag)
     return CDCost(
-        properties.data,
-        properties.compute_effort
+        p.data,
+        p.compute_effort
     )
 end
 

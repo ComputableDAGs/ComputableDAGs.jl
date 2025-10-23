@@ -239,7 +239,7 @@ function gen_tape(
 
     # get input symbols
     input_syms = Dict{String, Vector{Symbol}}()
-    for node in get_entry_nodes(dag)
+    for node in entry_nodes(dag)
         if !haskey(input_syms, node.name)
             input_syms[node.name] = Vector{Symbol}()
         end
@@ -248,7 +248,7 @@ function gen_tape(
     end
 
     # get out_symbol
-    out_sym = Symbol(to_var_name(get_exit_node(dag).id))
+    out_sym = Symbol(to_var_name(exit_node(dag).id))
 
     assign_inputs = gen_input_assignment_code(input_syms, instance, machine)
 

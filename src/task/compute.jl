@@ -1,12 +1,12 @@
 using StaticArrays
 
 """
-    get_function_call(n::Node)
-    get_function_call(t::AbstractTask, device::AbstractDevice, in_symbols::NTuple{}, out_symbol::Symbol)
+    function_call(n::Node)
+    function_call(t::AbstractTask, device::AbstractDevice, in_symbols::NTuple{}, out_symbol::Symbol)
 
 For a node or a task together with necessary information, a [`FunctionCall`](@ref)s for the computation of the node or task.
 """
-function get_function_call(
+function function_call(
         t::AbstractComputeTask,
         device::AbstractDevice,
         in_symbols::NTuple{N, Symbol},
@@ -15,11 +15,11 @@ function get_function_call(
     return FunctionCall(compute, (t,), [in_symbols...], [out_symbol], Type[Any], device)
 end
 
-function get_function_call(node::ComputeTaskNode, device::AbstractDevice)
+function function_call(node::ComputeTaskNode, device::AbstractDevice)
     # make sure the node is sorted so the arguments keep their order
     sort_node!(node)
 
-    return get_function_call(
+    return function_call(
         node.task,
         device,
         (Symbol.(to_var_name.(getindex.(node.children, 1)))...,),
@@ -27,8 +27,8 @@ function get_function_call(node::ComputeTaskNode, device::AbstractDevice)
     )
 end
 
-function get_function_call(node::DataTaskNode, device::AbstractDevice)
-    @assert length(node.children) == 1 "trying to call get_function_call on a data task node that has $(length(node.children)) children instead of 1\nchildren: $(node.children)"
+function function_call(node::DataTaskNode, device::AbstractDevice)
+    @assert length(node.children) == 1 "trying to call function_call on a data task node that has $(length(node.children)) children instead of 1\nchildren: $(node.children)"
 
     # TODO: dispatch to device implementations generating the copy commands
     return FunctionCall(
@@ -41,8 +41,8 @@ function get_function_call(node::DataTaskNode, device::AbstractDevice)
     )
 end
 
-function get_init_function_call(node::DataTaskNode, device::AbstractDevice)
-    @assert isempty(node.children) "trying to call get_init_function_call on a data task node that is not an entry node."
+function init_function_call(node::DataTaskNode, device::AbstractDevice)
+    @assert isempty(node.children) "trying to call init_function_call on a data task node that is not an entry node."
 
     return FunctionCall(
         identity,

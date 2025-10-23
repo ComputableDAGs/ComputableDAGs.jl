@@ -75,9 +75,9 @@ function lower(schedule::Vector{Tuple{Node, AbstractDevice}}, machine::Machine)
 
     for (node, device) in schedule
         if (node isa DataTaskNode && length(node.children) == 0)
-            push!(calls, get_init_function_call(node, entry_device(machine)))
+            push!(calls, init_function_call(node, entry_device(machine)))
         else
-            push!(calls, get_function_call(node, device))
+            push!(calls, function_call(node, device))
         end
     end
 

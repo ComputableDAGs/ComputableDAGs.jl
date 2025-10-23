@@ -216,13 +216,13 @@ function _remove_edge!(
 end
 
 """
-    get_snapshot_diff(dag::DAG)
+    snapshot_diff(dag::DAG)
 
 Return the graph's [`Diff`](@ref) since last time this function was called. Then, clear the current diff.
 
 See also: [`revert_diff!`](@ref), [`AppliedOperation`](@ref) and [`revert_operation!`](@ref)
 """
-function get_snapshot_diff(dag::DAG)
+function snapshot_diff(dag::DAG)
     t = deepcopy(dag.diff)
     empty!(dag.diff)
     return t

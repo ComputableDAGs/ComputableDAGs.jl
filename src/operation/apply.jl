@@ -119,7 +119,7 @@ function node_reduction!(dag::DAG, nodes::Vector{NodeType}) where {NodeType <: N
     @assert is_valid_node_reduction_input(dag, nodes)
 
     # clear snapshot
-    get_snapshot_diff(dag)
+    snapshot_diff(dag)
 
     n1 = nodes[1]
     n1_children = children(dag, n1)
@@ -159,7 +159,7 @@ function node_reduction!(dag::DAG, nodes::Vector{NodeType}) where {NodeType <: N
         end
     end
 
-    return get_snapshot_diff(dag)
+    return snapshot_diff(dag)
 end
 
 """
@@ -175,7 +175,7 @@ function node_split!(
     @assert is_valid_node_split_input(dag, n1)
 
     # clear snapshot
-    get_snapshot_diff(dag)
+    snapshot_diff(dag)
 
     n1_parents = parents(dag, n1)
     local parent_indices = Dict()
@@ -202,5 +202,5 @@ function node_split!(
         end
     end
 
-    return get_snapshot_diff(dag)
+    return snapshot_diff(dag)
 end

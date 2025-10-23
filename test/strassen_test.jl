@@ -34,10 +34,10 @@ EDGE_NUMBERS = (3, 96, 747, 5304) #, 37203
     @testset "DAG properties" begin
         @test is_valid(g)
 
-        @test length(ComputableDAGs.get_entry_nodes(g)) == 2
-        @test get_exit_node(g) isa DataTaskNode
+        @test length(ComputableDAGs.entry_nodes(g)) == 2
+        @test exit_node(g) isa DataTaskNode
 
-        props = get_properties(g)
+        props = properties(g)
         @test NODE_NUM_EXPECTED == props.number_of_nodes
         @test EDGE_NUM_EXPECTED == props.number_of_edges
     end

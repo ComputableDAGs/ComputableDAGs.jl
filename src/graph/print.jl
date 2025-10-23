@@ -59,7 +59,7 @@ function Base.show(io::IO, dag::DAG)
     end
     println(io)
     println(io, "  Edges: ", number_of_edges)
-    properties = get_properties(dag)
+    properties = properties(dag)
     println(io, "  Total Compute Effort: ", properties.compute_effort)
     println(io, "  Total Data Transfer: ", properties.data)
     return println(io, "  Total Compute Intensity: ", properties.compute_intensity)
