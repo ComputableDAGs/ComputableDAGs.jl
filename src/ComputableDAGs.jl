@@ -16,7 +16,7 @@ export GraphProperties
 export insert_node!, insert_edge!
 export is_entry_node, is_exit_node
 export compute, data, compute_effort
-export get_properties, get_exit_node
+export properties, exit_node
 
 # graph operation related
 export reset_graph!
@@ -39,7 +39,7 @@ export fixpoint_reached, optimize_to_fixpoint!
 export graph
 
 # machine info
-export get_machine_info, cpu_st
+export machine_info, cpu_st
 
 # GPU Extensions
 export kernel, CUDAGPU, ROCmGPU, oneAPIGPU

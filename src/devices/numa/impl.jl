@@ -22,11 +22,11 @@ function measure_device!(device::NumaNode; verbose::Bool)
 end
 
 """
-    get_devices(deviceType::Type{T}; verbose::Bool) where {T <: NumaNode}
+    devices(deviceType::Type{T}; verbose::Bool) where {T <: NumaNode}
 
 Return a Vector of [`NumaNode`](@ref)s available on the current machine. If `verbose` is true, print some additional information.
 """
-function get_devices(deviceType::Type{T}; verbose::Bool = false) where {T <: NumaNode}
+function devices(deviceType::Type{T}; verbose::Bool = false) where {T <: NumaNode}
     devices = Vector{AbstractDevice}()
     no_numa_nodes = highest_numa_node()
 

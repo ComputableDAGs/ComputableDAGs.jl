@@ -28,16 +28,16 @@ end
 
 Global vector of available and implemented device types. Each implementation of a [`AbstractDevice`](@ref) should add its concrete type to this vector.
 
-See also: [`device_types`](@ref), [`get_devices`](@ref)
+See also: [`device_types`](@ref), [`devices`](@ref)
 """
 DEVICE_TYPES = Vector{Type}()
 
 """
-    get_devices(t::Type{T}; verbose::Bool) where {T <: AbstractDevice}
+    devices(t::Type{T}; verbose::Bool) where {T <: AbstractDevice}
 
 Interface function that must be implemented for every subtype of [`AbstractDevice`](@ref). Returns a `Vector{Type}` of the devices for the given [`AbstractDevice`](@ref) Type available on the current machine.
 """
-function get_devices end
+function devices end
 
 """
     measure_device!(device::AbstractDevice; verbose::Bool)

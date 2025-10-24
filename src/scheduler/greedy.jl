@@ -11,7 +11,7 @@ function schedule_dag(::GreedyScheduler, dag::DAG, machine::Machine)
     # the stack makes sure that closely related nodes will be scheduled one after another
 
     # use a priority equal to the number of unseen children -> 0 are nodes that can be added
-    for node in get_entry_nodes(dag)
+    for node in entry_nodes(dag)
         push!(node_stack, node)
     end
 

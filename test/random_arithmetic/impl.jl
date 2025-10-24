@@ -32,7 +32,7 @@ const EPS = 1.0e-6
 @compute_task FMA 1 fma
 
 function _add_node(g::DAG, rng, c)
-    input_nodes = ComputableDAGs.get_entry_nodes(g)
+    input_nodes = ComputableDAGs.entry_nodes(g)
 
     n = rand(rng, 1:9)
 

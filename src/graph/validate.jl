@@ -5,7 +5,7 @@ Return whether the given graph is connected.
 """
 function is_connected(dag::DAG)
     node_queue = Deque{UUID}()
-    push!(node_queue, get_exit_node(dag).id)
+    push!(node_queue, exit_node(dag).id)
     seen_nodes = Set{UUID}()
 
     while !isempty(node_queue)

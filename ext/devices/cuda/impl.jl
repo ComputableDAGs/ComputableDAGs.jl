@@ -6,11 +6,11 @@ function ComputableDAGs.measure_device!(device::CUDAGPU; verbose::Bool)
 end
 
 """
-    get_devices(::Type{CUDAGPU}; verbose::Bool)
+    devices(::Type{CUDAGPU}; verbose::Bool)
 
 Return a Vector of [`CUDAGPU`](@ref)s available on the current machine. If `verbose` is true, print some additional information.
 """
-function ComputableDAGs.get_devices(::Type{CUDAGPU}; verbose::Bool = false)
+function ComputableDAGs.devices(::Type{CUDAGPU}; verbose::Bool = false)
     devices = Vector{ComputableDAGs.AbstractDevice}()
 
     if !CUDA.functional()
