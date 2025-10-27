@@ -14,7 +14,7 @@ function ComputableDAGs.kernel(graph::DAG, instance, context_module::Module)
 
     function_id = ComputableDAGs.to_var_name(UUIDs.uuid1(TaskLocalRNG()))
     expr = Meta.parse(
-        "@kernel function compute_$(function_id)(input_vector, output_vector)
+        "@kernel inbounds = true function compute_$(function_id)(@Const(input_vector), output_vector)
             id = @index(Global)
             @inline input = input_vector[id]
             $(assign_inputs)
