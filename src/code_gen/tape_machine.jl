@@ -12,32 +12,8 @@ end
 function expr_from_fc(fc::FunctionCall{VAL_T, Expr}) where {VAL_T}
     @assert length(fc) == 1 && isempty(fc.value_arguments[1]) "function call assigning an expression cannot be vectorized and cannot contain value arguments\n$fc"
 
-    fc_expr = Expr(
-        :block,
-        gen_local_init(fc),
-        fc.func,    # anonymous function code block
-        (   # implicit return (to make KA.jl happy...)
-            if length(fc.return_symbols[1]) == 1
-                fc.return_symbols[1][1]
-            else
-                Expr(:tuple, fc.return_symbols[1]...)
-            end
-        ),
-    )
-
-    func_call = Expr(
-        :call,                      # call
-        Expr(
-            :->,                    # anonymous function
-            Expr(
-                :tuple,             # anonymous function arguments
-            ),
-            fc_expr,            # anonymous function code block
-        ),
-    )
-
     access_expr = gen_access_expr(fc)
-    return Expr(:(=), access_expr, func_call)
+    return Expr(:(=), access_expr, fc.func)
 end
 
 """
@@ -60,7 +36,7 @@ function gen_input_assignment_code(
             device = entry_device(machine)
 
             fc = FunctionCall(
-                Expr(:(=), symbol, input_expr(instance, name, :input)),
+                input_expr(instance, name, :input),
                 (),
                 Symbol[:input],
                 Symbol[symbol],
@@ -74,6 +50,18 @@ function gen_input_assignment_code(
 
     return assign_inputs
 end
+
+function gen_function_body_simple(
+        tape::Tape,
+        context_module::Module
+    )
+    @debug "generating simple function body"
+
+    return _gen_function_body(
+        tape.schedule, Dict{Symbol, Type}(), tape.machine, context_module
+    )
+end
+
 
 """
     gen_function_body(tape::Tape, context_module::Module; closures_size)
@@ -94,7 +82,11 @@ function gen_function_body(
         concrete_input_type::Type = Nothing,
     )
     # only need to annotate types later when using closures
-    types = infer_types!(tape, context_module; concrete_input_type = concrete_input_type)
+    types = if closures_size != 0
+        infer_types!(tape, context_module; concrete_input_type = concrete_input_type)
+    else
+        Dict{Symbol, Type}()
+    end
 
     if closures_size > 1
         s = log(closures_size, length(tape.schedule))

@@ -1,4 +1,96 @@
 """
+    compute_function_expr_simple(
+        dag::DAG,
+        instance,
+        machine::Machine,
+        context_module::Module
+    )
+
+Helper function, returning the complete function expression.
+"""
+function compute_function_expr_simple(
+        dag::DAG,
+        instance,
+        machine::Machine,
+        context_module::Module
+    )
+    tape = gen_tape(dag, instance, machine, context_module)
+
+    code = gen_function_body_simple(
+        tape,
+        context_module
+    )
+    assign_inputs = Expr(:block, expr_from_fc.(tape.input_assign_code)...)
+
+    function_id = to_var_name(UUIDs.uuid1(TaskLocalRNG()))
+    res_sym = tape.output_symbol
+
+    return Expr(
+        :function, # function definition
+        Expr(
+            :call, Symbol("compute_$function_id"), Expr(:(::), :input, input_type(instance))
+        ), # function name and parameters
+        Expr(
+            :block,
+            assign_inputs,
+            Expr(:noinline, true),
+            code,
+            Expr(:noinline, false),
+            Expr(:return, res_sym)
+        ), # function body
+    )
+end
+
+
+"""
+    compute_function_expr(
+        dag::DAG,
+        instance,
+        machine::Machine,
+        context_module::Module
+    )
+
+Helper function, returning the complete function expression.
+"""
+function compute_function_expr(
+        dag::DAG,
+        instance,
+        machine::Machine,
+        context_module::Module;
+        closures_size::Int = 0,
+        concrete_input_type::Type = Nothing,
+    )
+    tape = gen_tape(dag, instance, machine, context_module)
+
+    code = gen_function_body(
+        tape,
+        context_module;
+        closures_size = closures_size,
+        concrete_input_type = concrete_input_type,
+    )
+    assign_inputs = Expr(:block, expr_from_fc.(tape.input_assign_code)...)
+
+    function_id = to_var_name(UUIDs.uuid1(TaskLocalRNG()))
+    res_sym = tape.output_symbol
+    expr = Expr(
+        :function, # function definition
+        Expr(
+            :call, Symbol("compute_$function_id"), Expr(:(::), :input, input_type(instance))
+        ), # function name and parameters
+        Expr(
+            :block,
+            assign_inputs,
+            Expr(:noinline, true),
+            code,
+            Expr(:noinline, false),
+            Expr(:return, res_sym)
+        ), # function body
+    )
+
+    return expr
+end
+
+"""
     compute_function(
         dag::DAG,
         instance,
@@ -33,32 +125,6 @@ function compute_function(
         push!(INITIALIZED_MODULES, context_module)
     end
 
-    tape = gen_tape(dag, instance, machine, context_module)
-
-    code = gen_function_body(
-        tape,
-        context_module;
-        closures_size = closures_size,
-        concrete_input_type = concrete_input_type,
-    )
-    assign_inputs = Expr(:block, expr_from_fc.(tape.input_assign_code)...)
-
-    function_id = to_var_name(UUIDs.uuid1(TaskLocalRNG()))
-    res_sym = tape.output_symbol
-    expr = Expr(
-        :function, # function definition
-        Expr(
-            :call, Symbol("compute_$function_id"), Expr(:(::), :input, input_type(instance))
-        ), # function name and parameters
-        Expr(
-            :block,
-            assign_inputs,
-            Expr(:noinline, true),
-            code,
-            Expr(:noinline, false),
-            Expr(:return, res_sym)
-        ), # function body
-    )
-
+    expr = compute_function_expr(dag, instance, machine, context_module; closures_size = closures_size, concrete_input_type = concrete_input_type)
     return invokelatest(RuntimeGeneratedFunction, @__MODULE__, context_module, expr)
 end

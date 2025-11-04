@@ -1,10 +1,19 @@
 module KernelAbstractionsExt
 
 using ComputableDAGs
+using KernelAbstractions
 using UUIDs
 using Random
 
-function ComputableDAGs.kernel(graph::DAG, instance, context_module::Module)
+function ComputableDAGs.init_kernel(mod::Module)
+    mod.eval(Meta.parse("@kernel inbounds = true function _ka_broadcast!(@Const(in::AbstractVector), out::AbstractVector)
+        id = @index(Global)
+        @inline out[id] = _compute_expr(in[id])
+    end"))
+    return nothing
+end
+
+function ComputableDAGs.kernel(graph::DAG, instance, context_module::Module; concrete_input_type::Type = Nothing)
     machine = cpu_st()
     tape = ComputableDAGs.gen_tape(graph, instance, machine, context_module)
 
@@ -12,18 +21,20 @@ function ComputableDAGs.kernel(graph::DAG, instance, context_module::Module)
     # TODO: use gen_function_body here
     code = Expr(:block, ComputableDAGs.expr_from_fc.(tape.schedule)...)
 
-    function_id = ComputableDAGs.to_var_name(UUIDs.uuid1(TaskLocalRNG()))
-    expr = Meta.parse(
-        "@kernel inbounds = true function compute_$(function_id)(@Const(input_vector), output_vector)
-            id = @index(Global)
-            @inline input = input_vector[id]
-            $(assign_inputs)
-            $code
-            @inline output_vector[id] = $(tape.output_symbol)
-        end"
-    )
+    expr = Expr(:block, assign_inputs, code, :(return $(tape.output_symbol)))
 
-    return expr
+    T = if isnothing(concrete_input_type)
+        ComputableDAGs.input_type(instance)
+    else
+        concrete_input_type
+    end
+
+    if haskey(getfield(context_module, ComputableDAGs.EXPR_SYM), T)
+        @warn "a KernelAbstractions broadcasting kernel for input type $T has already been defined and will be overwritten\nthis new function only takes effect if the old definition has not been called yet"
+    end
+    getfield(context_module, ComputableDAGs.EXPR_SYM)[T] = expr
+
+    return context_module._ka_broadcast!
 end
 
 end

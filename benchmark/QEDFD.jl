@@ -20,7 +20,7 @@ PSP = PhaseSpacePoint(PROC, MODEL, INPSL, tuple(rand(SFourMomentum, number_incom
 @show g
 
 @info "Building the function"
-@time f = compute_function(g, PROC, cpu_st(), @__MODULE__; closures_size = 100, concrete_input_type = typeof(PSP));
+@time f = compute_function(g, PROC, cpu_st(), @__MODULE__; concrete_input_type = typeof(PSP));
 
 #=@info "Writing llvm code"
 @time open("llvm.out", write = true) do file

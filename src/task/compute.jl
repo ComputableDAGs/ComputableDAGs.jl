@@ -115,6 +115,7 @@ function result_types(
         fc::FunctionCall{VAL_T, Expr}, known_res_types::Dict{Symbol, Type}, context_module::Module
     ) where {VAL_T}
     arg_types = _argument_types(known_res_types, fc)
+
     ret_expr = Expr(
         :call,
         Base.return_types,          # return types call

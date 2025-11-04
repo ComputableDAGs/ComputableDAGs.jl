@@ -5,6 +5,8 @@ Vector of modules to keep track which have been initialized with RuntimeGenerate
 """
 INITIALIZED_MODULES = Module[]
 
+const EXPR_SYM = Symbol("__expr_cache__")
+
 """
     init(mod::Module)
 
@@ -26,5 +28,17 @@ function init(mod::Module)
         RuntimeGeneratedFunctions.init(mod)
         push!(ComputableDAGs.INITIALIZED_MODULES, mod)
     end
+
+    mod.eval(:($EXPR_SYM = Dict{Type, Expr}()))
+
+    # TODO: use interpolated symbol here
+    mod.eval(Meta.parse("
+    @generated function _compute_expr(input::T) where {T}
+        return $mod.$EXPR_SYM[T]
+    end
+    "))
+
     return nothing
 end
+
+function init_kernel end
