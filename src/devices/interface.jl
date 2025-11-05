@@ -50,7 +50,7 @@ function measure_device! end
     kernel(graph::DAG, instance, context_module::Module; concrete_input_type=Nothing)
 
 !!! warn
-    Before calling this function, make sure to have called [`kernel_init`](@ref) in your session!
+    Before calling this function, make sure to have called [`init_kernel`](@ref) in your session!
 
 For a [`DAG`](@ref), and a problem instance, return a KernelAbstractions kernel of signature `kernel(input::AbstractVector, output::AbstractVector; ndranges::Int64)`, which will return the result of the DAG computation of the input on the given output vector on each index (like a broadcast). This function is only available as an extension when KernelAbstractions is loaded.
 
