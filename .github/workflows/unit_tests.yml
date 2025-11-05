@@ -18,6 +18,16 @@ jobs:
         julia-version: ['1.10', '1.11', '1.12']
         julia-arch: [x64]
         os: [ubuntu-latest]
+        backend:
+          - { container: "ubuntu:24.04",                                     cpu: "1", kacpu: "0", cuda: "0", amdgpu: "0", oneapi: "0", metal: "0" }
+          - { container: "ubuntu:24.04",                                     cpu: "0", kacpu: "1", cuda: "0", amdgpu: "0", oneapi: "0", metal: "0" }
+          # large runners with gpu hardware cost money
+          #- { container: "nvidia/cuda:12.9.1-devel-ubuntu24.04",             cpu: "0", kacpu: "0", cuda: "1", amdgpu: "0", oneapi: "0", metal: "0" }
+          #- { container: "rocm/dev-ubuntu-24.04:6.4.2",                      cpu: "0", kacpu: "0", cuda: "0", amdgpu: "1", oneapi: "0", metal: "0" }
+          #- { container: "intel/oneapi-hpckit:2025.2.0-0-devel-ubuntu24.04", cpu: "0", kacpu: "0", cuda: "0", amdgpu: "0", oneapi: "1", metal: "0" }
+
+    #container:
+    #  image: ${{matrix.backend.container}}
 
     steps:
       - name: Checkout repository
@@ -35,7 +45,14 @@ jobs:
         uses: julia-actions/cache@v2
 
       - name: Instantiate
-        run: julia --project=./ -e 'using Pkg; Pkg.instantiate()'
+        run: |
+          julia --project=./ -e 'using Pkg; Pkg.instantiate()'
+          echo "TEST_CPU=${{ matrix.backend.cpu }}" >> $GITHUB_ENV
+          echo "TEST_KACPU=${{ matrix.backend.kacpu }}" >> $GITHUB_ENV
+          echo "TEST_CUDA=${{ matrix.backend.cuda }}" >> $GITHUB_ENV
+          echo "TEST_AMDGPU=${{ matrix.backend.amdgpu }}" >> $GITHUB_ENV
+          echo "TEST_ONEAPI=${{ matrix.backend.oneapi }}" >> $GITHUB_ENV
+          echo "TEST_METAL=${{ matrix.backend.metal }}" >> $GITHUB_ENV
 
       - name: Run tests
         uses: julia-actions/julia-runtest@v1
