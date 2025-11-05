@@ -47,9 +47,12 @@ Interface function that must be implemented for every subtype of [`AbstractDevic
 function measure_device! end
 
 """
-    kernel(graph::DAG, instance, context_module::Module)
+    kernel(graph::DAG, instance, context_module::Module; concrete_input_type=Nothing)
 
-For a [`DAG`](@ref), and a problem instance, return an `Expr` containing a KernelAbstractions function of signature `compute_<id>(input::<GPU>Vector, output::<GPU>Vector; ndranges::Int64)`, which will return the result of the DAG computation of the input on the given output vector on each index (like a broadcast). This function is available as an extension when KernelAbstractions is loaded.
+!!! warn
+    Before calling this function, make sure to have called [`kernel_init`](@ref) in your session!
+
+For a [`DAG`](@ref), and a problem instance, return a KernelAbstractions kernel of signature `kernel(input::AbstractVector, output::AbstractVector; ndranges::Int64)`, which will return the result of the DAG computation of the input on the given output vector on each index (like a broadcast). This function is only available as an extension when KernelAbstractions is loaded.
 
 A simple example call for a kernel generated from this might look like the following:
 ```Julia
@@ -59,7 +62,7 @@ cuda_kernel(get_backend(inputs), 256)(inputs, outputs; ndrange=length(inputs))
 The internal index used is `@index(Global)` as provided by KernelAbstractions. For more details, please refer to the documentation of KernelAbstractions.jl.
 
 !!! note
-    Unlike the standard [`compute_function`](@ref) to generate a callable function which returns a `RuntimeGeneratedFunction`, this returns an `Expr` that needs to be `eval`'d. This is a current limitation of `RuntimeGeneratedFunctions.jl` which cannot wrap GPU kernels. This might change in the future. This also means that world age problems can appear when the world age does not increase between the `eval` and a call to the function.
+    Since RuntimeGeneratedFunctions.jl does not support kernels due to its dynamic nature, this is implemented in a similar but more basic way. One limitation is that the body of the generated function may not contain (non-opaque) closures, which also means that closure_sizes are not a supported keyword argument for these kernels.
 
 ### Size limitation
 

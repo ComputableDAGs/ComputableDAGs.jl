@@ -29,16 +29,20 @@ function init(mod::Module)
         push!(ComputableDAGs.INITIALIZED_MODULES, mod)
     end
 
-    mod.eval(:($EXPR_SYM = Dict{Type, Expr}()))
+    mod.eval(:($EXPR_SYM = Dict{Val, Expr}()))
 
-    # TODO: use interpolated symbol here
     mod.eval(Meta.parse("
-    @generated function _compute_expr(input::T) where {T}
-        return $mod.$EXPR_SYM[T]
+    @generated function _compute_expr(input::T, val::Val) where {T}
+        return $mod.$EXPR_SYM[val()]
     end
     "))
 
     return nothing
 end
 
+"""
+    init_kernel(mod::Module)
+
+Similar to [`init`](@ref), this is an init function for the KernelAbstractions extension of ComputableDAGs.jl. It must be called once after loading both ComputableDAGs and KernelAbstractions.
+"""
 function init_kernel end
