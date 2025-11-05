@@ -31,7 +31,7 @@ end
 for stp in SETUPS
     @testset "$backend $vec_type $el_type" for (backend, vec_type, el_type) in combinations(stp)
         @testset "Fibonacci test N = $N" for N in [3, 10, 20]
-            barrier(Fibonacci(N), backend, el_type, 16)
+            barrier(Fibonacci(N), backend, el_type, 128)
         end
     end
 end

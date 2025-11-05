@@ -51,18 +51,6 @@ function gen_input_assignment_code(
     return assign_inputs
 end
 
-function gen_function_body_simple(
-        tape::Tape,
-        context_module::Module
-    )
-    @debug "generating simple function body"
-
-    return _gen_function_body(
-        tape.schedule, Dict{Symbol, Type}(), tape.machine, context_module
-    )
-end
-
-
 """
     gen_function_body(tape::Tape, context_module::Module; closures_size)
 
