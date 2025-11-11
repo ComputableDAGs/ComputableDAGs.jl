@@ -1,8 +1,9 @@
 using ComputableDAGs
 using StaticArrays
 
-using ComputableDAGs: is_valid, input_expr, input_type
+using ComputableDAGs: input_expr, input_type
 
+include("validate/impl.jl")
 include("strassen/impl.jl")
 using .MatrixMultiplicationImpl
 

@@ -116,8 +116,6 @@ Reduce the given nodes together into one node, return the applied difference to 
 For details see [`NodeReduction`](@ref).
 """
 function node_reduction!(dag::DAG, nodes::Vector{NodeType}) where {NodeType <: Node}
-    @assert is_valid_node_reduction_input(dag, nodes)
-
     # clear snapshot
     snapshot_diff(dag)
 
@@ -172,8 +170,6 @@ For details see [`NodeSplit`](@ref).
 function node_split!(
         dag::DAG, n1::NodeType
     ) where {NodeType <: Node}
-    @assert is_valid_node_split_input(dag, n1)
-
     # clear snapshot
     snapshot_diff(dag)
 

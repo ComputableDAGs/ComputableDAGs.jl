@@ -35,8 +35,6 @@ A vector of nodes can be reduced if:
 - All nodes have the same task type.
 - All nodes have the same set of children.
 
-[`is_valid_node_reduction_input`](@ref) can be used to `@assert` these requirements.
-
 See also: [`can_reduce`](@ref)
 """
 struct NodeReduction <: Operation
@@ -63,8 +61,6 @@ The NodeSplit operation. Represents the split of its input node into one node fo
 A node can be split if:
 - It is in the graph.
 - It has at least 2 parents.
-
-[`is_valid_node_split_input`](@ref) can be used to `@assert` these requirements.
 
 See also: [`can_split`](@ref)
 """

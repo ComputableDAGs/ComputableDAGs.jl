@@ -1,14 +1,3 @@
-# functions to throw assertion errors for inconsistent or wrong node operations
-# should be called with @assert
-# the functions throw their own errors though, to still have helpful error messages
-
-"""
-    is_valid_node_reduction_input(dag::DAG, nodes::Vector{Node})
-
-Assert for a given node reduction input whether the nodes can be reduced. For the requirements of a node reduction see [`NodeReduction`](@ref).
-
-Intended for use with `@assert` or `@test`.
-"""
 function is_valid_node_reduction_input(dag::DAG, nodes::Vector{NodeType}) where {NodeType <: Node}
     for n in nodes
         if n ∉ dag
@@ -40,9 +29,9 @@ function is_valid_node_reduction_input(dag::DAG, nodes::Vector{NodeType}) where 
         end
     end
 
-    n1_children = children(dag, nodes[1])
+    n1_children = ComputableDAGs.children(dag, nodes[1])
     for n in nodes
-        if Set(n1_children) != Set(children(dag, n))
+        if Set(n1_children) != Set(ComputableDAGs.children(dag, n))
             throw(
                 AssertionError(
                     "[Node Reduction] the given nodes do not have equal prerequisite nodes which is required for node reduction",
@@ -54,13 +43,6 @@ function is_valid_node_reduction_input(dag::DAG, nodes::Vector{NodeType}) where 
     return true
 end
 
-"""
-    is_valid_node_split_input(graph::DAG, n1::Node)
-
-Assert for a given node split input whether the node can be split. For the requirements of a node split see [`NodeSplit`](@ref).
-
-Intended for use with `@assert` or `@test`.
-"""
 function is_valid_node_split_input(dag::DAG, n1::Node)
     if n1 ∉ dag
         throw(AssertionError("[Node Split] the given node is not part of the given graph"))
@@ -79,26 +61,12 @@ function is_valid_node_split_input(dag::DAG, n1::Node)
     return true
 end
 
-"""
-    is_valid(dag::DAG, nr::NodeReduction)
-
-Assert for a given [`NodeReduction`](@ref) whether it is a valid operation in the graph.
-
-Intended for use with `@assert` or `@test`.
-"""
-function is_valid(dag::DAG, nr::NodeReduction)
+function is_valid(dag::DAG, nr::ComputableDAGs.NodeReduction)
     @assert is_valid_node_reduction_input(dag, getindex.(Ref(dag.nodes), nr.input))
     return true
 end
 
-"""
-    is_valid(dag::DAG, nr::NodeSplit)
-
-Assert for a given [`NodeSplit`](@ref) whether it is a valid operation in the graph.
-
-Intended for use with `@assert` or `@test`.
-"""
-function is_valid(dag::DAG, ns::NodeSplit)
+function is_valid(dag::DAG, ns::ComputableDAGs.NodeSplit)
     @assert is_valid_node_split_input(dag, dag.nodes[ns.input])
     return true
 end
