@@ -25,10 +25,6 @@ in a `Vector`.
     the second represents the symbols that the results of the function call are assigned to. For most function calls,
     there is only one return symbol. When using closures when generating a function body for a [`Tape`](@ref), the
     option to have multiple return symbols is necessary.
-- `return_types::Vector{<:Type}`: The types of the function call with the arguments provided. This field only contains
-    one level of Vector, because it is required that a `FunctionCall` is type stable, and therefore, the types of the
-    return symbols have to be equal for all members of a vectorization. The return type is initially set to `Nothing`
-    and later inferred and assigned by [`infer_types!`](@ref).
 - `device::AbstractDevice`: The device that this function call is scheduled on.
 """
 struct FunctionCall{VAL_T <: Tuple, FUNC_T <: Union{Function, Expr}}
@@ -36,7 +32,6 @@ struct FunctionCall{VAL_T <: Tuple, FUNC_T <: Union{Function, Expr}}
     value_arguments::Vector{VAL_T}          # tuple of value arguments for the function call, will be prepended to the other arguments
     arguments::Vector{Vector{Symbol}}       # symbols of the inputs to the function call
     return_symbols::Vector{Vector{Symbol}}  # the return symbols
-    return_types::Vector{Type}              # the return type of the function call(s); there can only be one return type since we require type stability
     device::AbstractDevice
 end
 function FunctionCall(
@@ -44,14 +39,12 @@ function FunctionCall(
         value_arguments::VAL_T,
         arguments::Vector{Symbol},
         return_symbol::Vector{Symbol},
-        return_types::Vector{Type},
         device::AbstractDevice,
     ) where {VAL_T <: Tuple}
     # convenience constructor for function calls that do not use vectorization, which is most of the use cases
-    @assert length(return_types) == 0 || length(return_types) == length(return_symbol) "number of return types '$(length(return_types))' does not match the number of return symbols '$(length(return_symbol))'"
     @assert func isa Function || length(value_arguments) == 0 "no value arguments are allowed for a an Expr FunctionCall, but got '$value_arguments'"
     return FunctionCall(
-        func, [value_arguments], [arguments], [return_symbol], return_types, device
+        func, [value_arguments], [arguments], [return_symbol], device
     )
 end
 

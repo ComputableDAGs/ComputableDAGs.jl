@@ -41,6 +41,7 @@ pages = [
         "Code Generation" => "lib/internals/code_gen.md",
         "Devices" => "lib/internals/devices.md",
         "Utility" => "lib/internals/utility.md",
+        "KernelAbstractions Extension" => "lib/internals/ka_extension.md",
     ],
     "Contribution" => "contribution.md",
 ]
