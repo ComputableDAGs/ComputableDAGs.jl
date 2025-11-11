@@ -15,13 +15,12 @@ function ComputableDAGs.init_kernel(mod::Module)
     return nothing
 end
 
-function ComputableDAGs.kernel(graph::DAG, instance, context_module::Module)
-    machine = cpu_st()
-    tape = ComputableDAGs.gen_tape(graph, instance, machine, context_module)
+function ComputableDAGs.kernel(dag::DAG, instance, context_module::Module)
+    tape = ComputableDAGs.gen_tape(dag, instance, cpu_st(), ComputableDAGs.GreedyScheduler())
 
+    code = ComputableDAGs.gen_function_body(tape)
     assign_inputs = Expr(:block, ComputableDAGs.expr_from_fc.(tape.input_assign_code)...)
-    # TODO: use gen_function_body here
-    code = Expr(:block, ComputableDAGs.expr_from_fc.(tape.schedule)...)
+
     expr = Expr(:block, assign_inputs, code, :(return $(tape.output_symbol)))
 
     # generate random UUID for type independent lookup in the expression cache

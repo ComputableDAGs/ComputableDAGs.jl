@@ -5,7 +5,7 @@ using QEDprocesses
 using QEDcore
 using QEDbase
 
-RNG = Xoshiro(1)
+RNG = Xoshiro(143)
 MODEL = PerturbativeQED()
 PROC = ScatteringProcess(
     (Electron(), Photon()),
@@ -20,7 +20,7 @@ PSP = PhaseSpacePoint(PROC, MODEL, INPSL, tuple(rand(SFourMomentum, number_incom
 @show g
 
 @info "Building the function"
-@time f = compute_function(g, PROC, cpu_st(), @__MODULE__; concrete_input_type = typeof(PSP));
+@time f = compute_function(g, PROC, cpu_st(), @__MODULE__)
 
 #=@info "Writing llvm code"
 @time open("llvm.out", write = true) do file

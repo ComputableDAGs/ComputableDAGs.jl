@@ -87,64 +87,6 @@ function _validate_result_types(fc::FunctionCall, types, arg_types)
     return nothing
 end
 
-function result_types(
-        fc::FunctionCall{VAL_T, F_T}, known_res_types::Dict{Symbol, Type}, context_module::Module
-    ) where {VAL_T, F_T <: Function}
-    arg_types = (_value_argument_types(fc)..., _argument_types(known_res_types, fc)...)
-    @debug "checking $(fc.func) with arg types $(arg_types)"
-    types = Base.return_types(fc.func, arg_types)
-
-    _validate_result_types(fc, types, arg_types)
-
-    N_RET = length(fc.return_types)
-    if (N_RET == 1)
-        @debug "found return type $(types[1])"
-        empty!(fc.return_types)
-        push!(fc.return_types, types[1])
-        return nothing
-    end
-
-    @debug "found return types $(types[1].parameters...)"
-
-    empty!(fc.return_types)
-    append!(fc.return_types, types[1].parameters)
-    return nothing
-end
-
-function result_types(
-        fc::FunctionCall{VAL_T, Expr}, known_res_types::Dict{Symbol, Type}, context_module::Module
-    ) where {VAL_T}
-    arg_types = _argument_types(known_res_types, fc)
-
-    ret_expr = Expr(
-        :call,
-        Base.return_types,          # return types call
-        Expr(                       # function argument to return_types
-            :->,                        # anonymous function
-            Expr(
-                :tuple,                 # anonymous function arguments
-                fc.arguments[1]...,
-            ),
-            fc.func,                    # anonymous function code block
-        ),
-        Expr(:tuple, arg_types...), # types arguments to return_types
-    )
-    types = context_module.eval(ret_expr)
-
-    #@info "evaluation of expression\n$ret_expr\ngives\n$types"
-
-    _validate_result_types(fc, types, arg_types)
-
-    N_RET = length(fc.return_types)
-    empty!(fc.return_types)
-    if (N_RET == 1)
-        push!(fc.return_types, types[1])
-    else
-        append!(fc.return_types, types[1].parameters)
-    end
-    return nothing
-end
-
 @inline function _assert_array_types(args)
     return @assert false "all arguments of a vectorized compute task must be arrays"
 end

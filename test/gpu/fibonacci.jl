@@ -25,7 +25,7 @@ function barrier(fib::Fibonacci, backend::Backend, type::Type, size::Int)
     k(backend, 32)(in, out; ndrange = length(in))
 
     gt_out = fib_gt.(fib.n, getindex.(rand_inputs, 1), getindex.(rand_inputs, 2))
-    return @test count(isapprox.(out, gt_out)) == size
+    return @test count(isapprox.(Vector(out), gt_out)) == size
 end
 
 for stp in SETUPS

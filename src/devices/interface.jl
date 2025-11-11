@@ -47,7 +47,7 @@ Interface function that must be implemented for every subtype of [`AbstractDevic
 function measure_device! end
 
 """
-    kernel(graph::DAG, instance, context_module::Module; concrete_input_type=Nothing)
+    kernel(dag::DAG, instance, context_module::Module)
 
 !!! warn
     Before calling this function, make sure to have called [`init_kernel`](@ref) in your session!
@@ -62,7 +62,7 @@ cuda_kernel(get_backend(inputs), 256)(inputs, outputs; ndrange=length(inputs))
 The internal index used is `@index(Global)` as provided by KernelAbstractions. For more details, please refer to the documentation of KernelAbstractions.jl.
 
 !!! note
-    Since RuntimeGeneratedFunctions.jl does not support kernels due to its dynamic nature, this is implemented in a similar but more basic way. One limitation is that the body of the generated function may not contain (non-opaque) closures, which also means that `closures_size` is not a supported keyword argument for the kernel generation.
+    Since RuntimeGeneratedFunctions.jl does not support kernels due to its dynamic nature, this is implemented in a similar but more basic way. One limitation is that the body of the generated function may not contain (non-opaque) closures.
 
 !!! note
     Note that the return value of this function is a wrapper around a KernelAbstractions kernel, not the kernel itself. However, for the user, it should behave exactly the same way and passthrough any arguments and kwargs to the actual KA kernel.
