@@ -38,7 +38,6 @@ function gen_input_assignment_code(
                 (),
                 Symbol[:input],
                 Symbol[symbol],
-                Type[Nothing],
                 device,
             )
 
