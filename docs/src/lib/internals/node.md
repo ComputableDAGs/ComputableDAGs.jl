@@ -34,10 +34,3 @@ Modules = [ComputableDAGs]
 Pages = ["node/print.jl"]
 Order   = [:function]
 ```
-
-## Validate
-```@autodocs
-Modules = [ComputableDAGs]
-Pages = ["node/validate.jl"]
-Order   = [:function]
-```

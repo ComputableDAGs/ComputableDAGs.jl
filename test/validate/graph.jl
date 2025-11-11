@@ -1,8 +1,6 @@
-"""
-    is_connected(dag::DAG)
+using DataStructures
+using UUIDs
 
-Return whether the given graph is connected.
-"""
 function is_connected(dag::DAG)
     node_queue = Deque{UUID}()
     push!(node_queue, exit_node(dag).id)
@@ -20,11 +18,6 @@ function is_connected(dag::DAG)
     return length(seen_nodes) == length(dag.nodes)
 end
 
-"""
-    is_valid(dag::DAG)
-
-Validate the entire graph using asserts. Intended for testing with `@assert is_valid(dag)`.
-"""
 function is_valid(dag::DAG)
     for (id, node) in dag.nodes
         @assert is_valid(dag, node)

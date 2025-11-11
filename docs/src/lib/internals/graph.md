@@ -41,10 +41,3 @@ Modules = [ComputableDAGs]
 Pages = ["graph/properties.jl"]
 Order   = [:function]
 ```
-
-## Validate
-```@autodocs
-Modules = [ComputableDAGs]
-Pages = ["graph/validate.jl"]
-Order   = [:function]
-```

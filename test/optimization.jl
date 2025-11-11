@@ -24,8 +24,9 @@ RNG = Xoshiro(1)
             dag, instance, cpu_st(), @__MODULE__
         )
 
-        input = [rand(RNG, Float64, 3 * N) for _ in 1:100]
+        LEN = 128
+        input = [rand(RNG, Float64, 3 * N) for _ in 1:LEN]
 
-        @test isapprox(f.(input), reduced_f.(input))
+        @test count([isapprox(orig, reduced) || isnan(orig) && isnan(reduced) for (orig, reduced) in Iterators.zip(f.(input), reduced_f.(input))]) == LEN
     end
 end
