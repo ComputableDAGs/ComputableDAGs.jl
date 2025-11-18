@@ -15,14 +15,14 @@ function barrier(fib::Fibonacci, backend::Backend, type::Type, size::Int)
     dag = graph(fib)
     k = kernel(dag, fib, @__MODULE__)
 
-    rand_inputs = [(rand(type), rand(type)) for i in 1:size]
+    rand_inputs = [(rand(type), rand(type)) for _ in 1:size]
 
     in = allocate(backend, Tuple{type, type}, size)
     out = allocate(backend, type, size)
 
     copyto!(in, rand_inputs)
 
-    k(backend, 32)(in, out; ndrange = length(in))
+    k(backend, 32)(out, in; ndrange = length(in))
 
     gt_out = fib_gt.(fib.n, getindex.(rand_inputs, 1), getindex.(rand_inputs, 2))
     return @test count(isapprox.(Vector(out), gt_out)) == size
