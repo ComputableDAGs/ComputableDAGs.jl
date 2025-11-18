@@ -8,7 +8,7 @@ using Random
 include("kernel_wrapper.jl")
 
 function ComputableDAGs.init_kernel(mod::Module)
-    mod.eval(Meta.parse("@kernel inbounds = true function _ka_broadcast!(@Const(in::AbstractVector), out::AbstractVector, val::Val)
+    mod.eval(Meta.parse("@kernel inbounds = true function _ka_broadcast!(out::AbstractVector, @Const(in::AbstractVector), val::Val)
         id = @index(Global)
         @inline out[id] = _compute_expr(in[id], val)
     end"))

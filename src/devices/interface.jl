@@ -50,13 +50,13 @@ function measure_device! end
     kernel(dag::DAG, instance, context_module::Module)
 
 !!! warn
-    Before calling this function, make sure to have called [`init_kernel`](@ref) in your session!
+    Before calling this function, make sure to have called [`ComputableDAGs.init_kernel`](@ref) in your session!
 
-For a [`DAG`](@ref), and a problem instance, return a KernelAbstractions kernel of signature `kernel(input::AbstractVector, output::AbstractVector; ndranges::Int64)`, which will return the result of the DAG computation of the input on the given output vector on each index (like a broadcast). This function is only available as an extension when KernelAbstractions is loaded.
+For a [`DAG`](@ref), and a problem instance, return a KernelAbstractions kernel of signature `kernel(output::AbstractVector, input::AbstractVector; ndranges::Int64)`, which will return the result of the DAG computation of the input on the given output vector on each index (like a broadcast). This function is only available as an extension when KernelAbstractions is loaded.
 
 A simple example call for a kernel generated from this might look like the following:
 ```Julia
-cuda_kernel(get_backend(inputs), 256)(inputs, outputs; ndrange=length(inputs))
+cuda_kernel(get_backend(inputs), 256)(outputs, inputs; ndrange=length(inputs))
 ```
 
 The internal index used is `@index(Global)` as provided by KernelAbstractions. For more details, please refer to the documentation of KernelAbstractions.jl.
