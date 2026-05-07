@@ -8,6 +8,10 @@ using ComputableDAGs
 
 pages = [
     "index.md",
+    "Library" => [
+        "Public" => "lib/public.md",
+        "Task" => "lib/internals/tasks.md",
+    ],
     "Contribution" => "contribution.md",
 ]
 

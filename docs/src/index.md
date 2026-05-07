@@ -56,9 +56,3 @@ The *Optimizer* interface then allows to use an estimator to push and pop operat
 Finally, the *Scheduler* can use *Device* information to *generate* the code.
 
 For detailed information on all the interfaces und functionality provided, please refer to the public documentation or the respective internals, as linked above.
-
-## Library Outline
-
-```@autodocs
-Modules = [ComputableDAGs]
-```
