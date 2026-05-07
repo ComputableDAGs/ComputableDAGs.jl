@@ -1,0 +1,64 @@
+# ComputableDAGs.jl
+
+*A domain-specific DAG-optimizer*
+
+## General
+
+This packages provides a way to represent large computations in a graph representation. Once such a graph is created, it can
+- be analyzed to extract properties such as total compute effort or data transfer necessary,
+- be optimized using optimization algorithms,
+- be scheduled on heterogeneous machines, making use of all available hardware
+- be compiled and executed within the same session of julia.
+
+### Requirements for use
+
+There are some hard requirements for this to be possible to a specific computation problem:
+- The computation must be static, i.e., the structure of the graph may not dynamically change during the computation.
+- All data dependencies within the graph must be known in advance.
+- The overall computation must be separable into smaller parts with less than total interdependency.
+
+Some more soft requirements exist for parts of the project to be *useful*:
+- For optimizations to be effective, the functions should have a predictable compute effort that can be known in advance.
+- The individual tasks should not be too *small* (ideally at least a few dozen FLOPs) because the compiler is smarter at optimizing very small functions than we can be.
+- The individual tasks should not be too *large* so the graph has a large enough number of nodes to allow for a larger optimization space.
+- Tasks should [not have side-effects](https://en.wikipedia.org/wiki/Side_effect_(computer_science)) because the order and number of times a function is executed can not be relied upon.
+
+That being said, the package can still be useful even without using optimizations at all, simply as a way to schedule and distribute given work on a machine.
+
+### Comparison to Dagger.jl
+
+[Dagger.jl](https://juliaparallel.org/Dagger.jl/) is a popular way of using scheduling work distributed on a machine, with complex dependencies in the form of a DAG. This makes it similar to the goals of this package. However, Dagger.jl schedules immediately as a piece of work is given. This has some effects:
+- It *does* allow the DAG to be dynamically built, it does not have to be known in advance, like with ComputableDAGs.jl
+- It adds some overhead at execution time for scheduling the tasks. This becomes worse the more work the scheduler has to do, for example when many cores exist, and when the tasks themselves are small and finish quickly.
+- It *does not* allow for optimizations ahead of execution, for example to prevent duplicate work.
+- It *does not* allow scheduling with the entire structure of the DAG already known.
+
+Which package is better suited for a task certainly depends on the use-case.
+
+### Overview of the Project Structure
+
+TODO: Add links to the docs again when they exist again.
+
+![Parts of the Project](structure.png)
+
+The project consists of several parts that are designed to be mostly orthogonal interfaces, extendable with new implementations without having to change other parts of the code. For instructions on how to use the package and example implementations, refer to the manual, the examples, or the tests.
+
+The *Graph* is the central part. It consists of *Nodes* and *Edges*. Nodes represent a *Task*, which is either a computation or a data transfer. Edges purely represent the dependencies between the nodes.
+
+A graph has to be generated first, which is done by defining a *Model* and providing some form of *Generator* for a specific problem instance of that model. This part is entirely up to the user. A generator might parse a file and generate a graph from that, or it may generate a basic graph by itself.
+
+*Estimators* can be used to collect properties of the graph, for example the total compute effort defined by tasks.
+
+From any state of the graph, possible *Operations* can be generated. These represent topological changes to the graph which do not change the total computation. Operations can be applied and popped similar to a [stack](https://en.wikipedia.org/wiki/Stack_(abstract_data_type)).
+
+The *Optimizer* interface then allows to use an estimator to push and pop operations to reduce the execution time.
+
+Finally, the *Scheduler* can use *Device* information to *generate* the code.
+
+For detailed information on all the interfaces und functionality provided, please refer to the public documentation or the respective internals, as linked above.
+
+## Library Outline
+
+```@autodocs
+Modules = [ComputableDAGs]
+```
