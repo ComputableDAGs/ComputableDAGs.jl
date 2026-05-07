@@ -10,7 +10,8 @@ pages = [
     "index.md",
     "Library" => [
         "Public" => "lib/public.md",
-        "Task" => "lib/internals/tasks.md",
+        "Tasks" => "lib/internals/tasks.md",
+        "Nodes" => "lib/internals/nodes.md",
     ],
     "Contribution" => "contribution.md",
 ]

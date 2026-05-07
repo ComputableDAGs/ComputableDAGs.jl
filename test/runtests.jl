@@ -7,10 +7,13 @@ cpu_tests = _is_test_platform_active(["TEST_CPU"], true)
 
 if cpu_tests
 
-    @safetestset "Tasks Unit Tests" begin
+    @safetestset "Tasks" begin
         include("tasks.jl")
     end
 
+    @safetestset "Nodes" begin
+        include("nodes.jl")
+    end
 else
     @info "Skipping CPU tests"
 end
