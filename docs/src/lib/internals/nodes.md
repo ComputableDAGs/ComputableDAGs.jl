@@ -11,3 +11,12 @@ Nodes are the objects that make up the computational graphs that everything base
 ```@docs
 Node
 ```
+
+## Functions
+
+```@docs
+Node(task::Task) where {Task <: AbstractComputeTask}
+is_entry_node
+is_exit_node
+task
+```

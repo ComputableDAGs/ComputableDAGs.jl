@@ -12,6 +12,8 @@ pages = [
         "Public" => "lib/public.md",
         "Tasks" => "lib/internals/tasks.md",
         "Nodes" => "lib/internals/nodes.md",
+        "Graph" => "lib/internals/graph.md",
+        "Utility" => "lib/internals/utility.md",
     ],
     "Contribution" => "contribution.md",
 ]

@@ -25,3 +25,13 @@ Pages = ["public.md"]
 ```@docs
 ComputableDAGs
 ```
+
+## Types
+```@docs
+ComputableDAG
+```
+
+## Functions
+```@docs
+ComputableDAG()
+```

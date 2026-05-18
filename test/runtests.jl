@@ -1,11 +1,14 @@
 using SafeTestsets
 
-include("utils.jl")
+include("gpu/utility.jl")
 
 # check if we run CPU tests (yes by default)
 cpu_tests = _is_test_platform_active(["TEST_CPU"], true)
 
 if cpu_tests
+    @safetestset "Utility" begin
+        include("utility.jl")
+    end
 
     @safetestset "Tasks" begin
         include("tasks.jl")

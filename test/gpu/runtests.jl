@@ -8,7 +8,7 @@ using Pkg
 using ComputableDAGs
 using KernelAbstractions
 
-include("../utils.jl")
+include("utility.jl")
 
 SETUPS = TestSetup[]
 
