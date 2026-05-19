@@ -12,7 +12,7 @@ pages = [
         "Public" => "lib/public.md",
         "Tasks" => "lib/internals/tasks.md",
         "Nodes" => "lib/internals/nodes.md",
-        "Graph" => "lib/internals/graph.md",
+        "Computable DAG" => "lib/internals/computable_dag.md",
         "Utility" => "lib/internals/utility.md",
     ],
     "Contribution" => "contribution.md",

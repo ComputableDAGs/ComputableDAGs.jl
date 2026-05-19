@@ -1,8 +1,7 @@
 """
     ComputableDAG()
-    CDAG()
 
-Construct and return an empty [`ComputableDAG`](@ref). Can also use the alias CDAG().
+Construct and return an empty [`ComputableDAG`](@ref).
 """
 function ComputableDAG()
     return ComputableDAG(

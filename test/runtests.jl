@@ -17,6 +17,10 @@ if cpu_tests
     @safetestset "Nodes" begin
         include("nodes.jl")
     end
+
+    @safetestset "ComputableDAG" begin
+        include("computable_dag.jl")
+    end
 else
     @info "Skipping CPU tests"
 end

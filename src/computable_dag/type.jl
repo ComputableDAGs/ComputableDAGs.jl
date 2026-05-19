@@ -1,6 +1,5 @@
 """
     ComputableDAG
-    CDAG
 
 The representation of the graph as a set of [`Node`](@ref)s, connected by hyperedges representing data dependencies, and connected by normal edges to represent scheduling order.
 
@@ -12,5 +11,3 @@ struct ComputableDAG
 
     # TODO: add operation stack, diff, etc. back in
 end
-
-CDAG = ComputableDAG
