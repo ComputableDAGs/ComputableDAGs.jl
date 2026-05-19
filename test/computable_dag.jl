@@ -3,7 +3,7 @@ using ComputableDAGs
 using ComputableDAGs: nodes
 
 @testset "Create empty ComputableDAG" begin
-    DAG = ComputableDAG()
+    cdag = ComputableDAG()
 
-    @test isempty(nodes(DAG))
+    @test isempty(nodes(cdag))
 end

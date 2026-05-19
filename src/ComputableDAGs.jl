@@ -8,6 +8,7 @@ module ComputableDAGs
 using UUIDs
 
 export ComputableDAG, CDAG
+export @compute_task
 
 include("utility.jl")
 
@@ -16,6 +17,7 @@ include("nodes/type.jl")
 include("computable_dag/type.jl")
 
 include("tasks/properties.jl")
+include("tasks/macros.jl")
 
 include("nodes/create.jl")
 include("nodes/print.jl")

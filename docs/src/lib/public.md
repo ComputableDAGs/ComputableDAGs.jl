@@ -35,3 +35,8 @@ ComputableDAG
 ```@docs
 ComputableDAG()
 ```
+
+## Macros
+```@docs
+@compute_task
+```
