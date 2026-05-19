@@ -10,6 +10,8 @@ These are some utility types and functions not directly related to the core func
 
 ```@docs
 NULL_UUID
+__CURRENT_CDAG__
+__ASSEMBLE_CDAG_FLAG__
 ```
 
 ## Functions

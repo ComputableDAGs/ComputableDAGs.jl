@@ -39,4 +39,5 @@ ComputableDAG()
 ## Macros
 ```@docs
 @compute_task
+@assemble_cdag
 ```
