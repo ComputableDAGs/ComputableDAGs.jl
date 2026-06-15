@@ -61,3 +61,25 @@ macro assemble_cdag(block)
         end
     end
 end
+
+"""
+    @add_call task varargs
+
+!!! note
+    Only valid within a [`@assemble_dag`](@ref) block.
+
+## Arguments
+- `task`: The ComputeTask object to use.
+- `varargs...`: Any number of data nodes to use as input. They will be given
+    to the task's function in the same order. Each argument can also be an
+    iterable (vector, tuple, etc.) of nodes, which are automatically unpacked
+    and added individually.
+"""
+macro add_call(task, varargs...)
+    @debug "got $task with $(length(varargs)) arguments"
+
+    # TODO: implement
+    return quote
+        nothing
+    end
+end

@@ -40,4 +40,5 @@ ComputableDAG()
 ```@docs
 @compute_task
 @assemble_cdag
+@add_call
 ```

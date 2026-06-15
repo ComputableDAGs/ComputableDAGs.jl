@@ -15,6 +15,7 @@ end
     cdag = @assemble_cdag begin end
     @test isempty(nodes(cdag))
 
+    # test that the recursion guard does reset correctly
     cdag2 = @assemble_cdag begin end
     @test isempty(nodes(cdag2))
 

@@ -15,6 +15,7 @@ include("utility.jl")
 include("tasks/type.jl")
 include("nodes/type.jl")
 include("computable_dag/type.jl")
+include("function_call/type.jl")
 
 include("tasks/properties.jl")
 include("tasks/macros.jl")
