@@ -66,7 +66,7 @@ end
     @add_call task varargs
 
 !!! note
-    Only valid within a [`@assemble_dag`](@ref) block.
+    Only valid within a [`@assemble_cdag`](@ref) block.
 
 ## Arguments
 - `task`: The ComputeTask object to use.

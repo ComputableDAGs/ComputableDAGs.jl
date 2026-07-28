@@ -4,7 +4,7 @@ CurrentModule = ComputableDAGs
 
 # Graph
 
-The [`ComputableDAG`](@ref), i.e., graph object is the main piece in the project.
+The [`ComputableDAG`](@ref), i.e., graph object is the central piece in the project.
 
 ## Functions
 

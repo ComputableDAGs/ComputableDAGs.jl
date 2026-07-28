@@ -28,4 +28,7 @@ include("computable_dag/create.jl")
 include("computable_dag/macros.jl")
 include("computable_dag/properties.jl")
 
+include("function_call/utils.jl")
+include("function_call/code_gen.jl")
+
 end # module ComputableDAGs
