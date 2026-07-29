@@ -27,13 +27,13 @@ struct FunctionCall{VAL_T <: Tuple}
 end
 
 """
-    Assignment
+    ExprAssignment
 
 An assignment instruction which sets the given `return_symbol` to the value of
 the expression given. This is used for the entry points of the CDAG to grab
 the relevant part of the CDAGs input.
 """
-struct Assignment
+struct ExprAssignment
     expr::Expr
 
     return_symbol::Symbol

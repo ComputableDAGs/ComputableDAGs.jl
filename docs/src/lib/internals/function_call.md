@@ -11,7 +11,7 @@ This section is about the representation of instructions in the project.
 ```@docs
 AbstractInstruction
 FunctionCall
-Assignment
+ExprAssignment
 SendInstruction
 RecvInstruction
 VectorizedCall

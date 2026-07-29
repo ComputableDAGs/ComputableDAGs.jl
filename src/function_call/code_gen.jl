@@ -1,16 +1,15 @@
 """
-    access_expr(fc::FunctionCall{VAL_T}) where {VAL_T}
+    access_expr(return_symbols::AbstractVector{Symbol})
 
-Return an expression that can be assigned to, from the return symbols in the
-given function call. For multiple return symbols, this is a structured
-binding.
+Return an expression that can be assigned to, from the given return symbols.
+For multiple return symbols, this is a structured binding.
 """
-function access_expr(function_call::FunctionCall{VAL_T}) where {VAL_T}
-    if isone(length(function_call.return_symbols))
-        # single return value
-        return function_call.return_symbols[1]
+function access_expr(return_symbols::AbstractVector{Symbol})
+    if isone(length(return_symbols))
+        # no structured binding necessary
+        return return_symbols[1]
     end
-    return unroll_symbol_vector(function_call.return_symbols)
+    return unroll_symbol_vector(return_symbols)
 end
 
 """
@@ -26,7 +25,20 @@ function lower_to_expr(function_call::FunctionCall{VAL_T}) where {VAL_T}
         function_call.arguments...
     )
 
-    acc_expr = access_expr(function_call)
+    acc_expr = access_expr(function_call.return_symbols)
 
     return Expr(:(=), acc_expr, fc_expr)
+end
+
+"""
+    lower_to_expr(assignment::ExprAssignment)
+
+Generate and return an expression from this expression assignment.
+"""
+function lower_to_expr(assignment::ExprAssignment)
+    return Expr(
+        :(=),
+        assignment.return_symbol,
+        assignment.expr
+    )
 end
