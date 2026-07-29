@@ -12,10 +12,11 @@ export @compute_task, @assemble_cdag
 
 include("utility.jl")
 
-include("tasks/type.jl")
-include("nodes/type.jl")
-include("computable_dag/type.jl")
-include("function_call/type.jl")
+include("tasks/types.jl")
+include("nodes/types.jl")
+include("computable_dags/types.jl")
+include("devices/types.jl")
+include("instructions/types.jl")
 
 include("tasks/properties.jl")
 include("tasks/macros.jl")
@@ -24,11 +25,11 @@ include("nodes/create.jl")
 include("nodes/print.jl")
 include("nodes/properties.jl")
 
-include("computable_dag/create.jl")
-include("computable_dag/macros.jl")
-include("computable_dag/properties.jl")
+include("computable_dags/create.jl")
+include("computable_dags/macros.jl")
+include("computable_dags/properties.jl")
 
-include("function_call/utils.jl")
-include("function_call/code_gen.jl")
+include("instructions/utils.jl")
+include("instructions/code_gen.jl")
 
 end # module ComputableDAGs

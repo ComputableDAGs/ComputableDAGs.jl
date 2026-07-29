@@ -19,11 +19,11 @@ if cpu_tests
     end
 
     @safetestset "ComputableDAG" begin
-        include("computable_dag.jl")
+        include("computable_dags.jl")
     end
 
     @safetestset "Function Calls" begin
-        include("function_calls.jl")
+        include("instructions.jl")
     end
 else
     @info "Skipping CPU tests"

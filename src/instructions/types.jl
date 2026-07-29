@@ -12,7 +12,7 @@ Representation of a function call. Contains the function to call, value
 arguments of type `VAL_T`, argument symbols, the return symbol and type,
 and the device to execute on.
 """
-struct FunctionCall{VAL_T <: Tuple}
+struct FunctionCall{VAL_T <: Tuple} <: AbstractInstruction
     # the function representing the computation
     func::Function
 
@@ -33,7 +33,7 @@ An assignment instruction which sets the given `return_symbol` to the value of
 the expression given. This is used for the entry points of the CDAG to grab
 the relevant part of the CDAGs input.
 """
-struct ExprAssignment
+struct ExprAssignment <: AbstractInstruction
     expr::Expr
 
     return_symbol::Symbol
@@ -46,8 +46,8 @@ A send instruction that sends the value identified by the given `symbol` to
 the given destination device. This is collaborative, so the destination device
 must have a corresponding [`RecvInstruction`](@ref).
 """
-struct SendInstruction
-    #dest::Device
+struct SendInstruction <: AbstractInstruction
+    dest::AbstractDevice
 
     symbol::Symbol
 end
@@ -59,8 +59,8 @@ A receive instruction that receives the value identified by the given `symbol`
 from the given device and stores it in that symbol. This is collaborative, so
 the origin device must have a corresponding [`SendInstruction`](@ref).
 """
-struct RecvInstruction
-    #origin::Device
+struct RecvInstruction <: AbstractInstruction
+    origin::AbstractDevice
 
     symbol::Symbol
 end
@@ -75,7 +75,7 @@ multiple instructions simultaneously.
 !!! warn
     To be implemented.
 """
-struct VectorizedCall
+struct VectorizedCall <: AbstractInstruction
     # TBW
 end
 
@@ -90,10 +90,11 @@ freedom in the schedule and lower cache requirement.
 !!! warn
     To be implemented.
 """
-struct Accumulation
+struct Accumulation <: AbstractInstruction
     neutral
     op
     arguments
     return_symbol
     # TBW
+    # TODO: i think this is nonsense and not needed as an instruction, only as a node type
 end
