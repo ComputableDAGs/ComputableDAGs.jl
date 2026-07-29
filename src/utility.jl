@@ -8,6 +8,13 @@ See also [`isnull`](@ref).
 const NULL_UUID = UUID(0)
 
 """
+    MANAGEMENT_PORT
+
+A fixed port used for initial exchange of each device's socket info.
+"""
+MANAGEMENT_PORT = 15678
+
+"""
     isnull(id::UUID)
 
 Check whether a given UUID is "null", or invalid.

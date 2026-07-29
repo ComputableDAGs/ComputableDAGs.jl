@@ -15,6 +15,8 @@ pages = [
         "Computable DAG" => "lib/internals/computable_dags.md",
         "Instructions" => "lib/internals/instructions.md",
         "Devices" => "lib/internals/devices.md",
+        "Machines" => "lib/internals/machines.md",
+        "Device Managers" => "lib/internals/device_managers.md",
         "Utility" => "lib/internals/utility.md",
     ],
     "Contribution" => "contribution.md",

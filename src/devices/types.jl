@@ -7,10 +7,26 @@ Base type for devices of different architectures which can run
 abstract type AbstractDevice end
 
 """
-    CPU <: AbstractDevice
+    AbstractCPU <: AbstractDevice
 
+Base type for CPU devices.
+"""
+abstract type AbstractCPU <: AbstractDevice end
 
 """
-struct CPU <: AbstractDevice
+    AbstractGPU <: AbstractDevice
 
+Base type for GPU devices.
+"""
+abstract type AbstractGPU <: AbstractDevice end
+
+"""
+    CPU <: AbstractCPU
+"""
+struct CPU <: AbstractCPU
+    id::UUID
+
+    nthreads::Int
+
+    # TODO: numa regions, architecture, etc?
 end

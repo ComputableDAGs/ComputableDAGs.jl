@@ -10,5 +10,7 @@ Devices represent the components executing some part of a [`ComputableDAG`](@ref
 
 ```@docs
 AbstractDevice
+AbstractCPU
+AbstractGPU
 CPU
 ```

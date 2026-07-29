@@ -25,6 +25,10 @@ if cpu_tests
     @safetestset "Function Calls" begin
         include("instructions.jl")
     end
+
+    @safetestset "Device Managers" begin
+        include("device_managers.jl")
+    end
 else
     @info "Skipping CPU tests"
 end
