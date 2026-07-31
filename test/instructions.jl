@@ -1,6 +1,9 @@
 using ComputableDAGs
+using UUIDs
 
-using ComputableDAGs: FunctionCall, ExprAssignment, CPU, access_expr, lower_to_expr
+using ComputableDAGs: FunctionCall, ExprAssignment, SendInstruction, RecvInstruction, CPU
+using ComputableDAGs: access_expr, lower_to_expr, to_var_name
+using ComputableDAGs: DEVICE_MANAGER_SYM
 
 foo() = nothing
 bar(x) = x
@@ -134,5 +137,30 @@ CPU_T = CPU(1, true)
 
             @test x == v
         end
+    end
+
+    @testset "Send/Recv Instructions" begin
+        cpu1 = CPU(1, true)
+        cpu2 = CPU(1, false)
+
+        id1 = UUIDs.uuid1()
+        id2 = UUIDs.uuid1()
+
+        si1 = SendInstruction(cpu2, true, id1)
+        si2 = SendInstruction(cpu1, true, id2)
+
+        # cannot directly compare expressions for equality
+        @test string(lower_to_expr(si1, cpu1)) ==
+            string(:($(ComputableDAGs.send)($DEVICE_MANAGER_SYM, Val{true}(), $(cpu2.id), $(Symbol(to_var_name(id1))), $id1)))
+        @test string(lower_to_expr(si2, cpu2)) ==
+            string(:($(ComputableDAGs.send)($DEVICE_MANAGER_SYM, Val{true}(), $(cpu1.id), $(Symbol(to_var_name(id2))), $id2)))
+
+        ri1 = RecvInstruction(cpu2, true, id1, Int)
+        ri2 = RecvInstruction(cpu1, true, id2, Float64)
+
+        @test string(lower_to_expr(ri1, cpu1)) ==
+            string(:($(Symbol(to_var_name(id1))) = $(ComputableDAGs.get)($DEVICE_MANAGER_SYM, Val{true}(), $(cpu2.id), $id1, $(Int))))
+        @test string(lower_to_expr(ri2, cpu2)) ==
+            string(:($(Symbol(to_var_name(id2))) = $(ComputableDAGs.get)($DEVICE_MANAGER_SYM, Val{true}(), $(cpu1.id), $id2, $(Float64))))
     end
 end

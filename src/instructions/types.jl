@@ -42,27 +42,35 @@ end
 """
     SendInstruction
 
-A send instruction that sends the value identified by the given `symbol` to
+A send instruction that sends the value identified by the given `id` to
 the given destination device. This is collaborative, so the destination device
 must have a corresponding [`RecvInstruction`](@ref).
 """
 struct SendInstruction <: AbstractInstruction
     dest::AbstractDevice
 
-    symbol::Symbol
+    on_machine::Bool
+
+    id::UUID
 end
 
 """
-    RecvInstruction
+    RecvInstruction{T}
 
-A receive instruction that receives the value identified by the given `symbol`
+A receive instruction that receives the value identified by the given `id`
 from the given device and stores it in that symbol. This is collaborative, so
 the origin device must have a corresponding [`SendInstruction`](@ref).
+
+`T` is the type of the expected value to receive.
 """
-struct RecvInstruction <: AbstractInstruction
+struct RecvInstruction{T} <: AbstractInstruction
     origin::AbstractDevice
 
-    symbol::Symbol
+    on_machine::Bool
+
+    id::UUID
+
+    type::Type{T}
 end
 
 """

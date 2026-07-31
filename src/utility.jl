@@ -12,7 +12,7 @@ const NULL_UUID = UUID(0)
 
 A fixed port used for initial exchange of each device's socket info.
 """
-MANAGEMENT_PORT = 15678
+const MANAGEMENT_PORT = 15678
 
 """
     INITIALIZED_MODULES
@@ -22,6 +22,13 @@ Vector of modules to keep track which have been initialized with RuntimeGenerate
 INITIALIZED_MODULES = Module[]
 
 const EXPR_SYM = Symbol("__expr_cache__")
+
+"""
+    DEVICE_MANAGER_SYM
+
+The device manager symbol used as the variable name within generated functions.
+"""
+const DEVICE_MANAGER_SYM = Symbol("__device_manager__")
 
 """
     isnull(id::UUID)

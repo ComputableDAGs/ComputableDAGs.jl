@@ -13,6 +13,7 @@ NULL_UUID
 __CURRENT_CDAG__
 __ASSEMBLE_CDAG_FLAG__
 MANAGEMENT_PORT
+DEVICE_MANAGER_SYM
 ```
 
 ## Globals
@@ -25,4 +26,5 @@ INITIALIZED_MODULES
 
 ```@docs
 isnull
+to_var_name
 ```
