@@ -1,11 +1,11 @@
 """
-    lower(tape::Tape)
+    lower(tape::Tape{<:CPU})
 
 Lowers the given [`Tape`](@ref) down to an `Expr` containing all calls in
 order, first the input assignments (which may be empty if this is not the
 starting device), then all of the schedule tasks.
 """
-function lower(tape::Tape{DEV_T}) where {DEV_T <: CPU}
+function lower(tape::Tape{CPU})
     return Expr(
         :block,
         lower_to_expr.(tape.input_assignment_code, Ref(tape.device))...,
@@ -17,10 +17,12 @@ function lower(tape::Tape{DEV_T}) where {DEV_T <: CPU}
 end
 
 """
-    tape_function(tape)
+    tape_function(tape::Tape, context_module::Module)
 
 Return an expression containing the complete function definition generated
-from the given [`Tape`](@ref).
+from the given [`Tape`](@ref). The context module should be set to
+`@__MODULE__` by the caller to ensure functions from their context module can
+be seen inside the generated function.
 """
 function tape_function(tape::Tape, context_module::Module)
     global INITIALIZED_MODULES

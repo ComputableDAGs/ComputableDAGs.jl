@@ -49,10 +49,10 @@ ComputableDAGs.init(@__MODULE__)
 ```
 
 !!! note
-    This can be skipped when there is a world age increase between the
-    [`compute_function`](@ref) call and the call to the generated function.
-    Generally, this is often the case in the REPL or in scripts, but not in a
-    module.
+    This can be skipped when there is a world age increase between generating
+    a function from a [`ComputableDAG`](@ref) and the call to the generated
+    function. Generally, this is often the case in the REPL or in scripts, but
+    not in a module.
 """
 function init(mod::Module)
     if !(mod in ComputableDAGs.INITIALIZED_MODULES)
