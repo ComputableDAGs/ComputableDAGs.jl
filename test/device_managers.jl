@@ -37,9 +37,9 @@ RNG = Xoshiro(69)
         @test haskey(dev3_man.ipc_sockets, id1)
         @test haskey(dev3_man.ipc_sockets, id2)
 
-        close_zmq_manager(dev1_man)
-        close_zmq_manager(dev2_man)
-        close_zmq_manager(dev3_man)
+        close_zmq_manager(dev1_man, id1)
+        close_zmq_manager(dev2_man, id2)
+        close_zmq_manager(dev3_man, id3)
 
         for (dev, sock) in dev1_man.ipc_sockets
             @test !isopen(sock)
@@ -94,8 +94,8 @@ end
             @test value3 == get(dev1_man, Val(true), id3, value_id3, typeof(value3))
         end
 
-        close_zmq_manager(dev1_man)
-        close_zmq_manager(dev2_man)
-        close_zmq_manager(dev3_man)
+        close_zmq_manager(dev1_man, id1)
+        close_zmq_manager(dev2_man, id2)
+        close_zmq_manager(dev3_man, id3)
     end
 end

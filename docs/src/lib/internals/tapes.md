@@ -16,7 +16,7 @@ Tape
 ## Functions
 
 ```@docs
-lower(::Tape{CPU})
+lower(::Tape{CPU}, devices_on_machine::AbstractVector{UUID})
 lower(::TapeRack)
 tape_function
 ```

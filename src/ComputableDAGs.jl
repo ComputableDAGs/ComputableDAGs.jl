@@ -44,6 +44,7 @@ include("instructions/code_gen.jl")
 
 include("device_managers/communication.jl")
 include("device_managers/create.jl")
+include("device_managers/code_gen.jl")
 
 include("tapes/code_gen.jl")
 include("tapes/create.jl")

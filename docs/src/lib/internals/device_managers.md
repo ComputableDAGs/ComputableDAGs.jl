@@ -21,4 +21,6 @@ create_zmq_manager
 close_zmq_manager
 send
 get
+device_manager_setup_code
+device_manager_destroy_code
 ```

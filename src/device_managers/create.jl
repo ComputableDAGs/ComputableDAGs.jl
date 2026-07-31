@@ -1,3 +1,7 @@
+function _socket_path_from_ids(id1::UUID, id2::UUID)
+    return "/tmp/cdags_" * string(id1) * "_" * string(id2) * ".socket"
+end
+
 function _bind_tcp_on_free_port(socket::Socket)
     port = MANAGEMENT_PORT + 1
     cont = true
@@ -49,18 +53,26 @@ function create_zmq_manager(this::UUID, devices_on_machine::AbstractVector{UUID}
     # Set up own IPC socket per on-machine device
     ipc_sockets = Dict{UUID, Socket}()
     for dev in devices_on_machine
+        @debug "connecting/binding $dev on $this"
+        if this == dev
+            continue
+        end
+
         ipc_sockets[dev] = Socket(ctx, PAIR)
 
         # smaller id creates the socket, bigger id connects
         if this < dev
-            bind(ipc_sockets[dev], "ipc:///tmp/cdags_" * string(this) * "_" * string(dev) * ".socket")
+            bind(ipc_sockets[dev], "ipc://" * _socket_path_from_ids(this, dev))
         else
             # TODO: make this a non-busy wait somehow
-            while !issocket("/tmp/cdags_" * string(dev) * "_" * string(this) * ".socket")
+            while !issocket(_socket_path_from_ids(dev, this))
+                # TODO: fix
+                # this sucks badly but yield is not enough when julia isn't executed with some number of threads
+                # I assume it's because it yields between thread 0 and 1 and never gets to threads 2+
+                sleep(0.001)
                 yield()
             end
-            @debug "$this connected to $dev"
-            connect(ipc_sockets[dev], "ipc:///tmp/cdags_" * string(dev) * "_" * string(this) * ".socket")
+            connect(ipc_sockets[dev], "ipc://" * _socket_path_from_ids(dev, this))
         end
     end
 
@@ -74,21 +86,31 @@ function create_zmq_manager(this::UUID, devices_on_machine::AbstractVector{UUID}
 end
 
 """
-    close_zmq_manager(manager::ZMQDeviceManager)
+    close_zmq_manager(manager::ZMQDeviceManager, this::UUID)
 
-Closes the own sockets of the given manager.
+Closes the own sockets of the given manager and deletes the temporary socket files.
 
 See also: [`create_zmq_manager`](@ref)
 """
-function close_zmq_manager(manager::ZMQDeviceManager)
+function close_zmq_manager(manager::ZMQDeviceManager, this::UUID)
+    @debug "closing ZMQ Device Manager with ID $this"
+
     # RAII would be cool :(
     for (dev, s) in manager.ipc_sockets
         close(s)
+        # only remove the ones this device created
+        if (this < dev)
+            try
+                sock_path = _socket_path_from_ids(this, dev)
+                rm(sock_path)
+            catch
+                @warn "failed to remove socket file"
+            end
+        end
     end
     for (dev, s) in manager.tcp_sockets
         close(s)
     end
 
-    @debug "Device Manager closed"
     return nothing
 end
