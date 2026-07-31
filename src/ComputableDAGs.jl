@@ -9,6 +9,9 @@ using UUIDs
 using ZMQ
 using Serialization
 
+using RuntimeGeneratedFunctions
+RuntimeGeneratedFunctions.init(@__MODULE__)
+
 export ComputableDAG, CDAG
 export @compute_task, @assemble_cdag
 
@@ -21,6 +24,7 @@ include("devices/types.jl")
 include("machines/types.jl")
 include("instructions/types.jl")
 include("device_managers/types.jl")
+include("tapes/types.jl")
 
 include("tasks/properties.jl")
 include("tasks/macros.jl")
@@ -40,5 +44,8 @@ include("instructions/code_gen.jl")
 
 include("device_managers/communication.jl")
 include("device_managers/create.jl")
+
+include("tapes/code_gen.jl")
+include("tapes/create.jl")
 
 end # module ComputableDAGs

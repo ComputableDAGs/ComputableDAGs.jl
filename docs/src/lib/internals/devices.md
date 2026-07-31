@@ -14,3 +14,9 @@ AbstractCPU
 AbstractGPU
 CPU
 ```
+
+## Functions
+
+```@docs
+is_entry
+```

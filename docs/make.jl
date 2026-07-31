@@ -17,6 +17,7 @@ pages = [
         "Devices" => "lib/internals/devices.md",
         "Machines" => "lib/internals/machines.md",
         "Device Managers" => "lib/internals/device_managers.md",
+        "Tapes" => "lib/internals/tapes.md",
         "Utility" => "lib/internals/utility.md",
     ],
     "Contribution" => "contribution.md",
@@ -24,7 +25,9 @@ pages = [
 
 makedocs(;
     modules = [ComputableDAGs],
-    checkdocs = :exports,
+    checkdocs = :all,
+    linkcheck = true,
+    warnonly = [:linkcheck],
     authors = "Anton Reinhard",
     repo = Documenter.Remotes.GitHub("ComputableDAGs", "ComputableDAGs.jl"),
     sitename = "ComputableDAGs.jl",

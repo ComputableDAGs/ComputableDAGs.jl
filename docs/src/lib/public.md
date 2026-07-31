@@ -34,6 +34,7 @@ ComputableDAG
 ## Functions
 ```@docs
 ComputableDAG()
+init(mod::Module)
 ```
 
 ## Macros

@@ -28,5 +28,15 @@ struct CPU <: AbstractCPU
 
     nthreads::Int
 
+    entry_dev::Bool
+
+    """
+        CPU(nthreads::Int, entry_dev::Bool)
+
+    Construct a CPU device with a random ID and the given properties.
+    """
+    function CPU(nthreads::Int, entry_dev::Bool)
+        return new(UUIDs.uuid1(), nthreads, entry_dev)
+    end
     # TODO: numa regions, architecture, etc?
 end

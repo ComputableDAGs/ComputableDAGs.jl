@@ -13,11 +13,11 @@ function access_expr(return_symbols::AbstractVector{Symbol})
 end
 
 """
-    lower_to_expr(function_call::FunctionCall{VAL_T}) where {VAL_T}
+    lower_to_expr(function_call::FunctionCall{VAL_T}, dev::CPU) where {VAL_T}
 
 Generate and return an expression from this function call.
 """
-function lower_to_expr(function_call::FunctionCall{VAL_T}) where {VAL_T}
+function lower_to_expr(function_call::FunctionCall{VAL_T}, ::CPU) where {VAL_T}
     fc_expr = Expr(
         :call,
         function_call.func,
@@ -31,11 +31,11 @@ function lower_to_expr(function_call::FunctionCall{VAL_T}) where {VAL_T}
 end
 
 """
-    lower_to_expr(assignment::ExprAssignment)
+    lower_to_expr(assignment::ExprAssignment, dev::CPU)
 
 Generate and return an expression from this expression assignment.
 """
-function lower_to_expr(assignment::ExprAssignment)
+function lower_to_expr(assignment::ExprAssignment, ::CPU)
     return Expr(
         :(=),
         assignment.return_symbol,

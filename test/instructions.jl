@@ -1,6 +1,6 @@
 using ComputableDAGs
 
-using ComputableDAGs: FunctionCall, ExprAssignment, access_expr, lower_to_expr
+using ComputableDAGs: FunctionCall, ExprAssignment, CPU, access_expr, lower_to_expr
 
 foo() = nothing
 bar(x) = x
@@ -8,12 +8,14 @@ bar(x) = x
 # use - as non-commutative operation to check order of arguments
 baz(x, y) = x + y, x - y
 
+CPU_T = CPU(1, true)
+
 @testset "Instructions" begin
     @testset "Function Calls" begin
         @testset "FC (nothing function, positive)" begin
             fc = FunctionCall(foo, (), Symbol[], [:x])
             @test access_expr(fc.return_symbols) == :x
-            expr = lower_to_expr(fc)
+            expr = lower_to_expr(fc, CPU_T)
             @test expr == Expr(:(=), :x, Expr(:call, foo))
             @test isnothing(eval(expr))
         end
@@ -21,7 +23,7 @@ baz(x, y) = x + y, x - y
         @testset "FC (nothing function, method error)" begin
             fc = FunctionCall(foo, (1,), Symbol[], [:x])
             @test access_expr(fc.return_symbols) == :x
-            expr = lower_to_expr(fc)
+            expr = lower_to_expr(fc, CPU_T)
             @test expr == Expr(:(=), :x, Expr(:call, foo, 1))
             @test_throws MethodError eval(expr)
         end
@@ -29,7 +31,7 @@ baz(x, y) = x + y, x - y
         @testset "FC (identity function, undef var error)" begin
             fc = FunctionCall(bar, (), [:y], [:x])
             @test access_expr(fc.return_symbols) == :x
-            expr = lower_to_expr(fc)
+            expr = lower_to_expr(fc, CPU_T)
             @test expr == Expr(:(=), :x, Expr(:call, bar, :y))
             @test_throws UndefVarError eval(expr)
         end
@@ -37,7 +39,7 @@ baz(x, y) = x + y, x - y
         @testset "FC (identity function, positive, value argument)" begin
             fc = FunctionCall(bar, (5,), Symbol[], [:x])
             @test access_expr(fc.return_symbols) == :x
-            expr = lower_to_expr(fc)
+            expr = lower_to_expr(fc, CPU_T)
             @test expr == Expr(:(=), :x, Expr(:call, bar, 5))
             eval(expr)
             @test x == 5
@@ -46,7 +48,7 @@ baz(x, y) = x + y, x - y
         @testset "FC (identity function, positive, parameter)" begin
             fc = FunctionCall(bar, (), [:y], [:x])
             @test access_expr(fc.return_symbols) == :x
-            expr = lower_to_expr(fc)
+            expr = lower_to_expr(fc, CPU_T)
             @test expr == Expr(:(=), :x, Expr(:call, bar, :y))
 
             # small workaround to not have to assign y globally
@@ -57,7 +59,7 @@ baz(x, y) = x + y, x - y
         @testset "FC (multi function, positive, parameters)" begin
             fc = FunctionCall(baz, (), [:y1, :y2], [:x1, :x2])
             @test access_expr(fc.return_symbols) == Expr(:tuple, :x1, :x2)
-            expr = lower_to_expr(fc)
+            expr = lower_to_expr(fc, CPU_T)
             @test expr == Expr(:(=), Expr(:tuple, :x1, :x2), Expr(:call, baz, :y1, :y2))
 
             eval(
@@ -74,7 +76,7 @@ baz(x, y) = x + y, x - y
         @testset "FC (multi function, positive, value parameters)" begin
             fc = FunctionCall(baz, (5, 6), Symbol[], [:x1, :x2])
             @test access_expr(fc.return_symbols) == Expr(:tuple, :x1, :x2)
-            expr = lower_to_expr(fc)
+            expr = lower_to_expr(fc, CPU_T)
             @test expr == Expr(:(=), Expr(:tuple, :x1, :x2), Expr(:call, baz, 5, 6))
 
             eval(expr)
@@ -84,7 +86,7 @@ baz(x, y) = x + y, x - y
         @testset "FC (multi function, positive, mixed parameters)" begin
             fc = FunctionCall(baz, (5,), [:y], [:x1, :x2])
             @test access_expr(fc.return_symbols) == Expr(:tuple, :x1, :x2)
-            expr = lower_to_expr(fc)
+            expr = lower_to_expr(fc, CPU_T)
             @test expr == Expr(:(=), Expr(:tuple, :x1, :x2), Expr(:call, baz, 5, :y))
 
             eval(
@@ -103,7 +105,7 @@ baz(x, y) = x + y, x - y
             # necessary to pack the symbol in a block
             # because a smybol is not an expression
             ea = ExprAssignment(Expr(:block, :y), :x)
-            expr = lower_to_expr(ea)
+            expr = lower_to_expr(ea, CPU_T)
             @test expr == Expr(:(=), :x, Expr(:block, :y))
 
             eval(
@@ -119,7 +121,7 @@ baz(x, y) = x + y, x - y
 
         @testset "EA (tuple extraction)" for v in 1:3
             ea = ExprAssignment(Expr(:call, getindex, :y, v), :x)
-            expr = lower_to_expr(ea)
+            expr = lower_to_expr(ea, CPU_T)
             @test expr == Expr(:(=), :x, Expr(:call, getindex, :y, v))
 
             eval(

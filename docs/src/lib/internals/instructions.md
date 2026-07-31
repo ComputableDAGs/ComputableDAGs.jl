@@ -22,4 +22,5 @@ Accumulation
 ```@docs
 access_expr
 lower_to_expr
+unroll_symbol_vector
 ```

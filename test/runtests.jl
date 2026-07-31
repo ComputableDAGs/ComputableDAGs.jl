@@ -29,6 +29,10 @@ if cpu_tests
     @safetestset "Device Managers" begin
         include("device_managers.jl")
     end
+
+    @safetestset "Tapes" begin
+        include("tapes.jl")
+    end
 else
     @info "Skipping CPU tests"
 end
