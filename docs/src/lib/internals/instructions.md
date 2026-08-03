@@ -6,10 +6,14 @@ CurrentModule = ComputableDAGs
 
 This section is about the representation of instructions in the project.
 
+![AbstractInstructions type tree](instructions.png)
+
 ## Types
 
 ```@docs
 AbstractInstruction
+AbstractComputeInstruction
+AbstractCommunicationInstruction
 FunctionCall
 ExprAssignment
 SendInstruction
