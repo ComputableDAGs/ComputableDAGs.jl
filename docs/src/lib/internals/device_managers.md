@@ -17,8 +17,8 @@ ZMQDeviceManager
 ## Functions
 
 ```@docs
-create_zmq_manager
-close_zmq_manager
+create_device_manager
+close_device_manager
 send
 get
 device_manager_setup_code

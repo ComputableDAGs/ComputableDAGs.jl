@@ -30,6 +30,10 @@ if cpu_tests
         include("device_managers.jl")
     end
 
+    @safetestset "Machines" begin
+        include("machines.jl")
+    end
+
     @safetestset "Tapes" begin
         include("tapes.jl")
     end

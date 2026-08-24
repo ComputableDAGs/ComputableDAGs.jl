@@ -1,24 +1,23 @@
 """
-    device_manager_setup_code(device_id::UUID, devices_on_machine::AbstractVector{UUID})
+    device_manager_setup_code(device_id::UUID, cluster::Cluster)
 
-Generate and return the code required to create a device manager for the tape,
-connecting to the other devices of the IDs given.
+Generate and return the code required to create a device manager for the given
+device for the tape, connecting to the other devices of the [`Cluster`](@ref).
 
 See also: [`AbstractDeviceManager`](@ref), [`DEVICE_MANAGER_SYM`](@ref)
 """
-function device_manager_setup_code(device_id::UUID, devices_on_machine::AbstractVector{UUID})
-    # TODO: once tcp stuff works, pass this through
-    devices_off_machine = UUID[]
-
+function device_manager_setup_code(
+        device_id::UUID,
+        cluster::Cluster
+    )
     return Expr(
         :(=),
         DEVICE_MANAGER_SYM,
         Expr(
             :call,
-            ComputableDAGs.create_zmq_manager,
+            ComputableDAGs.create_device_manager,
+            cluster,
             device_id,
-            devices_on_machine,
-            devices_off_machine,
         )
     )
 end
@@ -34,7 +33,7 @@ See also: [`AbstractDeviceManager`](@ref), [`DEVICE_MANAGER_SYM`](@ref)
 function device_manager_destroy_code(device_id::UUID)
     return Expr(
         :call,
-        ComputableDAGs.close_zmq_manager,
+        ComputableDAGs.close_device_manager,
         DEVICE_MANAGER_SYM,
         device_id
     )

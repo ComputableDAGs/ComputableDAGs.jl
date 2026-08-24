@@ -1,14 +1,21 @@
 using ComputableDAGs
 using UUIDs
+using Random
 
 using ComputableDAGs: Tape, TapeRack, lower, tape_function, to_var_name
-using ComputableDAGs: AbstractInstruction, ExprAssignment, FunctionCall, SendInstruction, RecvInstruction, CPU
+using ComputableDAGs: AbstractInstruction, ExprAssignment, FunctionCall,
+    SendInstruction, RecvInstruction, CPU, Cluster, Machine, ZMQDeviceManager
 
 ComputableDAGs.init(@__MODULE__)
+
+RNG = Random.Xoshiro(654)
 
 square(x) = x * x
 foo(x, y) = y - x
 bar(x, y, z) = (x * y, x * z)
+
+TEST_CPU = CPU(1, true)
+TEST_CLUSTER = Cluster{ZMQDeviceManager}([Machine([TEST_CPU])])
 
 TESTING_TAPE = Tape(
     [ExprAssignment(Expr(:call, getindex, :input, 1), :x)],
@@ -19,21 +26,21 @@ TESTING_TAPE = Tape(
         FunctionCall(foo, (), [:t_3, :t_4], [:output]),        # output = foo(t_3, t_4)
     ],
     :output,
-    CPU(1, true)
+    TEST_CPU
 )
 
 @testset "Construction and Execution" begin
-    func = tape_function(TESTING_TAPE, UUID[], @__MODULE__)
+    func = tape_function(TESTING_TAPE, TEST_CLUSTER, @__MODULE__)
     @test -6 == func(5)
 end
 
-@noinline function function_barrier(tape, input)
-    func = tape_function(TESTING_TAPE, UUID[], @__MODULE__)
+@noinline function function_barrier(tape, cluster, input)
+    func = tape_function(tape, cluster, @__MODULE__)
     return func(input)
 end
 
 @testset "Test World Age Problems" begin
-    @test -14 == function_barrier(TESTING_TAPE, 1)
+    @test -14 == function_barrier(TESTING_TAPE, TEST_CLUSTER, 1)
 end
 
 function f1(x)
@@ -52,6 +59,9 @@ end
     cpu0 = CPU(1, false)
     cpu1 = CPU(1, false)
     cpu2 = CPU(1, true)
+
+    machine = Machine([cpu0, cpu1, cpu2])
+    cluster = Cluster{ZMQDeviceManager}([machine])
 
     data_ids = Dict{Int, UUID}()
     data_syms = Dict{Int, Symbol}()
@@ -111,9 +121,9 @@ end
         cpu2
     )
 
-    tape0_func = tape_function(tape0, [cpu0.id, cpu1.id, cpu2.id], @__MODULE__)
-    tape1_func = tape_function(tape1, [cpu0.id, cpu1.id, cpu2.id], @__MODULE__)
-    tape2_func = tape_function(tape2, [cpu0.id, cpu1.id, cpu2.id], @__MODULE__)
+    tape0_func = tape_function(tape0, cluster, @__MODULE__)
+    tape1_func = tape_function(tape1, cluster, @__MODULE__)
+    tape2_func = tape_function(tape2, cluster, @__MODULE__)
 
     t0_task = Threads.@spawn tape0_func()
     t1_task = Threads.@spawn tape1_func()

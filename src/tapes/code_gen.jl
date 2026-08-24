@@ -1,17 +1,16 @@
 """
-    lower(tape::Tape{<:CPU}, devices_on_machine::AbstractVector{UUID})
+    lower(tape::Tape{<:CPU}, cluster::Cluster)
 
 Lowers the given [`Tape`](@ref) down to an `Expr` containing all calls in
 order, first the input assignments (which may be empty if this is not the
 starting device), then all of the schedule tasks.
 
-The device IDs of all devices are required to set up the device managers
-correctly.
+The cluster is required to set up the device managers correctly.
 """
-function lower(tape::Tape{CPU}, devices_on_machine::AbstractVector{UUID})
+function lower(tape::Tape{CPU}, cluster::Cluster)
     return Expr(
         :block,
-        device_manager_setup_code(tape.device.id, devices_on_machine),
+        device_manager_setup_code(tape.device.id, cluster),
         lower_to_expr.(tape.input_assignment_code, Ref(tape.device))...,
         Expr(:noinline, true),
         lower_to_expr.(tape.schedule, Ref(tape.device))...,
@@ -25,7 +24,7 @@ end
 """
     tape_function(
         tape::Tape,
-        devices_on_machine::AbstractVector{UUID},
+        cluster::Cluster,
         context_module::Module
     )
 
@@ -34,10 +33,9 @@ generated from the given [`Tape`](@ref). The context module should be set to
 `@__MODULE__` by the caller to ensure functions from their context module can
 be seen inside the generated function.
 
-The device IDs of all devices are required to set up the device managers
-correctly.
+The [`Cluster`](@ref) is required to set up the device managers correctly.
 """
-function tape_function(tape::Tape, devices_on_machine::AbstractVector{UUID}, context_module::Module)
+function tape_function(tape::Tape, cluster::Cluster, context_module::Module)
     global INITIALIZED_MODULES
     if !(context_module in INITIALIZED_MODULES)
         RuntimeGeneratedFunctions.init(context_module)
@@ -50,7 +48,7 @@ function tape_function(tape::Tape, devices_on_machine::AbstractVector{UUID}, con
         Expr(:call, Symbol("compute_$(tape.device.id)"))
     end
 
-    function_body = lower(tape, devices_on_machine)
+    function_body = lower(tape, cluster)
 
     expr = Expr(
         :function,
@@ -62,12 +60,12 @@ function tape_function(tape::Tape, devices_on_machine::AbstractVector{UUID}, con
 end
 
 """
-    lower(tape_rack::TapeRack)
+    lower(tape_rack::TapeRack, cluster::Cluster, context_module::Module)
 
 Lowers the entire given [`TapeRack`](@ref).
 """
-function lower(tape_rack::TapeRack)
-    functions = tape_function.(tape_rack.tapes)
+function lower(tape_rack::TapeRack, cluster::Cluster, context_module::Module)
+    functions = tape_function.(tape_rack.tapes, Ref(cluster), Ref(context_module))
 
     # TODO fix
     return functions
